@@ -4,7 +4,7 @@ import com.johnymuffin.jvillage.beta.JVillage;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
-public class JVilageAdminCMD extends JVillageCommand {
+public class JVilageAdminCMD extends JVBaseCommand {
 
 
     public JVilageAdminCMD(JVillage plugin) {

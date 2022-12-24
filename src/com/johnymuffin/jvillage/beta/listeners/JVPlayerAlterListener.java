@@ -11,7 +11,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 
-import static com.johnymuffin.jvillage.beta.Utility.isAuthorized;
+import static com.johnymuffin.jvillage.beta.JVUtility.isAuthorized;
 
 public class JVPlayerAlterListener implements Listener {
     private JVillage plugin;

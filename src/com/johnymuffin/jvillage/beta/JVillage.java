@@ -3,11 +3,17 @@ package com.johnymuffin.jvillage.beta;
 import com.johnymuffin.beta.fundamentals.Fundamentals;
 import com.johnymuffin.beta.fundamentals.player.FundamentalsPlayer;
 import com.johnymuffin.jvillage.beta.commands.JVilageAdminCMD;
+import com.johnymuffin.jvillage.beta.commands.JVillageCMD;
 import com.johnymuffin.jvillage.beta.config.JVillageLanguage;
+import com.johnymuffin.jvillage.beta.interfaces.ClaimManager;
 import com.johnymuffin.jvillage.beta.listeners.JVMobListener;
 import com.johnymuffin.jvillage.beta.listeners.JVPlayerAlterListener;
 import com.johnymuffin.jvillage.beta.listeners.JVPlayerMoveListener;
+import com.johnymuffin.jvillage.beta.maps.JPlayerMap;
+import com.johnymuffin.jvillage.beta.maps.JVillageMap;
 import com.johnymuffin.jvillage.beta.models.*;
+import com.johnymuffin.jvillage.beta.models.chunk.VChunk;
+import com.johnymuffin.jvillage.beta.models.chunk.VClaim;
 import com.johnymuffin.jvillage.beta.world.WorldClaimManager;
 import com.palmergames.bukkit.towny.Towny;
 import com.palmergames.bukkit.towny.object.Resident;
@@ -92,6 +98,7 @@ public class JVillage extends JavaPlugin implements ClaimManager {
 
         //Register commands
         this.getCommand("villageadmin").setExecutor(new JVilageAdminCMD(this));
+        this.getCommand("village").setExecutor(new JVillageCMD(this));
 
         //Register events
         JVPlayerMoveListener playerMoveListener = new JVPlayerMoveListener(this);

@@ -1,4 +1,4 @@
-package com.johnymuffin.jvillage.beta.models;
+package com.johnymuffin.jvillage.beta.models.chunk;
 
 import org.bukkit.Location;
 

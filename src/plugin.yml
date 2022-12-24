@@ -9,7 +9,12 @@ softdepend:
 
 commands:
   villageadmin:
-    description: a home command
+    description: Village admin commands
     usage: /<command>
     aliases:
       - va
+  village:
+    description: Village player commands
+    usage: /<command>
+    aliases:
+      - v

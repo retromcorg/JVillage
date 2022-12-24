@@ -1,4 +1,6 @@
-package com.johnymuffin.jvillage.beta.models;
+package com.johnymuffin.jvillage.beta.models.chunk;
+
+import com.johnymuffin.jvillage.beta.models.Village;
 
 import java.util.UUID;
 

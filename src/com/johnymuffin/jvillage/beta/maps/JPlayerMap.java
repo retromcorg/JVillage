@@ -1,6 +1,7 @@
-package com.johnymuffin.jvillage.beta;
+package com.johnymuffin.jvillage.beta.maps;
 
 import com.johnymuffin.beta.fundamentals.Fundamentals;
+import com.johnymuffin.jvillage.beta.JVillage;
 import com.johnymuffin.jvillage.beta.models.Village;
 import com.johnymuffin.jvillage.beta.player.VPlayer;
 

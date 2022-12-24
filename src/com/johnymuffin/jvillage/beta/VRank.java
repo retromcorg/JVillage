@@ -1,7 +1,7 @@
-package com.johnymuffin.jvillage.beta;
-
-public enum VRank {
-    RESIDENT,
-    ASSISTANT,
-    OWNER,
-}
+//package com.johnymuffin.jvillage.beta;
+//
+//public enum VRank {
+//    MEMBER,
+//    ASSISTANT,
+//    OWNER,
+//}

@@ -1,14 +1,27 @@
 package com.johnymuffin.jvillage.beta.models;
 
+import java.util.UUID;
+
 public class VClaim extends VChunk {
-    private Village village;
+    //    private Village village;
+    private UUID village;
 
     public VClaim(Village village, String worldName, int x, int z) {
+        super(worldName, x, z);
+        this.village = village.getTownUUID();
+    }
+
+    public VClaim(UUID village, VChunk vChunk) {
+        super(vChunk.getWorldName(), vChunk.getX(), vChunk.getZ());
+        this.village = village;
+    }
+
+    public VClaim(UUID village, String worldName, int x, int z) {
         super(worldName, x, z);
         this.village = village;
     }
 
-    public Village getVillage() {
+    public UUID getVillage() {
         return village;
     }
 

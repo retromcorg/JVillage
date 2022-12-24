@@ -1,0 +1,41 @@
+
+Commands:
+Village [V]
+
+-----[Member Commands] -----
+/village [V] - Shows information on your selected village or a village with that name
+/village select [V] - Selects a village to perform actions on
+
+/village join [name] - Joins a village
+/village leave - Leaves your village
+
+/vilage autoswitch [on/off] - Toggles auto switching to villages you are a member of when entering them
+
+-----[Assistant Commands] -----
+/village invite [name] - Invites a player to your village
+
+/village claim - Claims the chunk you are standing in [Costs $5 per claim]
+/village unclaim - Unclaims the chunk you are standing in [Refunds $2.5 per claim]
+
+-----[Owner Commands] -----
+
+/village create [name] - Creates a village [Costs $1000]
+/village delete [name] - Deletes a village
+
+/village setowner [name] - Sets the new owner of a village
+/village promote [name] - Promotes a player to assistant
+/village demote [name] - Demotes a player from assistant to member
+
+/village unclaimall - Unclaims all chunks in your village asides from the town spawn chunk
+/village unclaimworld - Unclaims all chunks in the world the player is in (Minus spawn chunk)
+
+/village setspawn - Sets the spawn of your village
+
+/village permission [permission] [on/off] - Toggles a permission on or off
+    - strangermodify - Allows strangers to build in your village [Default:False]
+    - memberinvite - Allows members to invite players to your village [Default:False]
+    - mobspawning - Allows mobs to spawn in your village [Default:True]
+
+
+
+

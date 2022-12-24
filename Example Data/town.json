@@ -1,0 +1,25 @@
+{
+
+    "createdOn": 234654,
+    "createdBy": "2cfc6452-a6b4-4c49-982e-492eaa3a14ec",
+    "leaders": "2cfc6452-a6b4-4c49-982e-492eaa3a14ec",
+    "assistants": [],
+    "members": [],
+
+    "townSpawn": {
+        "world": "RetroMC",
+        "x": 193.14,
+        "y": 90,
+        "z": 4
+    },
+
+    "claims" : {
+        "RetroMC": [[1, 0], [19, 20]]
+    }
+
+
+    ""
+
+
+
+}

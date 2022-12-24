@@ -1,5 +1,8 @@
 package com.johnymuffin.jvillage.beta.models;
 
+import com.johnymuffin.jvillage.beta.interfaces.ClaimManager;
+import com.johnymuffin.jvillage.beta.models.chunk.VChunk;
+import com.johnymuffin.jvillage.beta.models.chunk.VClaim;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.json.simple.JSONArray;
@@ -199,10 +202,6 @@ public class Village implements ClaimManager {
         return members.toArray(new UUID[members.size()]);
     }
 
-    public void removeMember(UUID uuid) {
-        modified = true; // Indicate that the village has been modified and needs to be saved
-        members.remove(uuid);
-    }
 
     public void addMember(UUID uuid) {
         modified = true; // Indicate that the village has been modified and needs to be saved
@@ -216,11 +215,17 @@ public class Village implements ClaimManager {
     public void removeAssistant(UUID uuid) {
         modified = true; // Indicate that the village has been modified and needs to be saved
         assistants.remove(uuid);
+
+        //Remove from members if they are in there
+        members.remove(uuid);
     }
 
     public void addAssistant(UUID uuid) {
         modified = true; // Indicate that the village has been modified and needs to be saved
         assistants.add(uuid);
+
+        //Remove from members if they are in there
+        members.remove(uuid);
     }
 
     public UUID getOwner() {
@@ -257,6 +262,45 @@ public class Village implements ClaimManager {
             return true;
         }
 
+        return false;
+    }
+
+    public boolean isAssistant(UUID uuid) {
+        if (assistants.contains(uuid)) {
+            return true;
+        }
+
+        if (owner.equals(uuid)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean isOwner(UUID uuid) {
+        if (owner.equals(uuid)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean removeMember(UUID uuid) {
+        return members.remove(uuid);
+    }
+
+    public boolean removePlayerFromVillage(UUID uuid) {
+        if (isOwner(uuid)) {
+            throw new IllegalArgumentException("Cannot remove owner from village");
+        }
+        if (isAssistant(uuid)) {
+            removeAssistant(uuid);
+            return true;
+        }
+        if (isMember(uuid)) {
+            removeMember(uuid);
+            return true;
+        }
         return false;
     }
 
@@ -304,5 +348,13 @@ public class Village implements ClaimManager {
 
     public void setMembersCanInvite(boolean membersCanInvite) {
         this.membersCanInvite = membersCanInvite;
+    }
+
+    public int getTotalClaims() {
+        int total = 0;
+        for (String world : claims.keySet()) {
+            total += claims.get(world).size();
+        }
+        return total;
     }
 }

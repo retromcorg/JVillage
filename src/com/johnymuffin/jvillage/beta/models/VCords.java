@@ -50,6 +50,11 @@ public class VCords {
     }
 
     @Override
+    public String toString() {
+        return x + "," + y + "," + z + " - " + worldName;
+    }
+
+    @Override
     public int hashCode() {
         return Objects.hash(x, y, z, worldName);
     }

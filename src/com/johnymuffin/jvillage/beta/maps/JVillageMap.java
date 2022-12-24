@@ -1,5 +1,6 @@
-package com.johnymuffin.jvillage.beta;
+package com.johnymuffin.jvillage.beta.maps;
 
+import com.johnymuffin.jvillage.beta.JVillage;
 import com.johnymuffin.jvillage.beta.models.Village;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -72,6 +73,16 @@ public class JVillageMap {
         }
 
         return knownVillages.contains(villageUUID);
+    }
+
+    public Village getVillage(String name) {
+        for (UUID villageUUID : knownVillages) {
+            Village village = getVillage(villageUUID);
+            if (village.getTownName().equalsIgnoreCase(name)) {
+                return village;
+            }
+        }
+        return null;
     }
 
     public Village getVillage(UUID villageUUID) {

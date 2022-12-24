@@ -12,7 +12,8 @@ public class JVillageLanguage extends Configuration {
         super(file);
         map = new HashMap<String, String>();
         loadDefaults();
-        loadFile();
+        //TODO: Implement a proper development mode
+//        loadFile();
     }
 
     private void loadDefaults() {
@@ -26,9 +27,14 @@ public class JVillageLanguage extends Configuration {
         map.put("generic_invalid_world", "&cSorry, a world with that name couldn't be located");
         map.put("generic_action_completed", "&bYour action has been completed");
         map.put("generic_not_implemented", "&cSorry, that feature is not yet implemented");
-
+        map.put("village_not_found", "&4Sorry, a village with that name couldn't be located");
+        map.put("no_village_selected", "&4Sorry, you don't have a village selected");
+        map.put("not_in_village", "&4Sorry, you are not in that village");
+        map.put("village_owner_leave", "&4Sorry, the owner of a village can't leave it");
         map.put("movement_village_enter", "&bYou have entered the village of &9%village%");
         map.put("movement_wilderness_enter", "&bYou have entered the wilderness");
+
+        map.put("movement_autoselect_enter", "&bYour selected village has been set to &9%village% &bbecause you have entered it");
 
         map.put("build_denied", "&4Sorry, you don't have permission to build in &9%village%");
         map.put("destroy_denied", "&4Sorry, you don't have permission to destroy in &9%village%");
@@ -42,6 +48,64 @@ public class JVillageLanguage extends Configuration {
         map.put("command_villageadmin_plugin_import_towny_start", "&bImporting Towny data. The server might freeze while this is happening.");
         map.put("command_villageadmin_plugin_import_towny_success", "&bImporting Towny data completed successfully. The debug is available in the console.");
         map.put("command_villageadmin_plugin_import_towny_fail", "&bImporting Towny data failed. The debug is available in the console.");
+
+        //JVillage player command
+
+        //JVillage player help commands
+        map.put("command_village_use", "&9--- &bJVillage Menu&9---" +
+                "\n&7Village In: %villagein%" +
+                "\n&7Village Selected: %village%" +
+                "\n&7Village Info: /v info [village]" +
+                "\n&7Village Help: /v help");
+
+        map.put("command_village_help_use", "&bPlease use &9/village help [player|assistant|owner|flags]");
+
+        map.put("command_village_player_help", "&cJVillage Player Commands" +
+                "\n&8- &7/village info [village] &8- &7Show Village Info" +
+                "\n&8- &7/village help [&fplayer&7|assistant|owner]&8- &7Shows selected help page" +
+                "\n&8- &7/village select [village] &8- &7Select a village to modify" +
+                "\n&8- &7/village join [village] &8- &7Joins a village" +
+                "\n&8- &7/village leave [village]&8- &7Leaves a village" +
+                "\n&8- &7/village autoswitch [on/off] &8- &7Autoswitch town");
+
+        map.put("command_village_assistant_help", "&cJVillage Assistant Commands" +
+                "\n&8- &7/village invite [name] &8- &7Invite a player to your selected town" +
+                "\n&8- &7/village kick [name] &8- &7Kick a player from your selected town" +
+                "\n&8- &7/village claim &8- &7Claim the chunk you are standing in" +
+                "\n&8- &7/village unclaim &8- &7Unclaim the chunk you are standing in");
+
+        map.put("command_village_owner_help", "&cJVillage Owner Commands" +
+                "\n&8- &7/village create [name] &8- &7Create a new village" +
+                "\n&8- &7/village setowner [name] &8- &7Promote to owner" +
+                "\n&8- &7/village setassistant [name] &8- &7Set player to assistant" +
+                "\n&8- &7/village setspawn &8- &7Set the spawn point for your village");
+
+        map.put("command_village_info_use", "&6Information for %village%" +
+                "\n&7Owner: %owner%" +
+                "\n&7Assistants: %assistants%" +
+                "\n&7Members: %members%" +
+                "\n&7Claims: %claims%" +
+                "\n&7Spawn: %spawn%");
+
+        map.put("command_village_select_use", "&bYour selected village is &9%village%");
+        map.put("command_village_select_none", "&cYou have no selected village");
+        map.put("command_village_select_village", "&bYou have selected the village &9%village%");
+
+        map.put("command_village_autoswitch_on", "&bYou have enabled auto switching");
+        map.put("command_village_autoswitch_off", "&bYou have disabled auto switching");
+        map.put("command_village_autoswitch_use", "&cSorry, that is invalid. Try /village autoswitch [on|off]");
+        map.put("command_village_autoswitch_set", "&bYour auto switching has been set to &9%state%");
+
+        map.put("command_village_leave_success", "&bYou have left the village &9%village%");
+        map.put("command_village_leave_use", "&cSorry, that is invalid. Try /village leave [village]");
+
+        map.put("command_village_invite_use", "&cSorry, that is invalid. Try /village invite [name]" +
+                "\nThe player will be invited to your currently selected village");
+        map.put("command_village_invite_already", "&cSorry, that player is already a member of %village%");
+        map.put("command_village_invite_denied", "&cSorry, you don't have permission to invite players to %village%");
+        map.put("command_village_invite_received", "&bYou have been invited to join &9%village%" +
+                "\n&7Type &9/village join %village% &7to join the village");
+        map.put("command_village_invite_sent", "&bYou have invited &9%player% &bto join &9%village%");
 
         //JPerms command
         map.put("jperms_main_general_use", "&cSorry, that is invalid. Try /jperms (user/group/plugin)");

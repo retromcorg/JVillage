@@ -3,6 +3,7 @@ package com.johnymuffin.jvillage.beta.listeners;
 import com.johnymuffin.jvillage.beta.JVillage;
 import com.johnymuffin.jvillage.beta.events.PlayerSwitchTownEvent;
 import com.johnymuffin.jvillage.beta.models.Village;
+import com.johnymuffin.jvillage.beta.player.VPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -57,13 +58,36 @@ public class JVPlayerMoveListener extends CustomEventListener implements Listene
     }
 
     public void onPlayerSwitchTownEvent(final PlayerSwitchTownEvent event) {
+        //Autoswitch to the new village
+        boolean switchMessageSent = false;
         if (event.getNewVillage() != null) {
-            String message = plugin.getLanguage().getMessage("movement_village_enter");
-            message = message.replace("%village%", event.getNewVillage().getTownName());
-            event.getPlayer().sendMessage(message);
-        } else {
-            String message = plugin.getLanguage().getMessage("movement_wilderness_enter");
-            event.getPlayer().sendMessage(message);
+            VPlayer vPlayer = plugin.getPlayerMap().getPlayer(event.getPlayer().getUniqueId());
+            //If player has auto switch enabled
+            if (vPlayer.autoSwitchSelected()) {
+                //If player is member of the town they have entered
+                if (event.getNewVillage().isMember(event.getPlayer().getUniqueId())) {
+                    //If player doesn't already have the town selected
+                    if (vPlayer.getSelectedVillage() == null || !vPlayer.getSelectedVillage().equals(event.getNewVillage())) {
+                        //Select new village
+                        vPlayer.setSelectedVillage(event.getNewVillage());
+                        String message = plugin.getLanguage().getMessage("movement_autoselect_enter");
+                        message = message.replace("%village%", event.getNewVillage().getTownName());
+                        event.getPlayer().sendMessage(message);
+                        switchMessageSent = true;
+                    }
+                }
+            }
+        }
+        //Send cross border message if they didn't get the auto switch message
+        if (!switchMessageSent) {
+            if (event.getNewVillage() != null) {
+                String message = plugin.getLanguage().getMessage("movement_village_enter");
+                message = message.replace("%village%", event.getNewVillage().getTownName());
+                event.getPlayer().sendMessage(message);
+            } else {
+                String message = plugin.getLanguage().getMessage("movement_wilderness_enter");
+                event.getPlayer().sendMessage(message);
+            }
         }
     }
 

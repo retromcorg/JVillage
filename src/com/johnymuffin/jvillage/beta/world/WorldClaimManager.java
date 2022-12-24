@@ -1,14 +1,12 @@
 package com.johnymuffin.jvillage.beta.world;
 
 import com.johnymuffin.jvillage.beta.JVillage;
-import com.johnymuffin.jvillage.beta.models.ClaimManager;
-import com.johnymuffin.jvillage.beta.models.VChunk;
-import com.johnymuffin.jvillage.beta.models.VClaim;
+import com.johnymuffin.jvillage.beta.interfaces.ClaimManager;
+import com.johnymuffin.jvillage.beta.models.chunk.VChunk;
+import com.johnymuffin.jvillage.beta.models.chunk.VClaim;
 import com.johnymuffin.jvillage.beta.models.Village;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.UUID;
 
 public class WorldClaimManager implements ClaimManager {
     private ArrayList<VClaim> claims = new ArrayList<>();

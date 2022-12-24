@@ -25,7 +25,7 @@ public class VPlayer {
 
     private Village selectedVillage = null;
 
-    private ArrayList<Village> invitedTo = new ArrayList<>();
+//    private ArrayList<Village> invitedTo = new ArrayList<>();
 
     public VPlayer(JVillage plugin, UUID uuid) {
         this.uuid = uuid;
@@ -60,16 +60,20 @@ public class VPlayer {
         return false;
     }
 
+    public boolean removeVillageMembership(Village village) {
+        return memberships.remove(village);
+    }
+
     public void inviteToVillage(Village village) {
-        invitedTo.add(village);
+        village.isInvited(uuid);
     }
 
     public boolean isInvitedToVillage(Village village) {
-        return invitedTo.contains(village);
+        return village.isInvited(uuid);
     }
 
     public void removeInvitationToVillage(Village village) {
-        invitedTo.remove(village);
+        village.uninvitePlayer(uuid);
     }
 
     public boolean autoSwitchSelected() {
@@ -95,6 +99,10 @@ public class VPlayer {
             Bukkit.getPluginManager().callEvent(event);
             this.currentlyLocatedIn = newlyLocatedIn;
         }
+    }
+
+    public void setCurrentlyLocatedIn(Village newlyLocatedIn) {
+        this.currentlyLocatedIn = newlyLocatedIn;
     }
 
     public boolean isLocatedInVillage() {
@@ -146,5 +154,9 @@ public class VPlayer {
 
     public void setSelectedVillage(Village selectedVillage) {
         this.selectedVillage = selectedVillage;
+    }
+
+    public void joinVillage(Village village) {
+        village.addMember(uuid);
     }
 }

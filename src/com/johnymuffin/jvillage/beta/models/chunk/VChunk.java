@@ -16,21 +16,20 @@ public class VChunk {
     }
 
     public VChunk(Location location) {
-        this(location.getWorld().getName(), location.getBlockX() >> 4, location.getBlockZ() >> 4);
+        this(location.getWorld().getName(), location.getBlock().getChunk().getX(), location.getBlock().getChunk().getZ());
     }
-
 
     @Override
     public boolean equals(Object obj) {
         if (obj == this) return true;
         if (!(obj instanceof VChunk)) return false;
         VChunk chunk = (VChunk) obj;
-        return this.x == chunk.x && this.z == chunk.z && this.worldName.equals(chunk.worldName);
+        return this.x == chunk.x && this.z == chunk.z && this.worldName.equalsIgnoreCase(chunk.worldName);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(x, z, worldName);
+        return Objects.hash(x, z, worldName.toLowerCase());
     }
 
     public String getWorldName() {

@@ -67,6 +67,17 @@ public class JVillageMap {
         villageMap.remove(villageUUID);
     }
 
+    public void deleteVillageFromExistence(UUID villageUUID) {
+        villageMap.remove(villageUUID);
+        knownVillages.remove(villageUUID);
+
+        File villageDataFile = new File(plugin.getDataFolder(), "villages" + File.separator + villageUUID + ".json");
+        plugin.logger(Level.INFO, "Removing village data file for " + villageUUID + " from disk as it has been deleted.");
+        if (villageDataFile.exists()) {
+            villageDataFile.delete();
+        }
+    }
+
     public boolean isVillageKnown(UUID villageUUID) {
         if (villageUUID == null) {
             return false;

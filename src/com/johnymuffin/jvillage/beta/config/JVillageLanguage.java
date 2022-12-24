@@ -107,6 +107,22 @@ public class JVillageLanguage extends Configuration {
                 "\n&7Type &9/village join %village% &7to join the village");
         map.put("command_village_invite_sent", "&bYou have invited &9%player% &bto join &9%village%");
 
+        map.put("command_village_join_use", "&cSorry, that is invalid. Try /village join [village]");
+        map.put("command_village_join_success", "&bYou have joined the village &9%village%");
+        map.put("command_village_join_denied", "&cSorry, you haven't received an invite to join %village%");
+
+        map.put("command_village_delete_use", "&cSorry, that is invalid. Try /village delete [village]");
+        map.put("command_village_delete_not_owner", "&cSorry, you are not the owner so you can't delete %village%");
+        map.put("command_village_delete_success", "&bYou have deleted the village &9%village%");
+
+        map.put("command_village_delete_broadcast", "&bThe village &9%village% &bhas failed to maintain pace with the world and has fallen into ruin");
+
+        map.put("command_village_create_use", "&cSorry, that is invalid. Try /village create [name]");
+        map.put("command_village_create_invalid_name", "&cSorry, that is an invalid name. Please only use letters and numbers and less then 16 characters");
+        map.put("command_village_create_already_exists", "&cSorry, that village name already exists");
+        map.put("command_village_create_already_claimed", "&cSorry, that chunk is already claimed");
+        map.put("command_village_create_success", "&bYou have created the village &9%village%");
+
         //JPerms command
         map.put("jperms_main_general_use", "&cSorry, that is invalid. Try /jperms (user/group/plugin)");
         map.put("jperms_user_general_use", "&cSorry, that is invalid. Try /jperms user (username/uuid) (group/perm)");

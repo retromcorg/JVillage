@@ -1,7 +1,10 @@
 package com.johnymuffin.jvillage.beta.commands;
 
 import com.johnymuffin.jvillage.beta.JVillage;
+import com.johnymuffin.jvillage.beta.models.VCords;
 import com.johnymuffin.jvillage.beta.models.Village;
+import com.johnymuffin.jvillage.beta.models.chunk.VChunk;
+import com.johnymuffin.jvillage.beta.models.chunk.VClaim;
 import com.johnymuffin.jvillage.beta.player.VPlayer;
 import com.projectposeidon.api.PoseidonUUID;
 import org.bukkit.Bukkit;
@@ -9,6 +12,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import java.util.UUID;
 
 public class JVillageCMD extends JVBaseCommand {
 
@@ -37,6 +42,12 @@ public class JVillageCMD extends JVBaseCommand {
                 return leaveCommand(commandSender, removeFirstEntry(strings));
             if (subcommand.equalsIgnoreCase("invite"))
                 return inviteCommand(commandSender, removeFirstEntry(strings));
+            if (subcommand.equalsIgnoreCase("join"))
+                return joinCommand(commandSender, removeFirstEntry(strings));
+            if (subcommand.equalsIgnoreCase("delete"))
+                return deleteCommand(commandSender, removeFirstEntry(strings));
+            if (subcommand.equalsIgnoreCase("create"))
+                return createCommand(commandSender, removeFirstEntry(strings));
         }
 
         String villageIn = ChatColor.RED + "None";
@@ -61,6 +72,162 @@ public class JVillageCMD extends JVBaseCommand {
         menu = menu.replace("%village%", selectedVillage);
         menu = menu.replace("%villagein%", villageIn);
         sendWithNewline(commandSender, menu);
+        return true;
+    }
+
+    private boolean createCommand(CommandSender commandSender, String[] strings) {
+        if (!isAuthorized(commandSender, "jvillage.player.create")) {
+            commandSender.sendMessage(language.getMessage("no_permission"));
+            return true;
+        }
+
+        if (!(commandSender instanceof Player)) {
+            commandSender.sendMessage(language.getMessage("unavailable_to_console"));
+            return true;
+        }
+
+        Player player = (Player) commandSender;
+        VPlayer vPlayer = plugin.getPlayerMap().getPlayer(player.getUniqueId());
+
+        if (strings.length == 0) {
+            commandSender.sendMessage(language.getMessage("command_village_create_use"));
+            return true;
+        }
+
+        String villageName = strings[0];
+
+        //If string doesn't only contain numbers and letters
+        if (!villageName.matches("[a-zA-Z0-9]+")) {
+            commandSender.sendMessage(language.getMessage("command_village_create_invalid_name"));
+            return true;
+        }
+
+        //If string is too long
+        if (villageName.length() > 16) {
+            commandSender.sendMessage(language.getMessage("command_village_create_invalid_name"));
+            return true;
+        }
+
+        Village village = plugin.getVillageMap().getVillage(villageName);
+        if (village != null) {
+            commandSender.sendMessage(language.getMessage("command_village_create_already_exists"));
+            return true;
+        }
+
+        VChunk vChunk = new VChunk(player.getLocation().getWorld().getName(), player.getLocation().getBlock().getChunk().getX(), player.getLocation().getBlock().getChunk().getZ());
+
+        if (plugin.isClaimed(vChunk)) {
+            commandSender.sendMessage(language.getMessage("command_village_create_already_claimed"));
+            return true;
+        }
+
+
+        Village newVillage = new Village(villageName, UUID.randomUUID(), player.getUniqueId(), vChunk, new VCords(player.getLocation()));
+        plugin.getVillageMap().addVillageToMap(newVillage);
+
+        //Manually register the villages first chunk
+        for (VChunk claims : newVillage.getClaims()) {
+            System.out.println("[JVillage] Registering chunk at " + claims.getX() + "," + claims.getZ() + " in world " + claims.getWorldName() + " to village " + newVillage.getTownName());
+            plugin.addClaim(newVillage, claims);
+        }
+        plugin.loadAllChunks(newVillage);
+
+        vPlayer.setSelectedVillage(newVillage);
+        String message = language.getMessage("command_village_create_success");
+        message = message.replace("%village%", villageName);
+        commandSender.sendMessage(message);
+        return true;
+    }
+
+    private boolean deleteCommand(CommandSender commandSender, String[] strings) {
+        if (!isAuthorized(commandSender, "jvillage.player.delete")) {
+            commandSender.sendMessage(language.getMessage("no_permission"));
+            return true;
+        }
+
+        if (!(commandSender instanceof Player)) {
+            commandSender.sendMessage(language.getMessage("unavailable_to_console"));
+            return true;
+        }
+
+        Player player = (Player) commandSender;
+        VPlayer vPlayer = plugin.getPlayerMap().getPlayer(player.getUniqueId());
+
+        if (strings.length == 0) {
+            commandSender.sendMessage(language.getMessage("command_village_delete_use"));
+            return true;
+        }
+
+        String townName = strings[0];
+        Village village = plugin.getVillageMap().getVillage(townName);
+
+        // Check if town with requested name exists
+        if (village == null) {
+            commandSender.sendMessage(language.getMessage("village_not_found"));
+            return true;
+        }
+
+        // Check if player is the owner of the town
+        if (!village.getOwner().equals(vPlayer.getUUID())) {
+            String message = language.getMessage("command_village_delete_not_owner");
+            message = message.replace("%village%", village.getTownName());
+            commandSender.sendMessage(message);
+            return true;
+        }
+
+        // Delete the town
+        plugin.deleteVillage(village);
+
+        //Server broadcast
+        String publicMessage = language.getMessage("command_village_delete_broadcast");
+        publicMessage = publicMessage.replace("%village%", village.getTownName());
+        Bukkit.broadcastMessage(publicMessage);
+
+
+        String message = language.getMessage("command_village_delete_success");
+        message = message.replace("%village%", village.getTownName());
+        commandSender.sendMessage(message);
+        return true;
+
+    }
+
+    private boolean joinCommand(CommandSender commandSender, String[] strings) {
+        if (!isAuthorized(commandSender, "jvillage.player.join")) {
+            commandSender.sendMessage(language.getMessage("no_permission"));
+            return true;
+        }
+
+        if (!(commandSender instanceof Player)) {
+            commandSender.sendMessage(language.getMessage("unavailable_to_console"));
+            return true;
+        }
+
+        Player player = (Player) commandSender;
+        VPlayer vPlayer = plugin.getPlayerMap().getPlayer(player.getUniqueId());
+
+        if (strings.length == 0) {
+            commandSender.sendMessage(language.getMessage("command_village_join_use"));
+            return true;
+        }
+
+        String villageName = strings[0];
+        Village village = plugin.getVillageMap().getVillage(villageName);
+        if (village == null) {
+            commandSender.sendMessage(language.getMessage("village_not_found"));
+            return true;
+        }
+
+        if (vPlayer.isInvitedToVillage(village)) {
+            vPlayer.joinVillage(village);
+            String message = language.getMessage("command_village_join_success");
+            message = message.replace("%village%", village.getTownName());
+            commandSender.sendMessage(message);
+            return true;
+        }
+
+        String message = language.getMessage("command_village_join_denied");
+        message = message.replace("%village%", village.getTownName());
+        commandSender.sendMessage(message);
         return true;
     }
 

@@ -11,10 +11,7 @@ import org.bukkit.event.CustomEventListener;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerChangedWorldEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerRespawnEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.player.*;
 
 public class JVPlayerMoveListener extends CustomEventListener implements Listener {
     private JVillage plugin;
@@ -44,6 +41,11 @@ public class JVPlayerMoveListener extends CustomEventListener implements Listene
     @EventHandler(ignoreCancelled = true, priority = Event.Priority.Highest)
     public void onPlayerRespawnEvent(final PlayerRespawnEvent event) {
         updatePlayerLocation(event.getPlayer(), event.getRespawnLocation());
+    }
+
+    @EventHandler(ignoreCancelled = true, priority = Event.Priority.Highest)
+    public void onPlayerJoinEvent(final PlayerJoinEvent event) {
+        updatePlayerLocation(event.getPlayer(), event.getPlayer().getLocation());
     }
 
     //TODO: This might not be needed, decide if it is or not

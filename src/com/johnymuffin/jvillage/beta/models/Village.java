@@ -29,13 +29,14 @@ public class Village implements ClaimManager {
     //    private boolean anyoneCanJoin = false;
     private boolean membersCanInvite = false;
 
+    private ArrayList<UUID> invited = new ArrayList<UUID>();
+
     public Village(String townName, UUID townUUID, UUID owner, VChunk vChunk, VCords townSpawn) {
         this.townName = townName;
         this.townUUID = townUUID;
         this.owner = owner;
-        addClaim(this, vChunk);
+        System.out.println("[JVillage Debug] Claiming initial chunk: " + addClaim(this, vChunk));
         this.townSpawn = townSpawn;
-
         modified = true;
     }
 
@@ -110,17 +111,30 @@ public class Village implements ClaimManager {
         return object;
     }
 
+    public void invitePlayer(UUID uuid) {
+        this.invited.add(uuid);
+    }
+
+    public void uninvitePlayer(UUID uuid) {
+        this.invited.remove(uuid);
+    }
+
+    public boolean isInvited(UUID uuid) {
+        return this.invited.contains(uuid);
+    }
+
 
     public boolean addClaim(VChunk vChunk) {
         modified = true; // Indicate that the village has been modified and needs to be saved
+
         //Create world array if it doesn't exist
         if (!claims.containsKey(vChunk.getWorldName())) {
             claims.put(vChunk.getWorldName(), new ArrayList<VClaim>());
         }
-        //Check if chunk is already claimed
-        if (claims.get(vChunk.getWorldName()).contains(new VClaim(this, vChunk))) {
-            return false;
-        }
+//        //Check if chunk is already claimed
+//        if (claims.get(vChunk.getWorldName()).contains(new VClaim(this, vChunk))) {
+//            return false;
+//        }
         //Add chunk to claims
         claims.get(vChunk.getWorldName()).add(new VClaim(this, vChunk));
         return true;
@@ -302,6 +316,14 @@ public class Village implements ClaimManager {
             return true;
         }
         return false;
+    }
+
+    public ArrayList<VChunk> getClaims() {
+        ArrayList<VChunk> vChunks = new ArrayList<>();
+        for(String world : claims.keySet()){
+            vChunks.addAll(claims.get(world));
+        }
+        return vChunks;
     }
 
     public ArrayList<VClaim> getClaims(String world) {

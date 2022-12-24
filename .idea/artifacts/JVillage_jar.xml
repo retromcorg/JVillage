@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="jar" build-on-make="true" name="JVillage:jar">
-    <output-path>D:/220723 - RetroMC - Merge/plugins/update</output-path>
-    <root id="archive" name="JVillage.jar">
-      <element id="module-output" name="JVillage" />
-    </root>
-  </artifact>
-</component>

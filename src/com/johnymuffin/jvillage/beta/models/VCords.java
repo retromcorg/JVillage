@@ -1,6 +1,7 @@
 package com.johnymuffin.jvillage.beta.models;
 
 import org.bukkit.Location;
+import org.json.simple.JSONObject;
 
 import java.util.Objects;
 
@@ -20,6 +21,23 @@ public class VCords {
 
     public VCords(Location location) {
         this(location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getWorld().getName());
+    }
+
+    //Create from JSON
+    public VCords(JSONObject jsonObject) {
+        this.x = Long.valueOf(String.valueOf(jsonObject.get("x"))).intValue();
+        this.y = Long.valueOf(String.valueOf(jsonObject.get("y"))).intValue();
+        this.z = Long.valueOf(String.valueOf(jsonObject.get("z"))).intValue();
+        this.worldName = (String) jsonObject.get("world");
+    }
+
+    public JSONObject getJsonObject() {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("x", x);
+        jsonObject.put("y", y);
+        jsonObject.put("z", z);
+        jsonObject.put("world", worldName);
+        return jsonObject;
     }
 
 

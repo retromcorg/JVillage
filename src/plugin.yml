@@ -18,3 +18,124 @@ commands:
     usage: /<command>
     aliases:
       - v
+
+permissions:
+  jvillage.admin:
+    description: Allows access to all JVillage admin commands
+    default: op
+    children:
+      jvillage.admin.spawn: true
+      jvillage.admin.bypass: true
+      jvillage.admin.plugin: true
+      jvillage.admin.plugin.reload: true
+      jvillage.admin.plugin.import: true
+      jvillage.admin.plugin.import.towny: true
+
+  jvillage.admin.spawn:
+    description: Allows access to JVillage admin spawn commands
+    default: op
+
+  jvilage.admin.bypass:
+    description: Allows access to JVillage admin bypass commands
+    default: op
+
+  jvillage.admin.plugin:
+    description: Allows access to JVillage admin plugin commands
+    default: op
+
+  jvillage.admin.plugin.reload:
+    description: Allows access to JVillage admin plugin reload commands
+    default: op
+
+  jvillage.admin.plugin.import:
+    description: Allows access to JVillage admin plugin import commands
+    default: op
+
+  jvillage.admin.plugin.import.towny:
+    description: Allows access to JVillage admin plugin import towny commands
+    default: op
+
+  jvillage.player:
+    description: Allows access to all JVillage player commands
+    default: true
+    children:
+      jvillage.player.demote: true
+      jvillage.player.promote: true
+      jvillage.player.setowner: true
+      jvillage.player.spawn: true
+      jvillage.player.kick: true
+      jvillage.player.unclaim: true
+      jvillage.player.claim: true
+      jvillage.player.create: true
+      jvillage.player.delete: true
+      jvillage.player.join: true
+      jvillage.player.invite: true
+      jvillage.player.leave: true
+      jvillage.player.help: true
+      jvillage.player.autoswitch: true
+      jvillage.player.select: true
+      jvillage.player.info: true
+
+  jvillage.player.demote:
+    description: Allows access to JVillage player demote command
+    default: true
+
+  jvillage.player.promote:
+    description: Allows access to JVillage player promote command
+    default: true
+
+  jvillage.player.setowner:
+    description: Allows access to JVillage player setowner command
+    default: true
+
+  jvillage.player.spawn:
+    description: Allows access to JVillage player spawn command
+    default: true
+
+  jvillage.player.kick:
+    description: Allows access to JVillage player kick command
+    default: true
+
+  jvillage.player.unclaim:
+    description: Allows access to JVillage player unclaim command
+    default: true
+
+  jvillage.player.claim:
+    description: Allows access to JVillage player claim command
+    default: true
+
+  jvillage.player.create:
+    description: Allows access to JVillage player create command
+    default: true
+
+  jvillage.player.delete:
+    description: Allows access to JVillage player delete command
+    default: true
+
+  jvillage.player.join:
+    description: Allows access to JVillage player join command
+    default: true
+
+  jvillage.player.invite:
+    description: Allows access to JVillage player invite command
+    default: true
+
+  jvillage.player.leave:
+    description: Allows access to JVillage player leave command
+    default: true
+
+  jvillage.player.help:
+    description: Allows access to JVillage player help command
+    default: true
+
+  jvillage.player.autoswitch:
+    description: Allows access to JVillage player autoswitch command
+    default: true
+
+  jvillage.player.select:
+    description: Allows access to JVillage player select command
+    default: true
+
+  jvillage.player.info:
+    description: Allows access to JVillage player info command
+    default: true

@@ -1,5 +1,6 @@
 package com.johnymuffin.jvillage.beta.models;
 
+import com.johnymuffin.jvillage.beta.JVillage;
 import com.johnymuffin.jvillage.beta.interfaces.ClaimManager;
 import com.johnymuffin.jvillage.beta.models.chunk.VChunk;
 import com.johnymuffin.jvillage.beta.models.chunk.VClaim;
@@ -13,12 +14,13 @@ import java.util.HashMap;
 import java.util.UUID;
 
 public class Village implements ClaimManager {
+    private JVillage plugin;
     private String townName;
     private UUID townUUID;
     private ArrayList<UUID> members = new ArrayList<UUID>();
     private ArrayList<UUID> assistants = new ArrayList<UUID>();
     private UUID owner;
-    private HashMap<String, ArrayList<VClaim>> claims = new HashMap<>(); //TODO: Use world UUID instead of world name
+    //    private HashMap<String, ArrayList<VClaim>> claims = new HashMap<>(); //TODO: Use world UUID instead of world name
     private VCords townSpawn;
 
     private boolean modified = false;
@@ -31,17 +33,19 @@ public class Village implements ClaimManager {
 
     private ArrayList<UUID> invited = new ArrayList<UUID>();
 
-    public Village(String townName, UUID townUUID, UUID owner, VChunk vChunk, VCords townSpawn) {
+    public Village(JVillage plugin, String townName, UUID townUUID, UUID owner, VChunk vChunk, VCords townSpawn) {
+        this.plugin = plugin;
         this.townName = townName;
         this.townUUID = townUUID;
         this.owner = owner;
-        System.out.println("[JVillage Debug] Claiming initial chunk: " + addClaim(this, vChunk));
+        System.out.println("[JVillage Debug] Claiming initial chunk: " + addClaim(new VClaim(this, vChunk)));
         this.townSpawn = townSpawn;
         modified = true;
     }
 
     //Create village from JSON
-    public Village(UUID uuid, JSONObject object) {
+    public Village(JVillage plugin, UUID uuid, JSONObject object) {
+        this.plugin = plugin;
         this.townName = String.valueOf(object.get("name"));
         this.townUUID = uuid; // Ignore UUID in JSON file and use the one from the file name
         this.owner = UUID.fromString(String.valueOf(object.get("owner")));
@@ -73,8 +77,9 @@ public class Village implements ClaimManager {
                 JSONArray claimCords = (JSONArray) worldClaim;
                 int x = Integer.parseInt(String.valueOf(claimCords.get(0)));
                 int z = Integer.parseInt(String.valueOf(claimCords.get(1)));
-                VChunk vChunk = new VChunk(worldName, x, z);
-                addClaim(this, vChunk);
+//                VChunk vChunk = new VChunk(worldName, x, z);
+                VClaim vClaim = new VClaim(this.getTownUUID(), worldName, x, z);
+                addClaim(vClaim);
             }
         }
 
@@ -94,19 +99,31 @@ public class Village implements ClaimManager {
             assistants.add(assistant.toString());
         }
         object.put("assistants", assistants);
-        JSONArray claims = new JSONArray();
-        for (String worldName : this.claims.keySet()) {
+        JSONArray claimsJsonArray = new JSONArray();
+//        for (String worldName : this.claims.keySet()) {
+//            JSONArray worldClaims = new JSONArray();
+//            worldClaims.add(worldName);
+//            for (VChunk vChunk : this.claims.get(worldName)) {
+//                JSONArray claimCords = new JSONArray();
+//                claimCords.add(vChunk.getX());
+//                claimCords.add(vChunk.getZ());
+//                worldClaims.add(claimCords);
+//            }
+//            claimsJsonArray.add(worldClaims);
+//        }
+        for(String worldName : this.getWorldsWithClaims()) {
             JSONArray worldClaims = new JSONArray();
             worldClaims.add(worldName);
-            for (VChunk vChunk : this.claims.get(worldName)) {
+            for(VClaim vClaim : this.getClaimsInWorld(worldName)) {
                 JSONArray claimCords = new JSONArray();
-                claimCords.add(vChunk.getX());
-                claimCords.add(vChunk.getZ());
+                claimCords.add(vClaim.getX());
+                claimCords.add(vClaim.getZ());
                 worldClaims.add(claimCords);
             }
-            claims.add(worldClaims);
+            claimsJsonArray.add(worldClaims);
         }
-        object.put("claims", claims);
+
+        object.put("claims", claimsJsonArray);
         object.put("townSpawn", this.townSpawn.getJsonObject());
         return object;
     }
@@ -124,37 +141,37 @@ public class Village implements ClaimManager {
     }
 
 
-    public boolean addClaim(VChunk vChunk) {
+    public boolean addClaim(VClaim vChunk) {
         modified = true; // Indicate that the village has been modified and needs to be saved
 
+
+        return plugin.getVillageClaimsArray(this).add(vChunk);
+
         //Create world array if it doesn't exist
-        if (!claims.containsKey(vChunk.getWorldName())) {
-            claims.put(vChunk.getWorldName(), new ArrayList<VClaim>());
-        }
+//        if (!claims.containsKey(vChunk.getWorldName())) {
+//            claims.put(vChunk.getWorldName(), new ArrayList<VClaim>());
+//        }
 //        //Check if chunk is already claimed
 //        if (claims.get(vChunk.getWorldName()).contains(new VClaim(this, vChunk))) {
 //            return false;
 //        }
         //Add chunk to claims
-        claims.get(vChunk.getWorldName()).add(new VClaim(this, vChunk));
-        return true;
+//        claims.get(vChunk.getWorldName()).add(new VClaim(this, vChunk));
+//        return true;
     }
 
-    public boolean addClaim(Village village, VChunk vChunk) {
-        return village.addClaim(vChunk);
-    }
-
-    public boolean removeClaim(VChunk vChunk) {
+    public boolean removeClaim(VClaim vChunk) {
         modified = true; // Indicate that the village has been modified and needs to be saved
-        if (!claims.containsValue(vChunk)) {
-            return false;
-        }
-        claims.remove(vChunk);
-        return true;
+        return plugin.getVillageClaimsArray(this).remove(vChunk);
+//        if (!claims.containsValue(vChunk)) {
+//            return false;
+//        }
+//        claims.remove(vChunk);
+//        return true;
     }
 
     public boolean isClaimed(VChunk vChunk) {
-        return claims.containsValue(vChunk);
+        return plugin.getVillageClaimsArray(this).contains(vChunk);
     }
 
 
@@ -318,26 +335,27 @@ public class Village implements ClaimManager {
         return false;
     }
 
-    public ArrayList<VChunk> getClaims() {
-        ArrayList<VChunk> vChunks = new ArrayList<>();
-        for(String world : claims.keySet()){
-            vChunks.addAll(claims.get(world));
-        }
-        return vChunks;
+    public ArrayList<VClaim> getClaims() {
+//        ArrayList<VClaim> vChunks = new ArrayList<>();
+//        for (String world : claims.keySet()) {
+//            vChunks.addAll(claims.get(world));
+//        }
+//        return vChunks;
+        return plugin.getVillageClaimsArray(this);
     }
 
-    public ArrayList<VClaim> getClaims(String world) {
-        if (claims.containsKey(world)) {
-            return claims.get(world);
-        }
-        ArrayList<VClaim> empty = new ArrayList<VClaim>();
-        claims.put(world, empty);
-        return empty;
-    }
+//    public ArrayList<VClaim> getClaims(String world) {
+//        if (claims.containsKey(world)) {
+//            return claims.get(world);
+//        }
+//        ArrayList<VClaim> empty = new ArrayList<VClaim>();
+//        claims.put(world, empty);
+//        return empty;
+//    }
 
-    public String[] getClaimedWorlds() {
-        return claims.keySet().toArray(new String[claims.keySet().size()]);
-    }
+//    public String[] getClaimedWorlds() {
+//        return claims.keySet().toArray(new String[claims.keySet().size()]);
+//    }
 
     public boolean isModified() {
         return modified;
@@ -373,10 +391,26 @@ public class Village implements ClaimManager {
     }
 
     public int getTotalClaims() {
-        int total = 0;
-        for (String world : claims.keySet()) {
-            total += claims.get(world).size();
+        return getClaims().size();
+    }
+
+    public String[] getWorldsWithClaims() {
+        ArrayList<String> worlds = new ArrayList<>();
+        for (VClaim vClaim : getClaims()) {
+            if (!worlds.contains(vClaim.getWorldName())) {
+                worlds.add(vClaim.getWorldName());
+            }
         }
-        return total;
+        return worlds.toArray(new String[worlds.size()]);
+    }
+
+    private VClaim[] getClaimsInWorld(String world) {
+        ArrayList<VClaim> vClaims = new ArrayList<>();
+        for (VClaim vClaim : getClaims()) {
+            if (vClaim.getWorldName().equalsIgnoreCase(world)) {
+                vClaims.add(vClaim);
+            }
+        }
+        return vClaims.toArray(new VClaim[vClaims.size()]);
     }
 }

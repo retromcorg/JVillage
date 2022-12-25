@@ -122,15 +122,15 @@ public class JVillageCMD extends JVBaseCommand {
         }
 
 
-        Village newVillage = new Village(villageName, UUID.randomUUID(), player.getUniqueId(), vChunk, new VCords(player.getLocation()));
+        Village newVillage = new Village(plugin, villageName, UUID.randomUUID(), player.getUniqueId(), vChunk, new VCords(player.getLocation()));
         plugin.getVillageMap().addVillageToMap(newVillage);
 
         //Manually register the villages first chunk
-        for (VChunk claims : newVillage.getClaims()) {
-            System.out.println("[JVillage] Registering chunk at " + claims.getX() + "," + claims.getZ() + " in world " + claims.getWorldName() + " to village " + newVillage.getTownName());
-            plugin.addClaim(newVillage, claims);
-        }
-        plugin.loadAllChunks(newVillage);
+//        for (VClaim claim : newVillage.getClaims()) {
+//            System.out.println("[JVillage] Registering chunk at " + claim.getX() + "," + claim.getZ() + " in world " + claim.getWorldName() + " to village " + newVillage.getTownName());
+//            plugin.addClaim(claim);
+//        }
+//        plugin.loadAllChunks(newVillage);
 
         vPlayer.setSelectedVillage(newVillage);
         String message = language.getMessage("command_village_create_success");

@@ -44,7 +44,8 @@ public class JVillage extends JavaPlugin implements ClaimManager {
     private PluginDescriptionFile pdf;
     //    private HashMap<VillageEntry, Village> villages = new HashMap<>(); //Main list for all villages
 //    private HashMap<String, WorldClaimManager> claims = new HashMap<>();
-    private ArrayList<VClaim> claims = new ArrayList<>();
+//    private ArrayList<VClaim> claims = new ArrayList<>();
+    private HashMap<Village, ArrayList<VClaim>> claims = new HashMap<>();
 
     private JVillageLanguage language;
 
@@ -79,15 +80,8 @@ public class JVillage extends JavaPlugin implements ClaimManager {
         for (UUID villageUUID : villageMap.getKnownVillages()) {
             Village village = villageMap.getVillage(villageUUID);
             villagesLoaded++;
-            int claims = loadAllChunks(village);
+            int claims = village.getTotalClaims();
             claimsLoaded += claims;
-
-//            for (String world : village.getClaimedWorlds()) {
-//                for (VClaim vClaim : village.getClaims(world)) {
-//                    addClaim(village, vClaim);
-//                    claimsLoaded++;
-//                }
-//            }
         }
 
         logger(Level.INFO, "Loaded " + villagesLoaded + " villages and " + claimsLoaded + " claims.");
@@ -129,16 +123,16 @@ public class JVillage extends JavaPlugin implements ClaimManager {
         }, 20 * 60 * 5, 20 * 60 * 5);
     }
 
-    public int loadAllChunks(Village village) {
-        int claimsLoaded = 0;
-        for (String world : village.getClaimedWorlds()) {
-            for (VClaim vClaim : village.getClaims(world)) {
-                addClaim(village, vClaim);
-                claimsLoaded++;
-            }
-        }
-        return claimsLoaded;
-    }
+//    public int loadAllChunks(Village village) {
+//        int claimsLoaded = 0;
+//        for (String world : village.getWorldsWithClaims()) {
+//            for (VClaim vClaim : village.getClaims(world)) {
+//                addClaim(vClaim);
+//                claimsLoaded++;
+//            }
+//        }
+//        return claimsLoaded;
+//    }
 
     public Fundamentals getFundamentals() {
         return (Fundamentals) Bukkit.getPluginManager().getPlugin("Fundamentals");
@@ -156,12 +150,20 @@ public class JVillage extends JavaPlugin implements ClaimManager {
     public Village getVillageAtLocation(Location location) {
         VChunk vChunk = new VChunk(location);
 
-        for (VClaim vClaim : claims) {
+        for (VClaim vClaim : getAllClaims()) {
             if (vClaim.equals(vChunk)) {
                 return getVillageMap().getVillage(vClaim.getVillage());
             }
         }
         return null;
+    }
+
+    public ArrayList<VClaim> getAllClaims() {
+        ArrayList<VClaim> allClaims = new ArrayList<>();
+        for (ArrayList<VClaim> vClaims : claims.values()) {
+            allClaims.addAll(vClaims);
+        }
+        return allClaims;
     }
 
     @Override
@@ -213,16 +215,9 @@ public class JVillage extends JavaPlugin implements ClaimManager {
         }
 
         //Remove all claims from main plugin cache
-//        for (String world : this.claims.keySet()) {
-//            WorldClaimManager worldClaimManager = getWorldClaimManager(world, false);
-//            worldClaimManager.removeClaimsByVillage(village);
-//        }
-        Iterator<VClaim> claimIterator = claims.iterator();
-        while (claimIterator.hasNext()) {
-            VClaim vClaim = claimIterator.next();
-            if (vClaim.getVillage().equals(village)) {
-                claimIterator.remove();
-            }
+        if (this.claims.remove(village) == null) {
+            logger(Level.WARNING, "Failed to remove village from claims cache.");
+            throw new RuntimeException("Failed to remove village from claims cache.");
         }
 
         //Remove village from vPlayers currently online
@@ -384,12 +379,13 @@ public class JVillage extends JavaPlugin implements ClaimManager {
 
 
             //Create JVillage Town
-            Village village = new Village(newTownName, townUUID, townOwnerUUID, spawnChunk, townSpawn);
+            Village village = new Village(plugin, newTownName, townUUID, townOwnerUUID, spawnChunk, townSpawn);
             townsImported++;
             this.villageMap.addVillageToMap(village);
             //Register claims
             for (VChunk vClaim : townClaims) {
-                village.addClaim(vClaim);
+                village.addClaim(new VClaim(village, vClaim));
+//                village.addClaim(vClaim);
             }
             //Register assistants
             for (UUID assistantUUID : assistants) {
@@ -462,8 +458,16 @@ public class JVillage extends JavaPlugin implements ClaimManager {
             uuid = UUID.randomUUID();
         }
 
-        return new Village(townName, uuid, owner, vChunk, townSpawn);
+        return new Village(plugin, townName, uuid, owner, vChunk, townSpawn);
 
+    }
+
+    public ArrayList<VClaim> getVillageClaimsArray(Village village) {
+        if(!this.claims.containsKey(village)) {
+           this.claims.put(village, new ArrayList<>());
+        }
+
+        return this.claims.get(village);
     }
 
     public boolean villageNameAvailable(String villageName) {
@@ -485,24 +489,27 @@ public class JVillage extends JavaPlugin implements ClaimManager {
     }
 
 
-    public boolean addClaim(Village village, VChunk vChunk) {
+    public boolean addClaim(VClaim vChunk) {
 //        WorldClaimManager worldClaimManager = getWorldClaimManager(vChunk.getWorldName(), false);
 //        return worldClaimManager.addClaim(village, vChunk);
-        if(vChunk instanceof VClaim) {
-            return claims.add((VClaim) vChunk);
-        }
-        return claims.add(new VClaim(village, vChunk));
+        Village village = getVillageMap().getVillage(vChunk.getVillage());
+        return this.claims.get(village).add(vChunk);
     }
 
-    public boolean removeClaim(VChunk vChunk) {
-        return claims.remove(vChunk);
-//        WorldClaimManager worldClaimManager = getWorldClaimManager(vChunk.getWorldName(), false);
-//        return worldClaimManager.removeClaim(vChunk);
+    public boolean removeClaim(VClaim vChunk) {
+        Village village = getVillageMap().getVillage(vChunk.getVillage());
+
+        ArrayList<VClaim> villageClaims = this.claims.get(village);
+        return villageClaims.remove(vChunk);
     }
 
     public boolean isClaimed(VChunk vChunk) {
-//        WorldClaimManager worldClaimManager = getWorldClaimManager(vChunk.getWorldName(), false);
-//        return worldClaimManager.isClaimed(vChunk);
-        return claims.contains(vChunk);
+        ArrayList<VClaim> villageClaims = getAllClaims();
+        for (VClaim vClaim : villageClaims) {
+            if (vClaim.equals(vChunk)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

@@ -132,6 +132,8 @@ public class JVillageMap {
             throw new IllegalArgumentException("Village already exists in map.");
         }
         villageMap.put(village.getTownUUID(), village);
+        knownVillages.add(village.getTownUUID());
+        saveVillage(village);
     }
 
     private Village loadVillage(UUID villageUUID) throws IOException, ParseException {
@@ -142,7 +144,7 @@ public class JVillageMap {
         }
         JSONParser parser = new JSONParser();
         JSONObject villageData = (JSONObject) parser.parse(new FileReader(file));
-        return new Village(villageUUID, villageData);
+        return new Village(plugin, villageUUID, villageData);
     }
 
     private void saveVillage(Village village) {

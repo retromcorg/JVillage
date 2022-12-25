@@ -47,6 +47,33 @@ public class VPlayer {
 
     }
 
+
+    /**
+     * @return The number of villages the player is a member of, but not the owner of.
+     */
+    public int getVillageMembershipCount() {
+        int membershipCount = 0;
+        for (Village village : memberships) {
+            if (!village.isOwner(uuid)) {
+                membershipCount++;
+            }
+        }
+        return membershipCount;
+    }
+
+    /**
+     * @return The number of villages the player is the owner of.
+     */
+    public int getVillageOwnershipCount() {
+        int ownershipCount = 0;
+        for (Village village : memberships) {
+            if (village.isOwner(uuid)) {
+                ownershipCount++;
+            }
+        }
+        return ownershipCount;
+    }
+
     public boolean isPlayerInVillage(Village village) {
         return isPlayerInVillage(village.getTownUUID());
     }
@@ -65,7 +92,7 @@ public class VPlayer {
     }
 
     public void inviteToVillage(Village village) {
-        village.isInvited(uuid);
+        village.invitePlayer(uuid);
     }
 
     public boolean isInvitedToVillage(Village village) {

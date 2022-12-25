@@ -5,6 +5,7 @@ import com.johnymuffin.beta.fundamentals.player.FundamentalsPlayer;
 import com.johnymuffin.jvillage.beta.commands.JVilageAdminCMD;
 import com.johnymuffin.jvillage.beta.commands.JVillageCMD;
 import com.johnymuffin.jvillage.beta.config.JVillageLanguage;
+import com.johnymuffin.jvillage.beta.config.JVillageSettings;
 import com.johnymuffin.jvillage.beta.interfaces.ClaimManager;
 import com.johnymuffin.jvillage.beta.listeners.JVMobListener;
 import com.johnymuffin.jvillage.beta.listeners.JVPlayerAlterListener;
@@ -48,6 +49,7 @@ public class JVillage extends JavaPlugin implements ClaimManager {
     private HashMap<Village, ArrayList<VClaim>> claims = new HashMap<>();
 
     private JVillageLanguage language;
+    private JVillageSettings settings;
 
     private boolean errored = false;
 
@@ -64,6 +66,7 @@ public class JVillage extends JavaPlugin implements ClaimManager {
 
         //Config files
         language = new JVillageLanguage(new File(this.getDataFolder(), "language.yml"));
+        settings = new JVillageSettings(new File(this.getDataFolder(), "settings.yml"));
 
         //Generate WorldCLaimManagers
 //        for (World world : Bukkit.getWorlds()) {
@@ -448,6 +451,10 @@ public class JVillage extends JavaPlugin implements ClaimManager {
 //    }
 
 
+    public JVillageSettings getSettings() {
+        return settings;
+    }
+
     public Village generateNewVillage(String townName, UUID owner, VChunk vChunk, VCords townSpawn) {
         if (!villageNameAvailable(townName)) {
             return null;
@@ -463,8 +470,8 @@ public class JVillage extends JavaPlugin implements ClaimManager {
     }
 
     public ArrayList<VClaim> getVillageClaimsArray(Village village) {
-        if(!this.claims.containsKey(village)) {
-           this.claims.put(village, new ArrayList<>());
+        if (!this.claims.containsKey(village)) {
+            this.claims.put(village, new ArrayList<>());
         }
 
         return this.claims.get(village);

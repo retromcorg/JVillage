@@ -20,18 +20,19 @@ public class Village implements ClaimManager {
     private ArrayList<UUID> members = new ArrayList<UUID>();
     private ArrayList<UUID> assistants = new ArrayList<UUID>();
     private UUID owner;
-    //    private HashMap<String, ArrayList<VClaim>> claims = new HashMap<>(); //TODO: Use world UUID instead of world name
     private VCords townSpawn;
 
     private boolean modified = false;
 
-    //Flags
-    private boolean randomCanAlter = false;
-    private boolean mobsCanSpawn = false;
-    //    private boolean anyoneCanJoin = false;
-    private boolean membersCanInvite = false;
+    private HashMap<VillageFlags, Boolean> flags = new HashMap<VillageFlags, Boolean>();
 
     private ArrayList<UUID> invited = new ArrayList<UUID>();
+
+    private void initializeFlags() {
+        for (VillageFlags flag : VillageFlags.values()) {
+            flags.put(flag, false);
+        }
+    }
 
     public Village(JVillage plugin, String townName, UUID townUUID, UUID owner, VChunk vChunk, VCords townSpawn) {
         this.plugin = plugin;
@@ -41,6 +42,7 @@ public class Village implements ClaimManager {
         System.out.println("[JVillage Debug] Claiming initial chunk: " + addClaim(new VClaim(this, vChunk)));
         this.townSpawn = townSpawn;
         modified = true;
+        initializeFlags();
     }
 
     //Create village from JSON
@@ -82,6 +84,12 @@ public class Village implements ClaimManager {
                 addClaim(vClaim);
             }
         }
+        initializeFlags();
+        //Load flags saved
+        JSONObject flags = (JSONObject) object.getOrDefault("flags", new JSONObject());
+        for (Object flag : flags.keySet()) {
+            this.flags.put(VillageFlags.valueOf(String.valueOf(flag)), Boolean.parseBoolean(String.valueOf(flags.get(flag))));
+        }
 
     }
 
@@ -100,21 +108,10 @@ public class Village implements ClaimManager {
         }
         object.put("assistants", assistants);
         JSONArray claimsJsonArray = new JSONArray();
-//        for (String worldName : this.claims.keySet()) {
-//            JSONArray worldClaims = new JSONArray();
-//            worldClaims.add(worldName);
-//            for (VChunk vChunk : this.claims.get(worldName)) {
-//                JSONArray claimCords = new JSONArray();
-//                claimCords.add(vChunk.getX());
-//                claimCords.add(vChunk.getZ());
-//                worldClaims.add(claimCords);
-//            }
-//            claimsJsonArray.add(worldClaims);
-//        }
-        for(String worldName : this.getWorldsWithClaims()) {
+        for (String worldName : this.getWorldsWithClaims()) {
             JSONArray worldClaims = new JSONArray();
             worldClaims.add(worldName);
-            for(VClaim vClaim : this.getClaimsInWorld(worldName)) {
+            for (VClaim vClaim : this.getClaimsInWorld(worldName)) {
                 JSONArray claimCords = new JSONArray();
                 claimCords.add(vClaim.getX());
                 claimCords.add(vClaim.getZ());
@@ -122,6 +119,13 @@ public class Village implements ClaimManager {
             }
             claimsJsonArray.add(worldClaims);
         }
+
+        //Save Flags
+        JSONObject flags = new JSONObject();
+        for (VillageFlags flag : this.flags.keySet()) {
+            flags.put(flag.toString(), this.flags.get(flag));
+        }
+        object.put("flags", flags);
 
         object.put("claims", claimsJsonArray);
         object.put("townSpawn", this.townSpawn.getJsonObject());
@@ -143,31 +147,12 @@ public class Village implements ClaimManager {
 
     public boolean addClaim(VClaim vChunk) {
         modified = true; // Indicate that the village has been modified and needs to be saved
-
-
         return plugin.getVillageClaimsArray(this).add(vChunk);
-
-        //Create world array if it doesn't exist
-//        if (!claims.containsKey(vChunk.getWorldName())) {
-//            claims.put(vChunk.getWorldName(), new ArrayList<VClaim>());
-//        }
-//        //Check if chunk is already claimed
-//        if (claims.get(vChunk.getWorldName()).contains(new VClaim(this, vChunk))) {
-//            return false;
-//        }
-        //Add chunk to claims
-//        claims.get(vChunk.getWorldName()).add(new VClaim(this, vChunk));
-//        return true;
     }
 
     public boolean removeClaim(VClaim vChunk) {
         modified = true; // Indicate that the village has been modified and needs to be saved
         return plugin.getVillageClaimsArray(this).remove(vChunk);
-//        if (!claims.containsValue(vChunk)) {
-//            return false;
-//        }
-//        claims.remove(vChunk);
-//        return true;
     }
 
     public boolean isClaimed(VChunk vChunk) {
@@ -207,7 +192,7 @@ public class Village implements ClaimManager {
     }
 
     public boolean canPlayerAlter(Player player) {
-        if (this.randomCanAlter) {
+        if (isRandomCanAlter()) {
             return true;
         }
         if (isMember(player.getUniqueId())) {
@@ -317,6 +302,7 @@ public class Village implements ClaimManager {
     }
 
     public boolean removeMember(UUID uuid) {
+        modified = true; // Indicate that the village has been modified and needs to be saved
         return members.remove(uuid);
     }
 
@@ -336,58 +322,44 @@ public class Village implements ClaimManager {
     }
 
     public ArrayList<VClaim> getClaims() {
-//        ArrayList<VClaim> vChunks = new ArrayList<>();
-//        for (String world : claims.keySet()) {
-//            vChunks.addAll(claims.get(world));
-//        }
-//        return vChunks;
         return plugin.getVillageClaimsArray(this);
     }
-
-//    public ArrayList<VClaim> getClaims(String world) {
-//        if (claims.containsKey(world)) {
-//            return claims.get(world);
-//        }
-//        ArrayList<VClaim> empty = new ArrayList<VClaim>();
-//        claims.put(world, empty);
-//        return empty;
-//    }
-
-//    public String[] getClaimedWorlds() {
-//        return claims.keySet().toArray(new String[claims.keySet().size()]);
-//    }
 
     public boolean isModified() {
         return modified;
     }
 
     public void setModified(boolean modified) {
+        modified = true; // Indicate that the village has been modified and needs to be saved
         this.modified = modified;
     }
 
 
     public boolean isRandomCanAlter() {
-        return randomCanAlter;
+        return this.flags.get(VillageFlags.RANDOM_CAN_ALTER);
     }
 
     public void setRandomCanAlter(boolean randomCanAlter) {
-        this.randomCanAlter = randomCanAlter;
+        modified = true; // Indicate that the village has been modified and needs to be saved
+        this.flags.put(VillageFlags.RANDOM_CAN_ALTER, randomCanAlter);
     }
 
     public boolean isMobsCanSpawn() {
-        return mobsCanSpawn;
+        return this.flags.get(VillageFlags.MOBS_CAN_SPAWN);
     }
 
     public void setMobsCanSpawn(boolean mobsCanSpawn) {
-        this.mobsCanSpawn = mobsCanSpawn;
+        modified = true; // Indicate that the village has been modified and needs to be saved
+        this.flags.put(VillageFlags.MOBS_CAN_SPAWN, mobsCanSpawn);
     }
 
     public boolean isMembersCanInvite() {
-        return membersCanInvite;
+        return this.flags.get(VillageFlags.MEMBERS_CAN_INVITE);
     }
 
     public void setMembersCanInvite(boolean membersCanInvite) {
-        this.membersCanInvite = membersCanInvite;
+        modified = true; // Indicate that the village has been modified and needs to be saved
+        this.flags.put(VillageFlags.MEMBERS_CAN_INVITE, membersCanInvite);
     }
 
     public int getTotalClaims() {

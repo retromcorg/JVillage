@@ -1,5 +1,6 @@
 package com.johnymuffin.jvillage.beta.config;
 
+import com.avaje.ebeaninternal.server.jmx.MAdminAutofetch;
 import org.bukkit.util.config.Configuration;
 
 import java.io.File;
@@ -33,6 +34,8 @@ public class JVillageLanguage extends Configuration {
         map.put("village_owner_leave", "&4Sorry, the owner of a village can't leave it");
         map.put("movement_village_enter", "&bYou have entered the village of &9%village%");
         map.put("movement_wilderness_enter", "&bYou have entered the wilderness");
+        map.put("unknown_economy_error", "&4Sorry, an unknown economy error occurred");
+
 
         map.put("movement_autoselect_enter", "&bYour selected village has been set to &9%village% &bbecause you have entered it");
 
@@ -66,7 +69,8 @@ public class JVillageLanguage extends Configuration {
                 "\n&8- &7/village select [village] &8- &7Select a village to modify" +
                 "\n&8- &7/village join [village] &8- &7Joins a village" +
                 "\n&8- &7/village leave [village]&8- &7Leaves a village" +
-                "\n&8- &7/village autoswitch [on/off] &8- &7Autoswitch town");
+                "\n&8- &7/village autoswitch [on/off] &8- &7Autoswitch town" +
+                "\n&8- &7/village spawn &8- &7Teleport to village spawn");
 
         map.put("command_village_assistant_help", "&cJVillage Assistant Commands" +
                 "\n&8- &7/village invite [name] &8- &7Invite a player to your selected town" +
@@ -77,7 +81,8 @@ public class JVillageLanguage extends Configuration {
         map.put("command_village_owner_help", "&cJVillage Owner Commands" +
                 "\n&8- &7/village create [name] &8- &7Create a new village" +
                 "\n&8- &7/village setowner [name] &8- &7Promote to owner" +
-                "\n&8- &7/village setassistant [name] &8- &7Set player to assistant" +
+                "\n&8- &7/village promote [name] &8- &7Promote a player to assistant" +
+                "\n&8- &7/village demote [name] &8- &7Demote a player from assistant" +
                 "\n&8- &7/village setspawn &8- &7Set the spawn point for your village");
 
         map.put("command_village_info_use", "&6Information for %village%" +
@@ -110,6 +115,7 @@ public class JVillageLanguage extends Configuration {
         map.put("command_village_join_use", "&cSorry, that is invalid. Try /village join [village]");
         map.put("command_village_join_success", "&bYou have joined the village &9%village%");
         map.put("command_village_join_denied", "&cSorry, you haven't received an invite to join %village%");
+        map.put("command_village_join_limit", "&cSorry, you can't join %village%. You have reached the limit of %limit% villages");
 
         map.put("command_village_delete_use", "&cSorry, that is invalid. Try /village delete [village]");
         map.put("command_village_delete_not_owner", "&cSorry, you are not the owner so you can't delete %village%");
@@ -122,6 +128,54 @@ public class JVillageLanguage extends Configuration {
         map.put("command_village_create_already_exists", "&cSorry, that village name already exists");
         map.put("command_village_create_already_claimed", "&cSorry, that chunk is already claimed");
         map.put("command_village_create_success", "&bYou have created the village &9%village%");
+        map.put("command_village_create_limit", "&cSorry, you can't create a village. You have reached the limit of %limit% villages");
+        map.put("command_village_create_insufficient_funds", "&cSorry, you don't have enough money to create a village. It costs $%cost%");
+        map.put("command_village_create_payment", "&bYou have paid &9$%amount% &bto create the village &9%village%");
+        map.put("command_village_create_message", "&b%player% &bhas created the village &9%village%");
+
+        map.put("command_village_claim_not_assistant", "&cSorry, you are not an assistant or owner of &9%village%&c so you can't claim chunks");
+        map.put("command_village_claim_success", "&bYou have claimed the chunk you are standing in for &9%village%. &bIt cost &9$%cost%");
+        map.put("command_village_claim_already_claimed", "&cSorry, that chunk is already claimed");
+        map.put("command_village_claim_not_neighboring", "&cSorry, you can only claim chunks that are next to your village" +
+                "\n&cIf you want to make an outpost, use /village claim outpost");
+        map.put("command_village_claim_insufficient_funds", "&cSorry, you don't have enough money to claim this chunk. It costs $%cost%");
+
+        map.put("command_village_unclaim_not_claimed", "&cSorry, that chunk is not claimed by &9%village%");
+        map.put("command_village_unclaim_success", "&bYou have unclaimed the chunk you are standing in for &9%village%");
+        map.put("command_village_unclaim_not_assistant", "&cSorry, you are not an assistant or owner of &9%village%&c so you can't unclaim chunks");
+
+        map.put("command_village_kick_use", "&cSorry, that is invalid. Try /village kick [name]");
+        map.put("command_village_kick_not_found", "&cSorry, the UUID of &9%player% &cwas not found");
+        map.put("command_village_kick_not_member", "&cSorry, that player is not a member of &9%village%");
+        map.put("command_village_kick_success", "&bYou have kicked &9%player% &bfrom &9%village%");
+        map.put("command_village_kick_denied", "&cSorry, you are not the owner of &9%village%&c so you can't kick members");
+        map.put("command_village_kick_message", "&bYou have been kicked from &9%village%");
+
+        map.put("command_village_spawm_unsafe", "&cSorry, teleportation to %village% has been determined to be unsafe");
+        map.put("command_village_spawn_success", "&bYou have been teleported to the spawn of &9%village%");
+        map.put("command_village_spawn_not_member", "&cSorry, you are not a member of &9%village%&c so you can't teleport to the spawn");
+
+        map.put("command_village_setowner_use", "&cSorry, that is invalid. Try /village setowner [name]");
+        map.put("command_village_setowner_not_owner", "&cSorry, you are not the owner of &9%village%&c so you can't change the owner");
+        map.put("command_village_setowner_not_in_village", "&cSorry, that player is not a member of &9%village%");
+        map.put("command_village_setowner_message", "&bYou are now the owner of &9%village%");
+        map.put("command_village_setowner_success", "&bYou have changed the owner of &9%village% &bto &9%player%");
+
+        map.put("command_village_promote_use", "&cSorry, that is invalid. Try /village promote [name]");
+        map.put("command_village_promote_not_owner", "&cSorry, you are not the owner of &9%village%&c so you can't promote members");
+        map.put("command_village_promote_not_found", "&cSorry, the UUID of &9%player% &cwas not found");
+        map.put("command_village_promote_not_in_village", "&cSorry, that player is not a member of &9%village%");
+        map.put("command_village_promote_already_assistant", "&cSorry, that player is already an assistant of &9%village%");
+        map.put("command_village_promote_success", "&bYou have promoted &9%player% &bto assistant of &9%village%");
+        map.put("command_village_promote_message", "&bYou have been promoted to assistant of &9%village%");
+
+        map.put("command_village_demote_use", "&cSorry, that is invalid. Try /village demote [name]");
+        map.put("command_village_demote_not_owner", "&cSorry, you are not the owner of &9%village%&c so you can't demote members");
+        map.put("command_village_demote_not_found", "&cSorry, the UUID of &9%player% &cwas not found");
+        map.put("command_village_demote_not_in_village", "&cSorry, that player is not a member of &9%village%");
+        map.put("command_village_demote_not_assistant", "&cSorry, that player is not an assistant of &9%village% so they can't be demoted.");
+        map.put("command_village_demote_message", "&bYou have been demoted from assistant of &9%village%");
+        map.put("command_village_demote_success", "&bYou have demoted &9%player% &bfrom assistant of &9%village%");
 
         //JPerms command
         map.put("jperms_main_general_use", "&cSorry, that is invalid. Try /jperms (user/group/plugin)");

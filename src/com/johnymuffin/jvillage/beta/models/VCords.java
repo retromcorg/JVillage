@@ -1,5 +1,6 @@
 package com.johnymuffin.jvillage.beta.models;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.json.simple.JSONObject;
 
@@ -38,6 +39,10 @@ public class VCords {
         jsonObject.put("z", z);
         jsonObject.put("world", worldName);
         return jsonObject;
+    }
+
+    public Location getLocation() {
+        return new Location(Bukkit.getWorld(worldName), x, y, z);
     }
 
 

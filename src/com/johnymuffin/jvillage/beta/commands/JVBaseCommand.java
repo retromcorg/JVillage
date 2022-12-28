@@ -4,6 +4,9 @@ import com.johnymuffin.jvillage.beta.JVillage;
 import com.johnymuffin.jvillage.beta.config.JVillageLanguage;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+
+import java.util.UUID;
 
 public abstract class JVBaseCommand implements CommandExecutor {
     protected JVillage plugin;
@@ -32,4 +35,14 @@ public abstract class JVBaseCommand implements CommandExecutor {
             commandSender.sendMessage(line);
         }
     }
+
+    public void messagePlayers(String message, UUID... playerUUIDs) {
+        for (UUID playerUUID : playerUUIDs) {
+            Player player = com.johnymuffin.jvillage.beta.JVUtility.getPlayerFromUUID(playerUUID);
+            if (player != null) {
+                player.sendMessage(message);
+            }
+        }
+    }
+
 }

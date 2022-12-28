@@ -18,6 +18,7 @@ commands:
     usage: /<command>
     aliases:
       - v
+      - town
 
 permissions:
   jvillage.admin:

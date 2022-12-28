@@ -310,8 +310,9 @@ public class JVillage extends JavaPlugin implements ClaimManager {
                 townOwnerUUID = PoseidonUUID.getPlayerUUIDFromCache(townOwnerUsername, false);
             }
             if (townOwnerUUID == null) {
-                log.warning("[" + pluginName + "] Could not find UUID for town owner: " + townOwnerUsername + ". The town will not be imported.");
-                townsSkipped++;
+//                log.warning("[" + pluginName + "] Could not find UUID for town owner: " + townOwnerUsername + ". The town will not be imported.");
+//                townsSkipped++;
+                townOwnerUUID = UUID.fromString("ca5c33ce-5825-45e3-ab92-0127c05c2016"); //UUID for jetpackingwolf
                 continue;
             }
 
@@ -371,10 +372,12 @@ public class JVillage extends JavaPlugin implements ClaimManager {
             try {
                 townSpawn = new VCords(town.getSpawn().getBlockX(), town.getSpawn().getBlockY(), town.getSpawn().getBlockZ(), town.getSpawn().getWorld().getName());
             } catch (Exception exception) {
-                exception.printStackTrace();
-                log.warning("[" + pluginName + "] Could not find town spawn for town " + newTownName + ". The town will not be imported.");
-                townsSkipped++;
-                continue;
+//                exception.printStackTrace();
+//                log.warning("[" + pluginName + "] Could not find town spawn for town " + newTownName + ". The town will not be imported.");
+//                townsSkipped++;
+//                continue;
+                logger(Level.WARNING, "Could not find town spawn for town " + newTownName + ". The town spawn will be set to the world spawn.");
+                townSpawn = new VCords(Bukkit.getWorlds().get(0).getSpawnLocation().getBlockX(), Bukkit.getWorlds().get(0).getSpawnLocation().getBlockY(), Bukkit.getWorlds().get(0).getSpawnLocation().getBlockZ(), Bukkit.getWorlds().get(0).getName());
             }
 
             //First chunk from townSpawn
@@ -398,6 +401,9 @@ public class JVillage extends JavaPlugin implements ClaimManager {
             for (UUID residentUUID : residents) {
                 village.addMember(residentUUID);
             }
+            //Register claims
+
+
             logger(Level.INFO, "Towny Import: Imported town " + newTownName + " with " + townClaims.size() + " claims. Owner Name: " + townOwnerUsername + " Assistants: " + assistants.size() + " Residents: " + residents.size());
         }
 

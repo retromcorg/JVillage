@@ -251,6 +251,16 @@ public class Village implements ClaimManager {
     public void setOwner(UUID uuid) {
         modified = true; // Indicate that the village has been modified and needs to be saved
         owner = uuid;
+
+        //Remove the new owner from the members list or assistants list
+        //TODO: This shouldn't be handled in this low level function. Move later
+        if (members.contains(uuid)) {
+            members.remove(uuid);
+        }
+
+        if (assistants.contains(uuid)) {
+            assistants.remove(uuid);
+        }
     }
 
 //    public HashMap<String, ArrayList<VChunk>> getClaims() {

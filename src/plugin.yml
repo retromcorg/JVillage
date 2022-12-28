@@ -1,11 +1,13 @@
 name: JVillage
 description: A claim plugin designed for Project Poseidon
 main: com.johnymuffin.jvillage.beta.JVillage
-version: 1.0.0
+version: 1.0.1
 authors:
   - JohnyMuffin
 softdepend:
   - Fundamentals
+  - WorldEdit
+  - WorldGuard
 
 commands:
   villageadmin:
@@ -19,6 +21,13 @@ commands:
     aliases:
       - v
       - town
+  member:
+    description: Member commands
+    usage: /<command>
+    aliases:
+      - resident
+      - res
+      - player
 
 permissions:
   jvillage.admin:
@@ -79,6 +88,10 @@ permissions:
 
   jvillage.player.demote:
     description: Allows access to JVillage player demote command
+    default: true
+
+  jvillage.player.resident:
+    description: Allows access to JVillage player resident command
     default: true
 
   jvillage.player.promote:

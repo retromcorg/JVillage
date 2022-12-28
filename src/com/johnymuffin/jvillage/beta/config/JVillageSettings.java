@@ -4,6 +4,8 @@ import com.johnymuffin.jvillage.beta.JVillage;
 import org.bukkit.util.config.Configuration;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.List;
 
 public class JVillageSettings extends Configuration {
 
@@ -20,6 +22,9 @@ public class JVillageSettings extends Configuration {
         generateConfigOption("settings.town-create.price.amount", 1000);
         generateConfigOption("settings.town-create.price.info", "This is the price to create a town. Set to 0 to disable.");
 
+        generateConfigOption("settings.town.max-name-length.value", 20);
+        generateConfigOption("settings.town.max-name-length.info", "This is the maximum length of a town name.");
+
         generateConfigOption("settings.town-claim.price.amount", 10);
         generateConfigOption("settings.town-claim.price.info", "This is the price to claim a chunk. Set to 0 to disable.");
 
@@ -32,8 +37,20 @@ public class JVillageSettings extends Configuration {
         generateConfigOption("settings.resident.maximum-towns-joined.value", 10);
         generateConfigOption("settings.resident.maximum-towns-joined.info", "This is the maximum number of towns a resident can join. Set to 0 to disable.");
 
+        generateConfigOption("settings.world-guard.blocked-regions.info", "Claims will not be allowed by players within these WorldGuard regions.");
+        getWorldGuardPermissions(); //This is a hack to get the default value to be added to the config file.
 
     }
+
+    public List<String> getWorldGuardPermissions() {
+        String key = "settings.world-guard.blocked-regions.value";
+        if (this.getStringList(key, null) == null || this.getStringList(key, null).isEmpty()) {
+            this.setProperty(key, Arrays.asList("example1", "example2"));
+        }
+        return this.getStringList(key, null);
+
+    }
+
 
     public void generateConfigOption(String key, Object defaultValue) {
         if (this.getProperty(key) == null) {

@@ -4,6 +4,7 @@ import com.johnymuffin.beta.fundamentals.Fundamentals;
 import com.johnymuffin.beta.fundamentals.player.FundamentalsPlayer;
 import com.johnymuffin.jvillage.beta.commands.JVilageAdminCMD;
 import com.johnymuffin.jvillage.beta.commands.JVillageCMD;
+import com.johnymuffin.jvillage.beta.commands.VResidentCommand;
 import com.johnymuffin.jvillage.beta.config.JVillageLanguage;
 import com.johnymuffin.jvillage.beta.config.JVillageSettings;
 import com.johnymuffin.jvillage.beta.interfaces.ClaimManager;
@@ -22,9 +23,13 @@ import com.palmergames.bukkit.towny.object.Town;
 import com.palmergames.bukkit.towny.object.TownBlock;
 import com.palmergames.bukkit.towny.object.TownyWorld;
 import com.projectposeidon.api.PoseidonUUID;
+import com.sk89q.worldguard.bukkit.BukkitUtil;
+import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.protection.ApplicableRegionSet;
+import com.sk89q.worldguard.protection.managers.RegionManager;
+import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -32,7 +37,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -63,6 +68,15 @@ public class JVillage extends JavaPlugin implements ClaimManager {
         pdf = this.getDescription();
         pluginName = pdf.getName();
         log.info("[" + pluginName + "] Is Loading, Version: " + pdf.getVersion());
+
+        //Check for Fundamentals
+        if (Bukkit.getPluginManager().getPlugin("Fundamentals") == null) {
+            log.severe("[" + pluginName + "] Fundamentals is not installed, disabling plugin");
+            errored = true;
+            this.getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
+
 
         //Config files
         language = new JVillageLanguage(new File(this.getDataFolder(), "language.yml"));
@@ -103,6 +117,7 @@ public class JVillage extends JavaPlugin implements ClaimManager {
         //Register commands
         this.getCommand("villageadmin").setExecutor(new JVilageAdminCMD(this));
         this.getCommand("village").setExecutor(new JVillageCMD(this));
+        this.getCommand("member").setExecutor(new VResidentCommand(this));
 
         //Register events
         JVPlayerMoveListener playerMoveListener = new JVPlayerMoveListener(this);
@@ -188,6 +203,27 @@ public class JVillage extends JavaPlugin implements ClaimManager {
         this.getServer().getPluginManager().disablePlugin(this);
     }
 
+    public boolean worldGuardIsClaimAllowed(VCords vCords) {
+        if (Bukkit.getPluginManager().getPlugin("WorldGuard") == null) {
+            return true; //Assume yes if worldguard is disabled
+        }
+
+        WorldGuardPlugin worldGuardPlugin = (WorldGuardPlugin) Bukkit.getPluginManager().getPlugin("WorldGuard");
+        RegionManager regionManager = worldGuardPlugin.getRegionManager(Bukkit.getWorld(vCords.getWorldName()));
+        ApplicableRegionSet regionSet = regionManager.getApplicableRegions(vCords.getLocation());
+        List<String> blockedRegions = settings.getWorldGuardPermissions();
+
+        for (ProtectedRegion protectedRegion : regionSet) {
+            for (String blockedRegion : blockedRegions) {
+                if (protectedRegion.getId().equalsIgnoreCase(blockedRegion)) {
+                    return false;
+                }
+            }
+        }
+
+        return true; //Claim is allowed
+    }
+
     public void logger(Level level, String message) {
         Bukkit.getLogger().log(level, "[" + plugin.getDescription().getName() + "] " + message);
     }
@@ -247,6 +283,19 @@ public class JVillage extends JavaPlugin implements ClaimManager {
 //                addClaim(village, vClaim);
 //            }
 //        }
+//    }
+
+//    public boolean townyImportHomeChunks() {
+//        if (Bukkit.getServer().getPluginManager().getPlugin("Towny") == null || Bukkit.getServer().getPluginManager().getPlugin("Fundamentals") == null) {
+//            log.log(Level.WARNING, "[" + pluginName + "] Towny or Fundamentals not found, cancelling towny import.");
+//            return false;
+//        }
+//
+//        Towny towny = (Towny) getServer().getPluginManager().getPlugin("Towny");
+//        Fundamentals fundamentals = (Fundamentals) getServer().getPluginManager().getPlugin("Fundamentals");
+//
+//
+//
 //    }
 
     public boolean townyImport() {

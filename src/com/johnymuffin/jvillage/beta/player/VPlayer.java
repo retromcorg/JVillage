@@ -11,7 +11,6 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.UUID;
-import java.util.logging.Level;
 
 public class VPlayer {
     //Start - Village Memberships
@@ -86,6 +85,17 @@ public class VPlayer {
         }
         return false;
     }
+
+//    public String getUsername() {
+//        String username = PoseidonUUID.getPlayerUsernameFromUUID(uuid);
+//        if(username == null) {
+//            username = this.plugin.getFundamentals().getPlayerCache().getUsernameFromUUID(uuid);
+//        }
+//        if(username == null) {
+//            username = "Unknown Username";
+//        }
+//        return username;
+//    }
 
     public boolean removeVillageMembership(Village village) {
         return memberships.remove(village);
@@ -167,8 +177,38 @@ public class VPlayer {
     }
 
 
-    public ArrayList<Village> getMemberships() {
+    public ArrayList<Village> getAllMemberships() {
         return memberships;
+    }
+
+    public Village[] getTownsOwned() {
+        ArrayList<Village> townsOwned = new ArrayList<>();
+        for (Village village : memberships) {
+            if (village.isOwner(uuid)) {
+                townsOwned.add(village);
+            }
+        }
+        return townsOwned.toArray(new Village[0]);
+    }
+
+    public Village[] getTownsAssistantOf() {
+        ArrayList<Village> townsAssistantOf = new ArrayList<>();
+        for (Village village : memberships) {
+            if (village.isAssistant(uuid) && !village.isOwner(uuid)) {
+                townsAssistantOf.add(village);
+            }
+        }
+        return townsAssistantOf.toArray(new Village[0]);
+    }
+
+    public Village[] getTownsMemberOf() {
+        ArrayList<Village> townsMemberOf = new ArrayList<>();
+        for (Village village : memberships) {
+            if (!village.isAssistant(uuid) && !village.isOwner(uuid)) {
+                townsMemberOf.add(village);
+            }
+        }
+        return townsMemberOf.toArray(new Village[0]);
     }
 
     public UUID getUUID() {

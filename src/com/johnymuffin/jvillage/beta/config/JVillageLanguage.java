@@ -160,6 +160,7 @@ public class JVillageLanguage extends Configuration {
         map.put("command_village_claim_not_neighboring", "&cSorry, you can only claim chunks that are next to your village" +
                 "\n&cIf you want to make an outpost, use /village claim outpost");
         map.put("command_village_claim_insufficient_funds", "&cSorry, you don't have enough money to claim this chunk. It costs $%cost%");
+        map.put("command_village_claim_worldguard_denied", "&cSorry, you can't claim this chunk because it is protected by WorldGuard");
 
         map.put("command_village_unclaim_not_claimed", "&cSorry, that chunk is not claimed by &9%village%");
         map.put("command_village_unclaim_success", "&bYou have unclaimed the chunk you are standing in for &9%village%");
@@ -197,6 +198,13 @@ public class JVillageLanguage extends Configuration {
         map.put("command_village_demote_not_assistant", "&cSorry, that player is not an assistant of &9%village% so they can't be demoted.");
         map.put("command_village_demote_message", "&bYou have been demoted from assistant of &9%village%");
         map.put("command_village_demote_success", "&bYou have demoted &9%player% &bfrom assistant of &9%village%");
+
+        map.put("command_resident_info", "&7----- &dResident Menu &7-----" +
+                "\n&6Username: %username%" +
+                "\n&bOwner of: %owner%" +
+                "\n&aAssistant of: %assistant%" +
+                "\n&eMember of: %member%");
+
 
         //JPerms command
         map.put("jperms_main_general_use", "&cSorry, that is invalid. Try /jperms (user/group/plugin)");

@@ -21,6 +21,7 @@ import org.bukkit.entity.Player;
 import java.util.UUID;
 
 import static com.johnymuffin.beta.fundamentals.util.Utils.getSafeDestination;
+import static com.johnymuffin.jvillage.beta.JVUtility.getChunkCenter;
 import static com.johnymuffin.jvillage.beta.JVUtility.getPlayerFromUUID;
 
 public class JVillageCMD extends JVBaseCommand {
@@ -547,6 +548,14 @@ public class JVillageCMD extends JVBaseCommand {
 
         VChunk vChunk = new VChunk(player.getLocation());
 
+        if (!plugin.worldGuardIsClaimAllowed(getChunkCenter(vChunk))) {
+            String message = language.getMessage("command_village_claim_worldguard_denied");
+            message = message.replace("%village%", village.getTownName());
+            commandSender.sendMessage(message);
+            return true;
+        }
+
+
         //Check if the chunk is already claimed
         if (this.plugin.isClaimed(vChunk)) {
             commandSender.sendMessage(language.getMessage("command_village_claim_already_claimed"));
@@ -648,7 +657,7 @@ public class JVillageCMD extends JVBaseCommand {
         }
 
         //If string is too long
-        if (villageName.length() > 16) {
+        if (villageName.length() > settings.getConfigInteger("settings.town.max-name-length.value")) {
             commandSender.sendMessage(language.getMessage("command_village_create_invalid_name"));
             return true;
         }

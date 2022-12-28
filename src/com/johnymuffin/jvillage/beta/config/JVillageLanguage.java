@@ -52,6 +52,27 @@ public class JVillageLanguage extends Configuration {
         map.put("command_villageadmin_plugin_import_towny_success", "&bImporting Towny data completed successfully. The debug is available in the console.");
         map.put("command_villageadmin_plugin_import_towny_fail", "&bImporting Towny data failed. The debug is available in the console.");
 
+        map.put("command_villageadmin_village_use", "&cSorry, that is invalid. Try /villageadmin village (add|kick|setowner|delete)");
+
+        map.put("command_villageadmin_village_add_already_member", "&4Sorry, that player is already a member of that village");
+        map.put("command_villageadmin_village_add_success", "&b%username% has been added to the village %village%");
+        map.put("command_villageadmin_village_add_message", "&bYou have been added to the village %village% by %admin%");
+        map.put("command_villageadmin_village_add_use", "&cSorry, that is invalid. Try /villageadmin village add <village> <player>");
+
+        map.put("command_villageadmin_village_setowner_use", "&cSorry, that is invalid. Try /villageadmin village setowner <village> <player>");
+        map.put("command_villageadmin_village_setowner_already_owner", "&4Sorry, that player is already the owner of that village");
+        map.put("command_villageadmin_village_setowner_message", "&b%admin% has set %player% as the new owner of %village%");
+        map.put("command_villageadmin_village_setowner_success", "&b%player% is now the owner of %village%");
+
+        map.put("command_villageadmin_village_kick_use", "&cSorry, that is invalid. Try /villageadmin village kick <village> <player>");
+        map.put("command_villageadmin_village_kick_is_owner", "&4Sorry, you can't kick the owner of a village. Please set someone else as the owner first.");
+        map.put("command_villageadmin_village_kick_not_member", "&4Sorry, that player is not a member of that village");
+        map.put("command_villageadmin_village_kick_success", "&b%player% has been kicked from %village%");
+
+        map.put("command_villageadmin_village_delete_use", "&cSorry, that is invalid. Try /villageadmin village delete <village>");
+        map.put("command_villageadmin_village_delete_broadcast", "&b%village% has been obliterated by %admin% using the power of the gods");
+        map.put("command_villageadmin_village_delete_success", "&b%village% has been deleted successfully");
+
         //JVillage player command
 
         //JVillage player help commands

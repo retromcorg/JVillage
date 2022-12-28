@@ -58,10 +58,10 @@ public class JVMobListener extends EntityListener implements Listener {
 
         //Return if the victim is not a player
         if (!(event.getEntity() instanceof CraftPlayer)) {
-            System.out.println("EntityDamageByEntityEvent: " + event.getEntity().toString());
+//            System.out.println("EntityDamageByEntityEvent: " + event.getEntity().toString());
             return;
         }
-        System.out.println("Player was damaged");
+//        System.out.println("Player was damaged");
 
         //Return if the damager is not a hostile mob
         if (!(damager instanceof Monster)) {
@@ -72,7 +72,7 @@ public class JVMobListener extends EntityListener implements Listener {
                 return;
             }
         }
-        System.out.println("Player was damaged by a hostile mob");
+//        System.out.println("Player was damaged by a hostile mob");
 
         Player player = (Player) event.getEntity();
         VPlayer vPlayer = plugin.getPlayerMap().getPlayer(player.getUniqueId());
@@ -81,13 +81,13 @@ public class JVMobListener extends EntityListener implements Listener {
         if (vPlayer.isLocatedInVillage() == false) {
             return;
         }
-        System.out.println("Player was damaged by a hostile mob in a village");
+//        System.out.println("Player was damaged by a hostile mob in a village");
 
         if (vPlayer.getCurrentlyLocatedIn().isMobsCanSpawn()) {
             return;
         }
 
-        System.out.println("Player was damaged by a hostile mob in a village where mobs are not allowed to spawn");
+//        System.out.println("Player was damaged by a hostile mob in a village where mobs are not allowed to spawn");
 
         //Cancel the damage event if it is a hostile mob attacking a player in a village where mobs are not allowed to spawn
         event.setCancelled(true);

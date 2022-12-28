@@ -5,6 +5,7 @@ import com.johnymuffin.jvillage.beta.interfaces.ClaimManager;
 import com.johnymuffin.jvillage.beta.models.chunk.VChunk;
 import com.johnymuffin.jvillage.beta.models.chunk.VClaim;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -151,6 +152,11 @@ public class Village implements ClaimManager {
     }
 
     public boolean removeClaim(VClaim vChunk) {
+        modified = true; // Indicate that the village has been modified and needs to be saved
+        return plugin.getVillageClaimsArray(this).remove(vChunk);
+    }
+
+    public boolean removeClaim(VChunk vChunk) {
         modified = true; // Indicate that the village has been modified and needs to be saved
         return plugin.getVillageClaimsArray(this).remove(vChunk);
     }
@@ -374,6 +380,15 @@ public class Village implements ClaimManager {
 
     public int getTotalClaims() {
         return getClaims().size();
+    }
+
+    public void broadcastToTown(String message) {
+        String broadcastMessage = ChatColor.GOLD + "[" + ChatColor.AQUA + "Village: " + getTownName() + ChatColor.GOLD + "] " + ChatColor.GRAY + message;
+        for(Player player : Bukkit.getOnlinePlayers()) {
+            if(isMember(player.getUniqueId())) {
+                player.sendMessage(broadcastMessage);
+            }
+        }
     }
 
     public String[] getWorldsWithClaims() {

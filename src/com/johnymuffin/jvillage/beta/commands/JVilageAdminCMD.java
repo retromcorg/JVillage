@@ -2,6 +2,7 @@ package com.johnymuffin.jvillage.beta.commands;
 
 import com.johnymuffin.jvillage.beta.JVillage;
 import com.johnymuffin.jvillage.beta.models.Village;
+import com.johnymuffin.jvillage.beta.models.chunk.VChunk;
 import com.johnymuffin.jvillage.beta.player.VPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -9,6 +10,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;
+import java.util.WeakHashMap;
 
 import static com.johnymuffin.jvillage.beta.JVUtility.getPlayerFromUUID;
 
@@ -37,6 +39,46 @@ public class JVilageAdminCMD extends JVBaseCommand {
         return true;
     }
 
+    private boolean villageUnclaim(CommandSender commandSender, String[] strings) {
+        if (!isAuthorized(commandSender, "jvillage.admin.village.unclaim")) {
+            commandSender.sendMessage(language.getMessage("no_permission"));
+            return true;
+        }
+
+        if (!(commandSender instanceof Player)) {
+            commandSender.sendMessage(language.getMessage("unavailable_to_console"));
+            return true;
+        }
+
+        Player player = (Player) commandSender;
+        VChunk vChunk = new VChunk(player.getLocation());
+
+        boolean stillClaimed = true;
+        while (stillClaimed) {
+            Village village = plugin.getVillageAtLocation(vChunk);
+            if (village == null) {
+                stillClaimed = false;
+                continue;
+            }
+            village.removeClaim(vChunk);
+            //Check if the village is still valid
+            if (village.getClaims().size() == 0) {
+                String message = language.getMessage("command_villageadmin_village_delete_broadcast");
+                message = message.replace("%village%", village.getTownName());
+                message = message.replace("%admin%", player.getName());
+                Bukkit.broadcastMessage(message);
+                plugin.deleteVillage(village);
+            }
+
+            String message = language.getMessage("command_villageadmin_village_unclaim_occurrence");
+            message = message.replace("%village%", village.getTownName());
+            commandSender.sendMessage(message);
+        }
+
+        commandSender.sendMessage(language.getMessage("command_villageadmin_village_unclaim_success"));
+        return true;
+    }
+
     private boolean villageCommand(CommandSender commandSender, String[] strings) {
         if (!isAuthorized(commandSender, "jvillage.admin.village")) {
             commandSender.sendMessage(language.getMessage("no_permission"));
@@ -49,12 +91,16 @@ public class JVilageAdminCMD extends JVBaseCommand {
             if (subcommand.equalsIgnoreCase("add")) return villageAddCommand(commandSender, removeFirstEntry(strings));
             if (subcommand.equalsIgnoreCase("setowner"))
                 return villageSetOwnerCommand(commandSender, removeFirstEntry(strings));
-            if(subcommand.equalsIgnoreCase("kick")) return villageKickCommand(commandSender, removeFirstEntry(strings));
-            if(subcommand.equalsIgnoreCase("delete")) return villageDeleteCommand(commandSender, removeFirstEntry(strings));
+            if (subcommand.equalsIgnoreCase("kick"))
+                return villageKickCommand(commandSender, removeFirstEntry(strings));
+            if (subcommand.equalsIgnoreCase("delete"))
+                return villageDeleteCommand(commandSender, removeFirstEntry(strings));
+            if (subcommand.equalsIgnoreCase("unclaim"))
+                return villageUnclaim(commandSender, removeFirstEntry(strings));
 
         }
 
-        commandSender.sendMessage(language.getMessage("command_villageadmin_plugin_use"));
+        commandSender.sendMessage(language.getMessage("command_villageadmin_village_use"));
         return true;
 
     }

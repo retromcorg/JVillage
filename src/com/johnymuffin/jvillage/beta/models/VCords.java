@@ -56,7 +56,7 @@ public class VCords {
 
     @Override
     public String toString() {
-        return x + "," + y + "," + z + " - " + worldName;
+        return worldName + ": " + x + "," + y + "," + z;
     }
 
     @Override

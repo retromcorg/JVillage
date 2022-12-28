@@ -36,7 +36,7 @@ public class VResidentCommand extends JVBaseCommand {
             targetPlayerUUID = plugin.getFundamentals().getPlayerCache().getUUIDFromUsername(targetPlayerName);
             if (targetPlayerUUID == null) {
                 String message = language.getMessage("player_not_found_full");
-                message = message.replace("%player%", targetPlayerName);
+                message = message.replace("%username%", targetPlayerName);
                 commandSender.sendMessage(message);
                 return true;
             }
@@ -71,7 +71,7 @@ public class VResidentCommand extends JVBaseCommand {
 
         //Towns Member
         if(townsMember.length > 0) {
-            menu = menu.replace("%ember%", formatVillageList(townsMember));
+            menu = menu.replace("%member%", formatVillageList(townsMember));
         } else {
             menu = menu.replace("%member%", ChatColor.RED + "None");
         }

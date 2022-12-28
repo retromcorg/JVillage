@@ -73,6 +73,10 @@ public class JVillageCMD extends JVBaseCommand {
                 return demoteCommand(commandSender, removeFirstEntry(strings));
             if (subcommand.equalsIgnoreCase("promote"))
                 return promoteCommand(commandSender, removeFirstEntry(strings));
+            if (subcommand.equalsIgnoreCase("setspawn"))
+                return setSpawnCommand(commandSender, removeFirstEntry(strings));
+            if (subcommand.equalsIgnoreCase("rename"))
+                return renameCommand(commandSender, removeFirstEntry(strings));
         }
 
         String villageIn = ChatColor.RED + "None";
@@ -97,6 +101,111 @@ public class JVillageCMD extends JVBaseCommand {
         menu = menu.replace("%village%", selectedVillage);
         menu = menu.replace("%villagein%", villageIn);
         sendWithNewline(commandSender, menu);
+        return true;
+    }
+
+    private boolean renameCommand(CommandSender commandSender, String[] strings) {
+        if (!isAuthorized(commandSender, "jvillage.player.rename")) {
+            commandSender.sendMessage(language.getMessage("no_permission"));
+            return true;
+        }
+
+        if (!(commandSender instanceof Player)) {
+            commandSender.sendMessage(language.getMessage("unavailable_to_console"));
+            return true;
+        }
+
+        if (strings.length == 0) {
+            commandSender.sendMessage(language.getMessage("command_village_rename_use"));
+            return true;
+        }
+
+        Player player = (Player) commandSender;
+        VPlayer vPlayer = plugin.getPlayerMap().getPlayer(player.getUniqueId());
+        Village village = vPlayer.getSelectedVillage();
+
+
+        if (village == null) {
+            commandSender.sendMessage(language.getMessage("no_village_selected"));
+            return true;
+        }
+
+        if (!village.isOwner(player.getUniqueId())) {
+            String message = language.getMessage("command_village_rename_not_owner");
+            message = message.replace("%village%", village.getTownName());
+            commandSender.sendMessage(message);
+            return true;
+        }
+
+        String villageName = strings[0];
+
+        if (!villageName.matches("[a-zA-Z0-9]+")) {
+            commandSender.sendMessage(language.getMessage("command_village_rename_invalid_name"));
+            return true;
+        }
+
+        if (villageName.length() > settings.getConfigInteger("settings.town.max-name-length.value")) {
+            commandSender.sendMessage(language.getMessage("command_village_rename_invalid_name"));
+            return true;
+        }
+
+        Village village2 = plugin.getVillageMap().getVillage(villageName);
+        if (village2 != null) {
+            commandSender.sendMessage(language.getMessage("command_village_rename_already_exists"));
+            return true;
+        }
+
+        String oldName = village.getTownName();
+
+        //Rename the village
+        village.setTownName(villageName);
+
+        //Broadcast the rename
+        String message = language.getMessage("command_village_rename_broadcast");
+        message = message.replace("%village%", oldName);
+        message = message.replace("%new_village%", villageName);
+        Bukkit.broadcastMessage(message);
+
+        //Message the player
+        message = language.getMessage("command_village_rename_success");
+        message = message.replace("%village%", villageName);
+        commandSender.sendMessage(message);
+        return true;
+    }
+
+    private boolean setSpawnCommand(CommandSender commandSender, String[] strings) {
+        if (!isAuthorized(commandSender, "jvillage.player.setspawn")) {
+            commandSender.sendMessage(language.getMessage("no_permission"));
+            return true;
+        }
+
+        Player player = (Player) commandSender;
+        VPlayer vPlayer = plugin.getPlayerMap().getPlayer(player.getUniqueId());
+        Village village = vPlayer.getSelectedVillage();
+
+        if (village == null) {
+            commandSender.sendMessage(language.getMessage("no_village_selected"));
+            return true;
+        }
+
+        if (!village.getOwner().equals(player.getUniqueId())) {
+            String message = language.getMessage("command_village_setspawn_not_owner");
+            message = message.replace("%village%", village.getTownName());
+            commandSender.sendMessage(message);
+            return true;
+        }
+
+        VChunk vChunk = new VChunk(player.getLocation());
+        if (!village.getClaims().contains(vChunk)) {
+            String message = language.getMessage("command_village_setspawn_not_in_village");
+            message = message.replace("%village%", village.getTownName());
+            commandSender.sendMessage(message);
+            return true;
+        }
+
+        VCords cords = new VCords(player.getLocation());
+        village.setTownSpawn(cords);
+        village.broadcastToTown(player.getDisplayName() + " has set the spawn point to " + cords.toString());
         return true;
     }
 
@@ -817,6 +926,11 @@ public class JVillageCMD extends JVBaseCommand {
             String message = language.getMessage("command_village_join_success");
             message = message.replace("%village%", village.getTownName());
             commandSender.sendMessage(message);
+
+            //Broadcast join
+            String broadcast = language.getMessage("command_village_join_broadcast");
+            broadcast = broadcast.replace("%player%", player.getName());
+            village.broadcastToTown(broadcast);
             return true;
         }
 
@@ -876,6 +990,11 @@ public class JVillageCMD extends JVBaseCommand {
                 String targetMessage = language.getMessage("command_village_invite_received");
                 targetMessage = targetMessage.replace("%village%", village.getTownName());
                 sendWithNewline(target, targetMessage);
+                //Broadcast
+                String broadcast = language.getMessage("command_village_invite_broadcast");
+                broadcast = broadcast.replace("%player%", target.getName());
+                broadcast = broadcast.replace("%villagemember%", player.getName());
+                village.broadcastToTown(broadcast);
                 return true;
             }
 
@@ -925,6 +1044,11 @@ public class JVillageCMD extends JVBaseCommand {
             String message = language.getMessage("command_village_leave_success");
             message.replace("%village%", village.getTownName());
             commandSender.sendMessage(message);
+
+            //Broadcast leave
+            String broadcast = language.getMessage("command_village_leave_broadcast");
+            broadcast = broadcast.replace("%player%", player.getName());
+            village.broadcastToTown(broadcast);
             return true;
         }
 

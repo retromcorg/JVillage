@@ -52,7 +52,7 @@ public class JVillageLanguage extends Configuration {
         map.put("command_villageadmin_plugin_import_towny_success", "&bImporting Towny data completed successfully. The debug is available in the console.");
         map.put("command_villageadmin_plugin_import_towny_fail", "&bImporting Towny data failed. The debug is available in the console.");
 
-        map.put("command_villageadmin_village_use", "&cSorry, that is invalid. Try /villageadmin village (add|kick|setowner|delete)");
+        map.put("command_villageadmin_village_use", "&cSorry, that is invalid. Try /villageadmin village (add|kick|setowner|delete|unclaim)");
 
         map.put("command_villageadmin_village_add_already_member", "&4Sorry, that player is already a member of that village");
         map.put("command_villageadmin_village_add_success", "&b%username% has been added to the village %village%");
@@ -72,6 +72,10 @@ public class JVillageLanguage extends Configuration {
         map.put("command_villageadmin_village_delete_use", "&cSorry, that is invalid. Try /villageadmin village delete <village>");
         map.put("command_villageadmin_village_delete_broadcast", "&b%village% has been obliterated by %admin% using the power of the gods");
         map.put("command_villageadmin_village_delete_success", "&b%village% has been deleted successfully");
+
+        map.put("command_villageadmin_village_unclaim_use", "&cSorry, that is invalid. Try /villageadmin village unclaim"); //Not needed
+        map.put("command_villageadmin_village_unclaim_occurrence", "&bA claim has been removed for %village%");
+        map.put("command_villageadmin_village_unclaim_success", "&bRemoved all claims for the chunk you are standing in.");
 
         //JVillage player command
 
@@ -104,7 +108,8 @@ public class JVillageLanguage extends Configuration {
                 "\n&8- &7/village setowner [name] &8- &7Promote to owner" +
                 "\n&8- &7/village promote [name] &8- &7Promote a player to assistant" +
                 "\n&8- &7/village demote [name] &8- &7Demote a player from assistant" +
-                "\n&8- &7/village setspawn &8- &7Set the spawn point for your village");
+                "\n&8- &7/village setspawn &8- &7Set the spawn point for your village" +
+                "\n&8- &7/village rename [name] &8- &7Rename your village");
 
         map.put("command_village_info_use", "&6Information for %village%" +
                 "\n&7Owner: %owner%" +
@@ -124,6 +129,7 @@ public class JVillageLanguage extends Configuration {
 
         map.put("command_village_leave_success", "&bYou have left the village &9%village%");
         map.put("command_village_leave_use", "&cSorry, that is invalid. Try /village leave [village]");
+        map.put("command_village_leave_broadcast", "&f%player% has left the village.");
 
         map.put("command_village_invite_use", "&cSorry, that is invalid. Try /village invite [name]" +
                 "\nThe player will be invited to your currently selected village");
@@ -132,11 +138,13 @@ public class JVillageLanguage extends Configuration {
         map.put("command_village_invite_received", "&bYou have been invited to join &9%village%" +
                 "\n&7Type &9/village join %village% &7to join the village");
         map.put("command_village_invite_sent", "&bYou have invited &9%player% &bto join &9%village%");
+        map.put("command_village_invite_broadcast", "&f%player% has been invited by %villagemember%");
 
         map.put("command_village_join_use", "&cSorry, that is invalid. Try /village join [village]");
         map.put("command_village_join_success", "&bYou have joined the village &9%village%");
         map.put("command_village_join_denied", "&cSorry, you haven't received an invite to join %village%");
         map.put("command_village_join_limit", "&cSorry, you can't join %village%. You have reached the limit of %limit% villages");
+        map.put("command_village_join_broadcast", "&f%player% has joined the village.");
 
         map.put("command_village_delete_use", "&cSorry, that is invalid. Try /village delete [village]");
         map.put("command_village_delete_not_owner", "&cSorry, you are not the owner so you can't delete %village%");
@@ -183,6 +191,13 @@ public class JVillageLanguage extends Configuration {
         map.put("command_village_setowner_message", "&bYou are now the owner of &9%village%");
         map.put("command_village_setowner_success", "&bYou have changed the owner of &9%village% &bto &9%player%");
 
+        map.put("command_village_rename_use", "&cSorry, that is invalid. Try /village rename [name]");
+        map.put("command_village_rename_not_owner", "&cSorry, you are not the owner of &9%village%&c so you can't change the name");
+        map.put("command_village_rename_invalid_name", "&cSorry, that is an invalid name. Please only use letters and numbers and less then 22 characters");
+        map.put("command_village_rename_already_exists", "&cSorry, that village name already exists");
+        map.put("command_village_rename_broadcast", "&bThe village &9%village% &bhas been renamed to &9%new_village%");
+        map.put("command_village_rename_success", "&bYou have changed the name of &9%village%");
+
         map.put("command_village_promote_use", "&cSorry, that is invalid. Try /village promote [name]");
         map.put("command_village_promote_not_owner", "&cSorry, you are not the owner of &9%village%&c so you can't promote members");
         map.put("command_village_promote_not_found", "&cSorry, the UUID of &9%player% &cwas not found");
@@ -198,6 +213,9 @@ public class JVillageLanguage extends Configuration {
         map.put("command_village_demote_not_assistant", "&cSorry, that player is not an assistant of &9%village% so they can't be demoted.");
         map.put("command_village_demote_message", "&bYou have been demoted from assistant of &9%village%");
         map.put("command_village_demote_success", "&bYou have demoted &9%player% &bfrom assistant of &9%village%");
+
+        map.put("command_village_setspawn_not_owner", "&cSorry, you are not the owner of &9%village%&c so you can't change the spawn");
+        map.put("command_village_setspawn_not_in_village", "&cSorry, that location is not within an area claimed by &9%village%");
 
         map.put("command_resident_info", "&7----- &dResident Menu &7-----" +
                 "\n&6Username: %username%" +

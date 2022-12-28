@@ -176,6 +176,15 @@ public class JVillage extends JavaPlugin implements ClaimManager {
         return null;
     }
 
+    public Village getVillageAtLocation(VChunk vChunk) {
+        for (VClaim vClaim : getAllClaims()) {
+            if (vClaim.equals(vChunk)) {
+                return getVillageMap().getVillage(vClaim.getVillage());
+            }
+        }
+        return null;
+    }
+
     public ArrayList<VClaim> getAllClaims() {
         ArrayList<VClaim> allClaims = new ArrayList<>();
         for (ArrayList<VClaim> vClaims : claims.values()) {

@@ -68,6 +68,10 @@ public class JVMobListener extends EntityListener implements Listener {
             if(damager instanceof CraftArrow) {
                 CraftArrow arrow = (CraftArrow) event.getDamager();
                 damager = (CraftEntity) arrow.getShooter();
+                //Return if the damager is not a hostile mob
+                if (!(damager instanceof Monster)) {
+                    return;
+                }
             } else {
                 return;
             }

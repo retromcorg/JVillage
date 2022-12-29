@@ -224,6 +224,7 @@ public class VPlayer {
     }
 
     public void joinVillage(Village village) {
+        memberships.add(village);
         village.addMember(uuid);
     }
 }

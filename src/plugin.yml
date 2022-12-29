@@ -1,7 +1,7 @@
 name: JVillage
 description: A claim plugin designed for Project Poseidon
 main: com.johnymuffin.jvillage.beta.JVillage
-version: 1.0.1
+version: 1.0.3
 authors:
   - JohnyMuffin
 softdepend:
@@ -85,6 +85,10 @@ permissions:
       jvillage.player.autoswitch: true
       jvillage.player.select: true
       jvillage.player.info: true
+
+  jvillage.player.setspawn:
+    description: Allows access to JVillage player setspawn commands
+    default: true
 
   jvillage.player.demote:
     description: Allows access to JVillage player demote command

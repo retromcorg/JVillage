@@ -35,12 +35,12 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.io.FileWriter;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static com.johnymuffin.jvillage.beta.JVUtility.formatVillageList;
 
 public class JVillage extends JavaPlugin implements ClaimManager {
     //Basic Plugin Info
@@ -103,6 +103,24 @@ public class JVillage extends JavaPlugin implements ClaimManager {
 
         logger(Level.INFO, "Loaded " + villagesLoaded + " villages and " + claimsLoaded + " claims.");
 
+
+        logger(Level.INFO, "Checking for duplicate claims...");
+        int duplicateClaims = 0;
+
+
+        for (VClaim vClaim : this.getAllClaims()) {
+            Village[] villagesOnClaim = this.getVillagesAtLocation(vClaim);
+            if (villagesOnClaim.length > 1) {
+                duplicateClaims++;
+                logger(Level.WARNING, "Duplicate claim found at " + vClaim.toString() + " for villages " + formatVillageList(villagesOnClaim) + ". It is advised that you delete this claim from the JSON file or unclaim it with \"/va village unclaim\" while standing in it.");
+            }
+        }
+
+        if (duplicateClaims > 0) {
+            logger(Level.WARNING, duplicateClaims + " duplicate claims found.");
+        }
+
+
         int playersLoaded = 0;
         //Load players
         playerMap = new JPlayerMap(this);
@@ -139,6 +157,19 @@ public class JVillage extends JavaPlugin implements ClaimManager {
                 villageMap.saveData();
             }
         }, 20 * 60 * 5, 20 * 60 * 5);
+
+//        OverviewerExporter exporter = new OverviewerExporter(this);
+//        String regions = exporter.generateOverviewerRegions();
+//        //Write string to file
+//        File filePath = new File(this.getDataFolder(), "regions.js");
+//        try (FileWriter file = new FileWriter(filePath)) {
+//            file.write(regions);
+//            file.flush();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+
+
     }
 
 //    public int loadAllChunks(Village village) {
@@ -183,6 +214,18 @@ public class JVillage extends JavaPlugin implements ClaimManager {
             }
         }
         return null;
+    }
+
+    private Village[] getVillagesAtLocation(VChunk vChunk) {
+        ArrayList<Village> villages = new ArrayList<>();
+        for (VClaim vClaim : getAllClaims()) {
+            if (vClaim.equals(vChunk)) {
+                villages.add(getVillageMap().getVillage(vClaim.getVillage()));
+            }
+        }
+        //Remove duplicate entries
+        return villages.stream().distinct().toArray(Village[]::new);
+        
     }
 
     public ArrayList<VClaim> getAllClaims() {

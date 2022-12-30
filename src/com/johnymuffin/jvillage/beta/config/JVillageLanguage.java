@@ -47,6 +47,7 @@ public class JVillageLanguage extends Configuration {
         map.put("command_villageadmin_general_use", "&cSorry, that is invalid. Try /villageadmin (plugin|world|village|player)");
         map.put("command_villageadmin_plugin_use", "&cSorry, that is invalid. Try /villageadmin plugin (reload|save|version|import)");
         map.put("command_villageadmin_plugin_import_use", "&cSorry, that is invalid. Try /villageadmin plugin import (towny|factions)");
+        map.put("command_villageadmin_world_use", "&cSorry, that is invalid. Try /villageadmin world (wgcleanup)");
 
         map.put("command_villageadmin_plugin_import_towny_start", "&bImporting Towny data. The server might freeze while this is happening.");
         map.put("command_villageadmin_plugin_import_towny_success", "&bImporting Towny data completed successfully. The debug is available in the console.");
@@ -76,6 +77,8 @@ public class JVillageLanguage extends Configuration {
         map.put("command_villageadmin_village_unclaim_use", "&cSorry, that is invalid. Try /villageadmin village unclaim"); //Not needed
         map.put("command_villageadmin_village_unclaim_occurrence", "&bA claim has been removed for %village%");
         map.put("command_villageadmin_village_unclaim_success", "&bRemoved all claims for the chunk you are standing in.");
+
+        map.put("command_villageadmin_world_wgcleanup_success", "&bWorldGuard cleanup completed successfully");
 
         //JVillage player command
 

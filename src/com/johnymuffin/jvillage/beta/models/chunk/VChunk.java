@@ -28,6 +28,11 @@ public class VChunk {
     }
 
     @Override
+    public String toString() {
+        return worldName + ": " + x + "," + z;
+    }
+
+    @Override
     public int hashCode() {
         return Objects.hash(x, z, worldName.toLowerCase());
     }

@@ -23,7 +23,7 @@ public class JVUtility {
 
     public static VCords getChunkCenter(VChunk vChunk) {
 //        return new Location(Bukkit.getWorld(vChunk.getWorldName()), vChunk.getX() + 8, 0, vChunk.getZ() + 8);
-        return new VCords(vChunk.getX() + 8, 0, vChunk.getZ() + 8, vChunk.getWorldName());
+        return new VCords(vChunk.getX() * 16 + 8, 0, vChunk.getZ() * 16 + 8, vChunk.getWorldName());
     }
 
     public static Player getPlayerFromUUID(UUID uuid) {

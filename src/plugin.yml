@@ -1,7 +1,7 @@
 name: JVillage
 description: A claim plugin designed for Project Poseidon
 main: com.johnymuffin.jvillage.beta.JVillage
-version: 1.0.3
+version: 1.0.4
 authors:
   - JohnyMuffin
 softdepend:
@@ -40,6 +40,16 @@ permissions:
       jvillage.admin.plugin.reload: true
       jvillage.admin.plugin.import: true
       jvillage.admin.plugin.import.towny: true
+      jvillage.admin.world: true
+      jvillage.admin.world.wgcleanup: true
+
+  jvillage.admin.world:
+    description: Allows access to all JVillage world admin commands
+    default: op
+
+  jvillage.admin.world.wgcleanup:
+    description: Allows access to the JVillage world admin command to cleanup WorldGuard regions
+    default: op
 
   jvillage.admin.spawn:
     description: Allows access to JVillage admin spawn commands
@@ -47,7 +57,6 @@ permissions:
 
   jvilage.admin.bypass:
     description: Allows access to JVillage admin bypass commands
-    default: op
 
   jvillage.admin.plugin:
     description: Allows access to JVillage admin plugin commands

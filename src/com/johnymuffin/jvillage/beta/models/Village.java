@@ -13,6 +13,7 @@ import org.json.simple.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.logging.Level;
 
 public class Village implements ClaimManager {
     private JVillage plugin;
@@ -82,6 +83,11 @@ public class Village implements ClaimManager {
                 int z = Integer.parseInt(String.valueOf(claimCords.get(1)));
 //                VChunk vChunk = new VChunk(worldName, x, z);
                 VClaim vClaim = new VClaim(this.getTownUUID(), worldName, x, z);
+//                if (this.plugin.isClaimed(vClaim)) {
+//                    Village village = this.plugin.getVillageAtLocation(vClaim);
+//                    plugin.logger(Level.WARNING, "Skipping claim: " + vClaim.toString() + " for " + getTownName() + " as it is already claimed by " + village.getTownName() + ". It is advised that you delete this claim from the JSON file or unclaim it with \"/va village unclaim\" while standing in it.");
+//                    //Possibly a continued here? For now I'll leave it up to admins to fix
+//                }
                 addClaim(vClaim);
             }
         }
@@ -166,36 +172,36 @@ public class Village implements ClaimManager {
     }
 
 
-    public Village(JSONObject jsonObject) {
-        townName = (String) jsonObject.get("name");
-        townUUID = UUID.fromString((String) jsonObject.get("uuid"));
-        //Load Member List
-        for (Object member : (JSONArray) jsonObject.get("members")) {
-            this.members.add(UUID.fromString((String) member));
-        }
-        //Load Assistant List
-        for (Object assistant : (JSONArray) jsonObject.get("assistants")) {
-            this.assistants.add(UUID.fromString((String) assistant));
-        }
-        this.owner = UUID.fromString((String) jsonObject.get("owner"));
-        //Load Claims
-        JSONArray claims = (JSONArray) jsonObject.get("claims");
-        for (Object worldObject : claims) {
-            JSONObject world = (JSONObject) worldObject;
-            String worldName = (String) world.get("world");
-            JSONArray worldClaims = (JSONArray) world.get("claims");
-            for (Object claimObject : worldClaims) {
-                String claim = (String) claimObject;
-                String cords[] = claim.split(".");
-                VChunk vChunk = new VChunk(worldName, Integer.parseInt(cords[0]), Integer.parseInt(cords[1]));
-                claims.add(vChunk);
-            }
-        }
-        //Load Town Spawn
-        JSONObject townSpawn = (JSONObject) jsonObject.get("townSpawn");
-        this.townSpawn = new VCords(Integer.parseInt((String) townSpawn.get("x")), Integer.parseInt((String) townSpawn.get("y")), Integer.parseInt((String) townSpawn.get("z")), (String) townSpawn.get("world"));
-
-    }
+//    public Village(JSONObject jsonObject) {
+//        townName = (String) jsonObject.get("name");
+//        townUUID = UUID.fromString((String) jsonObject.get("uuid"));
+//        //Load Member List
+//        for (Object member : (JSONArray) jsonObject.get("members")) {
+//            this.members.add(UUID.fromString((String) member));
+//        }
+//        //Load Assistant List
+//        for (Object assistant : (JSONArray) jsonObject.get("assistants")) {
+//            this.assistants.add(UUID.fromString((String) assistant));
+//        }
+//        this.owner = UUID.fromString((String) jsonObject.get("owner"));
+//        //Load Claims
+//        JSONArray claims = (JSONArray) jsonObject.get("claims");
+//        for (Object worldObject : claims) {
+//            JSONObject world = (JSONObject) worldObject;
+//            String worldName = (String) world.get("world");
+//            JSONArray worldClaims = (JSONArray) world.get("claims");
+//            for (Object claimObject : worldClaims) {
+//                String claim = (String) claimObject;
+//                String cords[] = claim.split(".");
+//                VChunk vChunk = new VChunk(worldName, Integer.parseInt(cords[0]), Integer.parseInt(cords[1]));
+//                claims.add(vChunk);
+//            }
+//        }
+//        //Load Town Spawn
+//        JSONObject townSpawn = (JSONObject) jsonObject.get("townSpawn");
+//        this.townSpawn = new VCords(Integer.parseInt((String) townSpawn.get("x")), Integer.parseInt((String) townSpawn.get("y")), Integer.parseInt((String) townSpawn.get("z")), (String) townSpawn.get("world"));
+//
+//    }
 
     public boolean canPlayerAlter(Player player) {
         if (isRandomCanAlter()) {
@@ -384,8 +390,8 @@ public class Village implements ClaimManager {
 
     public void broadcastToTown(String message) {
         String broadcastMessage = ChatColor.GOLD + "[" + ChatColor.AQUA + "Village: " + getTownName() + ChatColor.GOLD + "] " + ChatColor.GRAY + message;
-        for(Player player : Bukkit.getOnlinePlayers()) {
-            if(isMember(player.getUniqueId())) {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            if (isMember(player.getUniqueId())) {
                 player.sendMessage(broadcastMessage);
             }
         }

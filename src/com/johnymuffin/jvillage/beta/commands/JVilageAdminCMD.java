@@ -1,8 +1,10 @@
 package com.johnymuffin.jvillage.beta.commands;
 
 import com.johnymuffin.jvillage.beta.JVillage;
+import com.johnymuffin.jvillage.beta.models.VCords;
 import com.johnymuffin.jvillage.beta.models.Village;
 import com.johnymuffin.jvillage.beta.models.chunk.VChunk;
+import com.johnymuffin.jvillage.beta.models.chunk.VClaim;
 import com.johnymuffin.jvillage.beta.player.VPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -10,8 +12,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;
-import java.util.WeakHashMap;
 
+import static com.johnymuffin.jvillage.beta.JVUtility.getChunkCenter;
 import static com.johnymuffin.jvillage.beta.JVUtility.getPlayerFromUUID;
 
 public class JVilageAdminCMD extends JVBaseCommand {
@@ -33,10 +35,59 @@ public class JVilageAdminCMD extends JVBaseCommand {
             //Plugin | World | Village | Player
             if (subcommand.equalsIgnoreCase("plugin")) return pluginCommand(commandSender, removeFirstEntry(strings));
             if (subcommand.equalsIgnoreCase("village")) return villageCommand(commandSender, removeFirstEntry(strings));
+            if (subcommand.equalsIgnoreCase("world")) return worldCommand(commandSender, removeFirstEntry(strings));
         }
 
         commandSender.sendMessage(language.getMessage("command_villageadmin_general_use"));
         return true;
+    }
+
+    private boolean worldCommand(CommandSender commandSender, String[] strings) {
+        if (!isAuthorized(commandSender, "jvillage.admin.world")) {
+            commandSender.sendMessage(language.getMessage("no_permission"));
+            return true;
+        }
+
+        if (strings.length > 0) {
+            String subcommand = strings[0];
+            if (subcommand.equalsIgnoreCase("wgcleanup"))
+                return worldWGCleanupCommand(commandSender, removeFirstEntry(strings));
+        }
+
+        commandSender.sendMessage(language.getMessage("command_villageadmin_world_use"));
+        return true;
+    }
+
+    private boolean worldWGCleanupCommand(CommandSender commandSender, String[] strings) {
+        if (!isAuthorized(commandSender, "jvillage.admin.world.wgcleanup")) {
+            commandSender.sendMessage(language.getMessage("no_permission"));
+            return true;
+        }
+
+        for (VClaim claim : plugin.getAllClaims()) {
+            Village village = this.plugin.getVillageMap().getVillage(claim.getVillage());
+            //Check if the claim is within a protected worldguard region
+            VCords cords = getChunkCenter(claim);
+            if (plugin.worldGuardIsClaimAllowed(cords)) {
+                continue;
+            }
+            //Remove the claim from the village
+            commandSender.sendMessage("Removing claim " + claim.toString() + " from village " + village.getTownName());
+            village.removeClaim(claim);
+            //Rum sanity checks to make sure the village is still valid
+            if (village.getClaims().size() == 0) {
+                String broadcast = language.getMessage("command_villageadmin_village_delete_broadcast");
+                broadcast = broadcast.replace("%admin%", commandSender.getName());
+                broadcast = broadcast.replace("%village%", village.getTownName());
+                Bukkit.broadcastMessage(broadcast);
+                commandSender.sendMessage("Village " + village.getTownName() + " has no claims left, removing village");
+                this.plugin.deleteVillage(village);
+            }
+
+        }
+        commandSender.sendMessage(language.getMessage("command_villageadmin_world_wgcleanup_success"));
+        return true;
+
     }
 
     private boolean villageUnclaim(CommandSender commandSender, String[] strings) {

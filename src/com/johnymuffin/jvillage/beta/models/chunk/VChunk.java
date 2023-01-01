@@ -24,7 +24,23 @@ public class VChunk {
         if (obj == this) return true;
         if (!(obj instanceof VChunk)) return false;
         VChunk chunk = (VChunk) obj;
-        return this.x == chunk.x && this.z == chunk.z && this.worldName.equalsIgnoreCase(chunk.worldName);
+        return this.x == chunk.x && this.z == chunk.z && this.worldName.equals(chunk.worldName);
+    }
+
+    public int getMinX() {
+        return x * 16;
+    }
+
+    public int getMinZ() {
+        return z * 16;
+    }
+
+    public int getMaxX() {
+        return x * 16 + 15;
+    }
+
+    public int getMaxZ() {
+        return z * 16 + 15;
     }
 
     @Override

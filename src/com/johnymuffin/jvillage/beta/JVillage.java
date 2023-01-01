@@ -2,6 +2,8 @@ package com.johnymuffin.jvillage.beta;
 
 import com.johnymuffin.beta.fundamentals.Fundamentals;
 import com.johnymuffin.beta.fundamentals.player.FundamentalsPlayer;
+import com.johnymuffin.beta.webapi.JWebAPI;
+import com.johnymuffin.beta.webapi.event.JWebAPIDisable;
 import com.johnymuffin.jvillage.beta.commands.JVilageAdminCMD;
 import com.johnymuffin.jvillage.beta.commands.JVillageCMD;
 import com.johnymuffin.jvillage.beta.commands.VResidentCommand;
@@ -16,14 +18,19 @@ import com.johnymuffin.jvillage.beta.maps.JVillageMap;
 import com.johnymuffin.jvillage.beta.models.*;
 import com.johnymuffin.jvillage.beta.models.chunk.VChunk;
 import com.johnymuffin.jvillage.beta.models.chunk.VClaim;
+//import com.johnymuffin.jvillage.beta.overviewer.RegionGenerator;
+//import com.johnymuffin.jvillage.beta.overviewer.OverviewerExporter;
 import com.johnymuffin.jvillage.beta.player.VPlayer;
+import com.johnymuffin.jvillage.beta.routes.api.v1.JVillageGetPlayerRoute;
+import com.johnymuffin.jvillage.beta.routes.api.v1.JVillageGetVillageList;
+import com.johnymuffin.jvillage.beta.routes.api.v1.JVillageGetVillageRoute;
+import com.legacyminecraft.poseidon.event.PoseidonCustomListener;
 import com.palmergames.bukkit.towny.Towny;
 import com.palmergames.bukkit.towny.object.Resident;
 import com.palmergames.bukkit.towny.object.Town;
 import com.palmergames.bukkit.towny.object.TownBlock;
 import com.palmergames.bukkit.towny.object.TownyWorld;
 import com.projectposeidon.api.PoseidonUUID;
-import com.sk89q.worldguard.bukkit.BukkitUtil;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.managers.RegionManager;
@@ -31,18 +38,18 @@ import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
+import org.bukkit.event.EventHandler;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
-import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static com.johnymuffin.jvillage.beta.JVUtility.formatVillageList;
-
-public class JVillage extends JavaPlugin implements ClaimManager {
+public class JVillage extends JavaPlugin implements ClaimManager, PoseidonCustomListener {
     //Basic Plugin Info
     private static JVillage plugin;
     private Logger log;
@@ -60,6 +67,8 @@ public class JVillage extends JavaPlugin implements ClaimManager {
 
     private JVillageMap villageMap;
     private JPlayerMap playerMap;
+
+    private boolean apiEnabled = false;
 
     @Override
     public void onEnable() {
@@ -104,21 +113,21 @@ public class JVillage extends JavaPlugin implements ClaimManager {
         logger(Level.INFO, "Loaded " + villagesLoaded + " villages and " + claimsLoaded + " claims.");
 
 
-        logger(Level.INFO, "Checking for duplicate claims...");
-        int duplicateClaims = 0;
-
-
-        for (VClaim vClaim : this.getAllClaims()) {
-            Village[] villagesOnClaim = this.getVillagesAtLocation(vClaim);
-            if (villagesOnClaim.length > 1) {
-                duplicateClaims++;
-                logger(Level.WARNING, "Duplicate claim found at " + vClaim.toString() + " for villages " + formatVillageList(villagesOnClaim) + ". It is advised that you delete this claim from the JSON file or unclaim it with \"/va village unclaim\" while standing in it.");
-            }
-        }
-
-        if (duplicateClaims > 0) {
-            logger(Level.WARNING, duplicateClaims + " duplicate claims found.");
-        }
+//        logger(Level.INFO, "Checking for duplicate claims...");
+//        int duplicateClaims = 0;
+//
+//
+//        for (VClaim vClaim : this.getAllClaims()) {
+//            Village[] villagesOnClaim = this.getVillagesAtLocation(vClaim);
+//            if (villagesOnClaim.length > 1) {
+//                duplicateClaims++;
+//                logger(Level.WARNING, "Duplicate claim found at " + vClaim.toString() + " for villages " + formatVillageList(villagesOnClaim) + ". It is advised that you delete this claim from the JSON file or unclaim it with \"/va village unclaim\" while standing in it.");
+//            }
+//        }
+//
+//        if (duplicateClaims > 0) {
+//            logger(Level.WARNING, duplicateClaims + " duplicate claims found.");
+//        }
 
 
         int playersLoaded = 0;
@@ -150,13 +159,23 @@ public class JVillage extends JavaPlugin implements ClaimManager {
         //Scheduled Tasks
 
         //Save all villages every 5 minutes
-        Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
-            @Override
-            public void run() {
-                plugin.logger(Level.INFO, "Saving all villages");
-                villageMap.saveData();
-            }
-        }, 20 * 60 * 5, 20 * 60 * 5);
+//        Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
+//            @Override
+//            public void run() {
+//                plugin.logger(Level.INFO, "Saving all villages");
+//                villageMap.saveData();
+//            }
+//        }, 20 * 60 * 5, 20 * 60 * 5);
+//
+//        try {
+//            exportOverviewerRegions();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+
+//        ArrayList<VClaim> claims = this.getVillageMap().getVillage("Kekistan").getClaims();
+//        RegionGenerator regionGenerator = new RegionGenerator(this);
+//        regionGenerator.generateMapRegionsForClaims(Bukkit.getWorlds().get(0), claims);
 
 //        OverviewerExporter exporter = new OverviewerExporter(this);
 //        String regions = exporter.generateOverviewerRegions();
@@ -169,7 +188,59 @@ public class JVillage extends JavaPlugin implements ClaimManager {
 //            e.printStackTrace();
 //        }
 
+        //Register API routes if JWebAPI is installed
+        if (Bukkit.getPluginManager().getPlugin("JWebAPI") != null) {
+            logger(Level.INFO, "JWebAPI found, registering API routes");
+            JWebAPI jWebAPI = (JWebAPI) Bukkit.getPluginManager().getPlugin("JWebAPI");
+            jWebAPI.registerRoute(JVillageGetPlayerRoute.class, "/api/v1/village/getPlayer");
+            jWebAPI.registerRoute(JVillageGetVillageRoute.class, "/api/v1/village/getVillage");
+            jWebAPI.registerRoute(JVillageGetVillageList.class, "/api/v1/village/getVillageList");
+            apiEnabled = true;
+            logger(Level.INFO, "API routes registered");
+        }
 
+        Bukkit.getPluginManager().registerEvents(this, this);
+
+    }
+
+    public void removeAPIRoutes() {
+        if (apiEnabled) {
+            logger(Level.INFO, "Unregistering API routes");
+            JWebAPI jWebAPI = (JWebAPI) Bukkit.getPluginManager().getPlugin("JWebAPI");
+            try {
+                jWebAPI.unregisterServlets(JVillageGetPlayerRoute.class);
+                jWebAPI.unregisterServlets(JVillageGetVillageRoute.class);
+                jWebAPI.unregisterServlets(JVillageGetVillageList.class);
+                logger(Level.INFO, "Unregistered API routes");
+            } catch (Exception e) {
+                logger(Level.WARNING, "Failed to unregister API routes");
+                e.printStackTrace();
+            }
+
+        }
+    }
+
+    @EventHandler
+    public void onCustomEvent(final Event customEvent) {
+        if (!apiEnabled) return;
+        if (!(customEvent instanceof JWebAPIDisable)) return;
+        //Remove API routes if enabled and JStoreDisableEvent is called
+        logger(Level.INFO, "JWebAPI disabled, removing API routes");
+        removeAPIRoutes();
+    }
+
+    @Override
+    public void onDisable() {
+        logger(Level.INFO, "Saving all villages");
+        villageMap.saveData();
+
+        removeAPIRoutes();
+
+        if (errored) {
+            logger(Level.INFO, "Has been disabled due to an error. No programmed shutdown procedures have been run.");
+            return;
+        }
+        logger(Level.INFO, "Has been disabled.");
     }
 
 //    public int loadAllChunks(Village village) {
@@ -181,6 +252,17 @@ public class JVillage extends JavaPlugin implements ClaimManager {
 //            }
 //        }
 //        return claimsLoaded;
+//    }
+
+//    public void exportOverviewerRegions() throws IOException {
+//        logger(Level.INFO, "Exporting Overviewer Regions");
+//        File regionFolder = new File(this.getDataFolder(), "regions");
+//        if (!regionFolder.exists()) {
+//            regionFolder.mkdirs();
+//        }
+//        OverviewerExporter exporter = new OverviewerExporter(this, regionFolder);
+//        exporter.generateOverviewerRegions();
+//        logger(Level.INFO, "Exported Overviewer Regions");
 //    }
 
     public Fundamentals getFundamentals() {
@@ -225,7 +307,7 @@ public class JVillage extends JavaPlugin implements ClaimManager {
         }
         //Remove duplicate entries
         return villages.stream().distinct().toArray(Village[]::new);
-        
+
     }
 
     public ArrayList<VClaim> getAllClaims() {
@@ -234,18 +316,6 @@ public class JVillage extends JavaPlugin implements ClaimManager {
             allClaims.addAll(vClaims);
         }
         return allClaims;
-    }
-
-    @Override
-    public void onDisable() {
-        if (errored) {
-            log.info("[" + pluginName + "] Has been disabled due to an error. No programmed shutdown procedures have been run.");
-            return;
-        }
-
-        plugin.logger(Level.INFO, "Saving all villages");
-        villageMap.saveData();
-
     }
 
     public void errorShutdown(String message) {

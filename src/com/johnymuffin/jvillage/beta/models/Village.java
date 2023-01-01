@@ -416,4 +416,8 @@ public class Village implements ClaimManager {
         }
         return vClaims.toArray(new VClaim[vClaims.size()]);
     }
+
+    public HashMap<VillageFlags, Boolean> getFlags() {
+        return flags;
+    }
 }

@@ -38,6 +38,12 @@ public class JVMobListener extends EntityListener implements Listener {
         if (village == null) {
             return;
         }
+
+        if (event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.SPAWNER && village.isMobSpawnerBypass()) {
+            //Allow the mob to spawn if it is from a spawner, and the village has mob spawner bypass enabled
+            return;
+        }
+
         if (village.isMobsCanSpawn()) {
             return;
         }
@@ -65,7 +71,7 @@ public class JVMobListener extends EntityListener implements Listener {
 
         //Return if the damager is not a hostile mob
         if (!(damager instanceof Monster)) {
-            if(damager instanceof CraftArrow) {
+            if (damager instanceof CraftArrow) {
                 CraftArrow arrow = (CraftArrow) event.getDamager();
                 damager = (CraftEntity) arrow.getShooter();
                 //Return if the damager is not a hostile mob

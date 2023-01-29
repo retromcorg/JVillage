@@ -87,6 +87,7 @@ public class JVillageLanguage extends Configuration {
                 "\n&7Village In: %villagein%" +
                 "\n&7Village Selected: %village%" +
                 "\n&7Village Info: /v info [village]" +
+                "\n&7Village List: /v list" +
                 "\n&7Village Help: /v help");
 
         map.put("command_village_help_use", "&bPlease use &9/village help [player|assistant|owner|flags]");
@@ -120,6 +121,12 @@ public class JVillageLanguage extends Configuration {
                 "\n&7Members: %members%" +
                 "\n&7Claims: %claims%" +
                 "\n&7Spawn: %spawn%");
+
+        map.put("command_village_list_use", "&9--- &bJVillage List&9---" +
+                "\n&7Village: %village%" +
+                "\n&7Owner: %owner%" +
+                "\n&7Assistants: %assistants%" +
+                "\n&7Members: %members%");
 
         map.put("command_village_select_use", "&bYour selected village is &9%village%");
         map.put("command_village_select_none", "&cYou have no selected village");

@@ -375,6 +375,15 @@ public class Village implements ClaimManager {
         this.flags.put(VillageFlags.MOBS_CAN_SPAWN, mobsCanSpawn);
     }
 
+    public boolean isMobSpawnerBypass() {
+        return this.flags.get(VillageFlags.MOB_SPAWNER_BYPASS);
+    }
+
+    public void setMobSpawnerBypass(boolean mobSpawnerBypass) {
+        modified = true; // Indicate that the village has been modified and needs to be saved
+        this.flags.put(VillageFlags.MOB_SPAWNER_BYPASS, mobSpawnerBypass);
+    }
+
     public boolean isMembersCanInvite() {
         return this.flags.get(VillageFlags.MEMBERS_CAN_INVITE);
     }

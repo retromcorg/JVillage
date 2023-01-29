@@ -5,4 +5,5 @@ public enum VillageFlags {
     RANDOM_CAN_ALTER,
     MOBS_CAN_SPAWN,
     MEMBERS_CAN_INVITE,
+    MOB_SPAWNER_BYPASS,
 }

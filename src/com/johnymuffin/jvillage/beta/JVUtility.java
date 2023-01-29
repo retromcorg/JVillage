@@ -4,7 +4,6 @@ import com.johnymuffin.jvillage.beta.models.VCords;
 import com.johnymuffin.jvillage.beta.models.Village;
 import com.johnymuffin.jvillage.beta.models.chunk.VChunk;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -24,6 +23,15 @@ public class JVUtility {
     public static VCords getChunkCenter(VChunk vChunk) {
 //        return new Location(Bukkit.getWorld(vChunk.getWorldName()), vChunk.getX() + 8, 0, vChunk.getZ() + 8);
         return new VCords(vChunk.getX() * 16 + 8, 0, vChunk.getZ() * 16 + 8, vChunk.getWorldName());
+    }
+
+    public static VCords[] getChunkCorners(VChunk vChunk) {
+        VCords[] corners = new VCords[4];
+        corners[0] = new VCords(vChunk.getX() * 16, 0, vChunk.getZ() * 16, vChunk.getWorldName());
+        corners[1] = new VCords(vChunk.getX() * 16 + 15, 0, vChunk.getZ() * 16, vChunk.getWorldName());
+        corners[2] = new VCords(vChunk.getX() * 16, 0, vChunk.getZ() * 16 + 15, vChunk.getWorldName());
+        corners[3] = new VCords(vChunk.getX() * 16 + 15, 0, vChunk.getZ() * 16 + 15, vChunk.getWorldName());
+        return corners;
     }
 
     public static Player getPlayerFromUUID(UUID uuid) {
@@ -46,7 +54,23 @@ public class JVUtility {
         return stringBuilder.toString();
     }
 
+    public static String formatUsernames(JVillage plugin, UUID[] players) {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < players.length; i++) {
+            String username = plugin.getPlayerMap().getPlayer(players[i]).getUsername();
 
+            //Don't show the username if the player username is unknown
+            if(username.equalsIgnoreCase("unknown uuid")) {
+                continue;
+            }
+
+            stringBuilder.append(username);
+            if (i < players.length - 1) {
+                stringBuilder.append(", ");
+            }
+        }
+        return stringBuilder.toString();
+    }
 
 
 }

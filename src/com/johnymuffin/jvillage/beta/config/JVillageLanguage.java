@@ -36,6 +36,8 @@ public class JVillageLanguage extends Configuration {
         map.put("movement_wilderness_enter", "&bYou have entered the wilderness");
         map.put("unknown_economy_error", "&4Sorry, an unknown economy error occurred");
 
+        map.put("assistant_or_higher", "&4Sorry, you must be an assistant or higher to do that");
+
 
         map.put("movement_autoselect_enter", "&bYour selected village has been set to &9%village% &bbecause you have entered it");
 
@@ -115,6 +117,14 @@ public class JVillageLanguage extends Configuration {
                 "\n&8- &7/village setspawn &8- &7Set the spawn point for your village" +
                 "\n&8- &7/village rename [name] &8- &7Rename your village");
 
+        map.put("command_village_flag_help", "&cJVillage Flag Commands" +
+                "\n&8- &7/village flag [flag] [value] &8- &7Set a flag for your village" +
+                "\n&8- &7/village flag list &8- &7List all flags for your village");
+
+        map.put("command_village_flag_unknown", "&cSorry, that flag does not exist. Try /village flag list");
+        map.put("command_village_flag_invalid_value", "&cSorry, that is not a valid value for that flag. Use true or false.");
+        map.put("command_village_flag_set_success", "&bFlag %flag% has been set to %value%");
+
         map.put("command_village_info_use", "&6Information for %village%" +
                 "\n&7Owner: %owner%" +
                 "\n&7Assistants: %assistants%" +
@@ -127,6 +137,10 @@ public class JVillageLanguage extends Configuration {
                 "\n&7Owner: %owner%" +
                 "\n&7Assistants: %assistants%" +
                 "\n&7Members: %members%");
+
+        map.put("command_village_flag_list_use", "&9--- &bJVillage Flags&9---" +
+                "%flags%");
+
 
         map.put("command_village_select_use", "&bYour selected village is &9%village%");
         map.put("command_village_select_none", "&cYou have no selected village");
@@ -232,18 +246,6 @@ public class JVillageLanguage extends Configuration {
                 "\n&bOwner of: %owner%" +
                 "\n&aAssistant of: %assistant%" +
                 "\n&eMember of: %member%");
-
-
-        //JPerms command
-        map.put("jperms_main_general_use", "&cSorry, that is invalid. Try /jperms (user/group/plugin)");
-        map.put("jperms_user_general_use", "&cSorry, that is invalid. Try /jperms user (username/uuid) (group/perm)");
-        map.put("jperms_user_perm_use", "&cSorry, that is invalid. Try /jperms user (username/uuid) perm (add/list/remove)");
-        map.put("jperms_user_perm_add_use", "&cSorry, that is invalid. Try /jperms user (username/uuid) perm add (perm)");
-        map.put("jperms_user_group_general_use", "&cSorry, that is invalid. Try /jperms user (username/uuid) group (set)");
-        map.put("jperms_group_general_use", "&cSorry, that is invalid. Try /jperms group (group) (list/perm/inheritance)");
-        map.put("jperms_group_general_unknown", "&cSorry, that group is unknown");
-        map.put("jperms_user_perm_remove_use", "&cSorry, that is invalid. Try /jperms user (username/uuid) perm remove (perm)");
-        map.put("jperms_plugin_use", "&cSorry, that is invalid. Try /jperms plugin (reload/save)");
 
     }
 

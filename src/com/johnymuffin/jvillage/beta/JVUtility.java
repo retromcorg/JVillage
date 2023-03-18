@@ -34,6 +34,14 @@ public class JVUtility {
         return corners;
     }
 
+    public static double distance(VCords cords1, VCords cords2) {
+        return Math.sqrt(Math.pow(cords1.getX() - cords2.getX(), 2) + Math.pow(cords1.getZ() - cords2.getZ(), 2));
+    }
+
+    public static double distance(VChunk chunk1, VChunk chunk2) {
+        return distance(getChunkCenter(chunk1), getChunkCenter(chunk2));
+    }
+
     public static Player getPlayerFromUUID(UUID uuid) {
         for (Player player : Bukkit.getOnlinePlayers()) {
             if (player.getUniqueId().equals(uuid)) {

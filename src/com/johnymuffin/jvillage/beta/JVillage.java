@@ -37,6 +37,7 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
@@ -200,6 +201,22 @@ public class JVillage extends JavaPlugin implements ClaimManager, PoseidonCustom
         }
 
         Bukkit.getPluginManager().registerEvents(this, this);
+
+
+        long startTime = System.currentTimeMillis();
+        for (int i = 0; i < 500; i++) {
+            //Random X and Z within 30000 blocks of 0,0
+            int x = (int) (Math.random() * 60000) - 30000;
+            int z = (int) (Math.random() * 60000) - 30000;
+
+            //Get closest village
+            VClaim claim = findClosestClaim(new VCords(x, 0, z, Bukkit.getWorlds().get(0).getName()));
+            Village village = getVillageMap().getVillage(claim.getVillage());
+            logger(Level.INFO, "Closest claim to " + x + ", " + z + " is " + village.getTownName() + " at " + (claim.getX() * 16) + ", " + (claim.getZ() * 16));
+        }
+        long endTime = System.currentTimeMillis();
+        logger(Level.INFO, "Took " + (endTime - startTime) + "ms to find 100 closest claims");
+
 
     }
 
@@ -627,6 +644,44 @@ public class JVillage extends JavaPlugin implements ClaimManager, PoseidonCustom
 //        return null;
 //    }
 
+
+    public static VClaim findClosestClaim(VCords cords) {
+        VClaim closestClaim = null;
+        double closestDistance = Double.MAX_VALUE;
+        for (VClaim claim : plugin.getClaimsInWorld(cords.getWorldName())) {
+            int claimX = claim.getX() * 16 + 8;
+            int claimZ = claim.getZ() * 16 + 8;
+            double distance = Math.sqrt(Math.pow(claimX - cords.getX(), 2) + Math.pow(claimZ - cords.getY(), 2));
+            if (distance < closestDistance) {
+                closestDistance = distance;
+                closestClaim = claim;
+            }
+        }
+        return closestClaim;
+    }
+
+    public static VClaim[] getClaimsInRadius(VCords cords, double radius) {
+        ArrayList<VClaim> claimsInRadius = new ArrayList<>();
+        for (VClaim claim : plugin.getClaimsInWorld(cords.getWorldName())) {
+            int claimX = claim.getX() * 16 + 8;
+            int claimZ = claim.getZ() * 16 + 8;
+            double distance = Math.sqrt(Math.pow(claimX - cords.getX(), 2) + Math.pow(claimZ - cords.getY(), 2));
+            if (distance < radius) {
+                claimsInRadius.add(claim);
+            }
+        }
+        return claimsInRadius.toArray(new VClaim[0]);
+    }
+
+    public VClaim[] getClaimsInWorld(String worldName) {
+        ArrayList<VClaim> claimsInWorld = new ArrayList<>();
+        for (VClaim claim2 : getAllClaims()) {
+            if (claim2.getWorldName().equals(worldName)) {
+                claimsInWorld.add(claim2);
+            }
+        }
+        return claimsInWorld.toArray(new VClaim[0]);
+    }
 
     public JVillageSettings getSettings() {
         return settings;

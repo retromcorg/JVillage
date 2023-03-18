@@ -203,6 +203,11 @@ public class Village implements ClaimManager {
 //
 //    }
 
+    public void setFlag(VillageFlags flag, boolean value) {
+        modified = true; // Indicate that the village has been modified and needs to be saved
+        flags.put(flag, value);
+    }
+
     public boolean canPlayerAlter(Player player) {
         if (isRandomCanAlter()) {
             return true;

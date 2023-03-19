@@ -1,6 +1,7 @@
 package com.johnymuffin.jvillage.beta.models.chunk;
 
 import com.johnymuffin.jvillage.beta.models.Village;
+import org.json.simple.JSONObject;
 
 import java.util.UUID;
 
@@ -30,4 +31,5 @@ public class VClaim extends VChunk {
     public VClaim(Village village, VChunk vChunk) {
         this(village, vChunk.getWorldName(), vChunk.getX(), vChunk.getZ());
     }
+
 }

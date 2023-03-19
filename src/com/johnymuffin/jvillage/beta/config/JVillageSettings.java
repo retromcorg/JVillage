@@ -38,6 +38,12 @@ public class JVillageSettings extends Configuration {
         generateConfigOption("settings.resident.maximum-towns-joined.info", "This is the maximum number of towns a resident can join. Set to 0 to disable.");
 
         generateConfigOption("settings.world-guard.blocked-regions.info", "Claims will not be allowed by players within these WorldGuard regions.");
+        generateConfigOption("settings.world-guard.blocked-regions.enabled", true);
+
+        generateConfigOption("settings.town-create.claim-radius.enabled", false);
+        generateConfigOption("settings.town-create.claim-radius.value", 128);
+        generateConfigOption("settings.town-create.claim-radius.info", "How far away a town creation claim has to be from other towns");
+
         getWorldGuardPermissions(); //This is a hack to get the default value to be added to the config file.
 
     }

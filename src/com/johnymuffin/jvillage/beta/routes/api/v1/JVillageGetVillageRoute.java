@@ -76,12 +76,14 @@ public class JVillageGetVillageRoute extends JVillageNormalRoute {
                     villageJSON.put("spawn", village.getTownSpawn().getJsonObject());
                     //Town Flags
                     JSONObject flags = new JSONObject();
-                    for(VillageFlags flag : village.getFlags().keySet()) {
+                    for (VillageFlags flag : village.getFlags().keySet()) {
                         flags.put(flag.toString(), village.getFlags().get(flag));
                     }
                     villageJSON.put("flags", flags);
                     villageJSON.put("claims", village.getTotalClaims());
                     villageJSON.put("error", false);
+
+                    villageJSON.put("creationTime", village.getCreationTime());
 
                     //Send response
                     response.setStatus(HttpServletResponse.SC_OK);

@@ -25,6 +25,10 @@ public class JVUtility {
         return new VCords(vChunk.getX() * 16 + 8, 0, vChunk.getZ() * 16 + 8, vChunk.getWorldName());
     }
 
+    public static boolean cordsInChunk(VCords cords, VChunk vChunk) {
+        return cords.getX() >= vChunk.getX() * 16 && cords.getX() <= vChunk.getX() * 16 + 15 && cords.getZ() >= vChunk.getZ() * 16 && cords.getZ() <= vChunk.getZ() * 16 + 15;
+    }
+
     public static VCords[] getChunkCorners(VChunk vChunk) {
         VCords[] corners = new VCords[4];
         corners[0] = new VCords(vChunk.getX() * 16, 0, vChunk.getZ() * 16, vChunk.getWorldName());

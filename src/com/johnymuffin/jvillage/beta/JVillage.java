@@ -50,6 +50,8 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static com.johnymuffin.jvillage.beta.JVUtility.formatVillageList;
+
 public class JVillage extends JavaPlugin implements ClaimManager, PoseidonCustomListener {
     //Basic Plugin Info
     private static JVillage plugin;
@@ -118,6 +120,7 @@ public class JVillage extends JavaPlugin implements ClaimManager, PoseidonCustom
 //        int duplicateClaims = 0;
 //
 //
+//        long startTime = System.currentTimeMillis();
 //        for (VClaim vClaim : this.getAllClaims()) {
 //            Village[] villagesOnClaim = this.getVillagesAtLocation(vClaim);
 //            if (villagesOnClaim.length > 1) {
@@ -126,9 +129,9 @@ public class JVillage extends JavaPlugin implements ClaimManager, PoseidonCustom
 //            }
 //        }
 //
-//        if (duplicateClaims > 0) {
-//            logger(Level.WARNING, duplicateClaims + " duplicate claims found.");
-//        }
+//        long endTime = System.currentTimeMillis();
+//
+//        logger(Level.INFO, "Checked " + claimsLoaded + " claims in " + (endTime - startTime) + "ms. Found " + duplicateClaims + " duplicate claims.");
 
 
         int playersLoaded = 0;
@@ -203,19 +206,19 @@ public class JVillage extends JavaPlugin implements ClaimManager, PoseidonCustom
         Bukkit.getPluginManager().registerEvents(this, this);
 
 
-        long startTime = System.currentTimeMillis();
-        for (int i = 0; i < 500; i++) {
-            //Random X and Z within 30000 blocks of 0,0
-            int x = (int) (Math.random() * 60000) - 30000;
-            int z = (int) (Math.random() * 60000) - 30000;
-
-            //Get closest village
-            VClaim claim = findClosestClaim(new VCords(x, 0, z, Bukkit.getWorlds().get(0).getName()));
-            Village village = getVillageMap().getVillage(claim.getVillage());
-            logger(Level.INFO, "Closest claim to " + x + ", " + z + " is " + village.getTownName() + " at " + (claim.getX() * 16) + ", " + (claim.getZ() * 16));
-        }
-        long endTime = System.currentTimeMillis();
-        logger(Level.INFO, "Took " + (endTime - startTime) + "ms to find 100 closest claims");
+//        long startTime = System.currentTimeMillis();
+//        for (int i = 0; i < 500; i++) {
+//            //Random X and Z within 30000 blocks of 0,0
+//            int x = (int) (Math.random() * 60000) - 30000;
+//            int z = (int) (Math.random() * 60000) - 30000;
+//
+//            //Get closest village
+//            VClaim claim = findClosestClaim(new VCords(x, 0, z, Bukkit.getWorlds().get(0).getName()));
+//            Village village = getVillageMap().getVillage(claim.getVillage());
+//            logger(Level.INFO, "Closest claim to " + x + ", " + z + " is " + village.getTownName() + " at " + (claim.getX() * 16) + ", " + (claim.getZ() * 16));
+//        }
+//        long endTime = System.currentTimeMillis();
+//        logger(Level.INFO, "Took " + (endTime - startTime) + "ms to find 100 closest claims");
 
 
     }
@@ -345,6 +348,10 @@ public class JVillage extends JavaPlugin implements ClaimManager, PoseidonCustom
     public boolean worldGuardIsClaimAllowed(VCords vCords) {
         if (Bukkit.getPluginManager().getPlugin("WorldGuard") == null) {
             return true; //Assume yes if worldguard is disabled
+        }
+
+        if(!this.getSettings().getConfigBoolean("settings.world-guard.blocked-regions.enabled")) {
+            return true;
         }
 
         WorldGuardPlugin worldGuardPlugin = (WorldGuardPlugin) Bukkit.getPluginManager().getPlugin("WorldGuard");
@@ -645,7 +652,7 @@ public class JVillage extends JavaPlugin implements ClaimManager, PoseidonCustom
 //    }
 
 
-    public static VClaim findClosestClaim(VCords cords) {
+    public VClaim findClosestClaim(VCords cords) {
         VClaim closestClaim = null;
         double closestDistance = Double.MAX_VALUE;
         for (VClaim claim : plugin.getClaimsInWorld(cords.getWorldName())) {
@@ -660,7 +667,7 @@ public class JVillage extends JavaPlugin implements ClaimManager, PoseidonCustom
         return closestClaim;
     }
 
-    public static VClaim[] getClaimsInRadius(VCords cords, double radius) {
+    public VClaim[] getClaimsInRadius(VCords cords, double radius) {
         ArrayList<VClaim> claimsInRadius = new ArrayList<>();
         for (VClaim claim : plugin.getClaimsInWorld(cords.getWorldName())) {
             int claimX = claim.getX() * 16 + 8;

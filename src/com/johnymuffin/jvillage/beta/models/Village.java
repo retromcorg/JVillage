@@ -2,6 +2,7 @@ package com.johnymuffin.jvillage.beta.models;
 
 import com.johnymuffin.jvillage.beta.JVillage;
 import com.johnymuffin.jvillage.beta.interfaces.ClaimManager;
+import com.johnymuffin.jvillage.beta.models.chunk.ChunkClaimSettings;
 import com.johnymuffin.jvillage.beta.models.chunk.VChunk;
 import com.johnymuffin.jvillage.beta.models.chunk.VClaim;
 import org.bukkit.Bukkit;
@@ -12,23 +13,27 @@ import org.json.simple.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.UUID;
-import java.util.logging.Level;
 
 public class Village implements ClaimManager {
-    private JVillage plugin;
+    private final JVillage plugin;
     private String townName;
-    private UUID townUUID;
-    private ArrayList<UUID> members = new ArrayList<UUID>();
-    private ArrayList<UUID> assistants = new ArrayList<UUID>();
+    private final UUID townUUID;
+    private final ArrayList<UUID> members = new ArrayList<UUID>();
+    private final ArrayList<UUID> assistants = new ArrayList<UUID>();
     private UUID owner;
     private VCords townSpawn;
 
     private boolean modified = false;
 
-    private HashMap<VillageFlags, Boolean> flags = new HashMap<VillageFlags, Boolean>();
+    private final HashMap<VillageFlags, Boolean> flags = new HashMap<VillageFlags, Boolean>();
 
-    private ArrayList<UUID> invited = new ArrayList<UUID>();
+    private final ArrayList<UUID> invited = new ArrayList<UUID>();
+
+    private final ArrayList<ChunkClaimSettings> claimMetadata = new ArrayList<>();
+
+    private final long creationTime;
 
     private void initializeFlags() {
         for (VillageFlags flag : VillageFlags.values()) {
@@ -44,6 +49,7 @@ public class Village implements ClaimManager {
         System.out.println("[JVillage Debug] Claiming initial chunk: " + addClaim(new VClaim(this, vChunk)));
         this.townSpawn = townSpawn;
         modified = true;
+        this.creationTime = System.currentTimeMillis() / 1000L;
         initializeFlags();
     }
 
@@ -91,6 +97,25 @@ public class Village implements ClaimManager {
                 addClaim(vClaim);
             }
         }
+
+        //Load chunk claim metadata
+        JSONArray chunkClaimMetadata = (JSONArray) object.getOrDefault("chunkClaimMetadata", new JSONArray());
+        for (Object worldArrayRaw : chunkClaimMetadata) {
+            JSONArray worldArray = (JSONArray) worldArrayRaw;
+
+            String worldName = String.valueOf(worldArray.get(0));
+
+            for (int i = 1; i < worldArray.size(); i++) {
+                JSONObject chunkMetadata = (JSONObject) worldArray.get(i);
+                ChunkClaimSettings settings = new ChunkClaimSettings(this, chunkMetadata, worldName);
+                claimMetadata.add(settings);
+            }
+
+        }
+
+        this.creationTime = Long.parseLong(String.valueOf(object.getOrDefault("creationTime", 1640995200L)));
+
+
         initializeFlags();
         //Load flags saved
         JSONObject flags = (JSONObject) object.getOrDefault("flags", new JSONObject());
@@ -99,6 +124,32 @@ public class Village implements ClaimManager {
         }
 
     }
+
+    public long getCreationTime() {
+        return creationTime;
+    }
+
+    public ChunkClaimSettings getChunkClaimSettings(VChunk vChunk) {
+        ChunkClaimSettings claim = claimMetadata.get(claimMetadata.indexOf(vChunk));
+
+        //Generate new Metadata if it doesn't exist
+        if (claim == null) {
+            //Time of 1st of January 2023
+            long time = 1640995200L;
+            claim = new ChunkClaimSettings(this, time, getOwner(), vChunk);
+            claimMetadata.add(claim);
+        }
+
+        return claim;
+    }
+
+    public void addChunkClaimMetadata(ChunkClaimSettings settings) {
+        modified = true;
+        //Remove old metadata if it exists
+        claimMetadata.remove(settings); //This works because it extends VChunk
+        claimMetadata.add(settings);
+    }
+
 
     public JSONObject getJsonObject() {
         JSONObject object = new JSONObject();
@@ -127,6 +178,18 @@ public class Village implements ClaimManager {
             claimsJsonArray.add(worldClaims);
         }
 
+        //Save chunk claim metadata
+        JSONArray chunkClaimMetadata = new JSONArray();
+        for (String worldName : this.getWorldsWithClaims()) {
+            JSONArray worldArray = new JSONArray();
+            worldArray.add(worldName);
+            for (ChunkClaimSettings settings : this.getChunkClaimSettingsInWorld(worldName)) {
+                worldArray.add(settings.getJsonObject());
+            }
+            chunkClaimMetadata.add(worldArray);
+        }
+        object.put("chunkClaimMetadata", chunkClaimMetadata);
+
         //Save Flags
         JSONObject flags = new JSONObject();
         for (VillageFlags flag : this.flags.keySet()) {
@@ -136,7 +199,18 @@ public class Village implements ClaimManager {
 
         object.put("claims", claimsJsonArray);
         object.put("townSpawn", this.townSpawn.getJsonObject());
+        object.put("creationTime", this.creationTime);
         return object;
+    }
+
+    private ChunkClaimSettings[] getChunkClaimSettingsInWorld(String worldName) {
+        ArrayList<ChunkClaimSettings> settings = new ArrayList<>();
+        for (ChunkClaimSettings setting : claimMetadata) {
+            if (setting.getWorldName().equals(worldName)) {
+                settings.add(setting);
+            }
+        }
+        return settings.toArray(new ChunkClaimSettings[0]);
     }
 
     public void invitePlayer(UUID uuid) {

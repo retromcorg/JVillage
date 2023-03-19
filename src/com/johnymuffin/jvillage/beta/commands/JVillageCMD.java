@@ -8,6 +8,7 @@ import com.johnymuffin.jvillage.beta.config.JVillageSettings;
 import com.johnymuffin.jvillage.beta.models.VCords;
 import com.johnymuffin.jvillage.beta.models.Village;
 import com.johnymuffin.jvillage.beta.models.VillageFlags;
+import com.johnymuffin.jvillage.beta.models.chunk.ChunkClaimSettings;
 import com.johnymuffin.jvillage.beta.models.chunk.VChunk;
 import com.johnymuffin.jvillage.beta.models.chunk.VClaim;
 import com.johnymuffin.jvillage.beta.player.VPlayer;
@@ -164,7 +165,7 @@ public class JVillageCMD extends JVBaseCommand {
         // See if user specified a flag
         VillageFlags flag = null;
         for (VillageFlags villageFlag : VillageFlags.values()) {
-            if (villageFlag.name().equalsIgnoreCase(strings[0]) || villageFlag.name().replace("_", "").equalsIgnoreCase(strings[0)) {
+            if (villageFlag.name().equalsIgnoreCase(strings[0]) || villageFlag.name().replace("_", "").equalsIgnoreCase(strings[0])) {
                 flag = villageFlag;
                 break;
             }
@@ -190,8 +191,8 @@ public class JVillageCMD extends JVBaseCommand {
 
 
         //Check if user is assistant or higher
-        if (!village.isAssistant(player.getUniqueId())) {
-            commandSender.sendMessage(language.getMessage("assistant_or_higher"));
+        if (!village.isOwner(player.getUniqueId())) {
+            commandSender.sendMessage(language.getMessage("owner_or_higher"));
             return true;
         }
 
@@ -768,6 +769,15 @@ public class JVillageCMD extends JVBaseCommand {
             return true;
         }
 
+        //Block unclaim if the chunk is the spawn chunk
+        VCords spawnCords = village.getTownSpawn();
+
+        if (cordsInChunk(spawnCords, vChunk)) {
+            String message = language.getMessage("command_village_unclaim_spawn_block");
+            sendWithNewline(commandSender, message);
+            return true;
+        }
+
         //Unclaim the chunk
         village.removeClaim(new VClaim(village, vChunk));
         String message = language.getMessage("command_village_unclaim_success");
@@ -883,6 +893,10 @@ public class JVillageCMD extends JVBaseCommand {
         //Claim the chunk
         village.addClaim(new VClaim(village, vChunk));
 
+        //Metadata for first chunk
+        ChunkClaimSettings claimSettings = new ChunkClaimSettings(village, System.currentTimeMillis() / 1000L, player.getUniqueId(), vChunk);
+        village.addChunkClaimMetadata(claimSettings);
+
         //Send message
         String message = language.getMessage("command_village_claim_success");
         message = message.replace("%village%", village.getTownName());
@@ -947,6 +961,19 @@ public class JVillageCMD extends JVBaseCommand {
             return true;
         }
 
+        //Check if another claim exists within a radius
+        //TODO: Fix this section of code
+        if (settings.getConfigBoolean("settings.town-create.claim-radius.enabled")) {
+            int radius = settings.getConfigInteger("settings.town-create.claim-radius.value");
+            VClaim[] claims = plugin.getClaimsInRadius(getChunkCenter(vChunk), radius);
+            if (claims.length > 0) {
+                String message = language.getMessage("command_village_create_too_close");
+                message = message.replace("%min%", String.valueOf(radius));
+                sendWithNewline(commandSender, message);
+                return true;
+            }
+        }
+
         //Check if player has enough money
         double creationCost = settings.getConfigDouble("settings.town-create.price.amount");
         if (creationCost > 0) {
@@ -973,6 +1000,10 @@ public class JVillageCMD extends JVBaseCommand {
 
         Village newVillage = new Village(plugin, villageName, UUID.randomUUID(), player.getUniqueId(), vChunk, new VCords(player.getLocation()));
         plugin.getVillageMap().addVillageToMap(newVillage);
+
+        //Metadata for first chunk
+        ChunkClaimSettings claimSettings = new ChunkClaimSettings(newVillage, System.currentTimeMillis() / 1000L, player.getUniqueId(), vChunk);
+        newVillage.addChunkClaimMetadata(claimSettings);
 
         //Manually register the villages first chunk
 //        for (VClaim claim : newVillage.getClaims()) {

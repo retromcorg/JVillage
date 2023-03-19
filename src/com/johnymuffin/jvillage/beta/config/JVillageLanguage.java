@@ -37,6 +37,7 @@ public class JVillageLanguage extends Configuration {
         map.put("unknown_economy_error", "&4Sorry, an unknown economy error occurred");
 
         map.put("assistant_or_higher", "&4Sorry, you must be an assistant or higher to do that");
+        map.put("owner_or_higher", "&4Sorry, you must be the owner or higher to do that");
 
 
         map.put("movement_autoselect_enter", "&bYour selected village has been set to &9%village% &bbecause you have entered it");
@@ -185,6 +186,7 @@ public class JVillageLanguage extends Configuration {
         map.put("command_village_create_insufficient_funds", "&cSorry, you don't have enough money to create a village. It costs $%cost%");
         map.put("command_village_create_payment", "&bYou have paid &9$%amount% &bto create the village &9%village%");
         map.put("command_village_create_message", "&b%player% &bhas created the village &9%village%");
+        map.put("command_village_create_too_close", "&cSorry, you are too close to another village. You need to be at least %min% blocks away");
 
         map.put("command_village_claim_not_assistant", "&cSorry, you are not an assistant or owner of &9%village%&c so you can't claim chunks");
         map.put("command_village_claim_success", "&bYou have claimed the chunk you are standing in for &9%village%. &bIt cost &9$%cost%");
@@ -197,6 +199,7 @@ public class JVillageLanguage extends Configuration {
         map.put("command_village_unclaim_not_claimed", "&cSorry, that chunk is not claimed by &9%village%");
         map.put("command_village_unclaim_success", "&bYou have unclaimed the chunk you are standing in for &9%village%");
         map.put("command_village_unclaim_not_assistant", "&cSorry, you are not an assistant or owner of &9%village%&c so you can't unclaim chunks");
+        map.put("command_village_unclaim_spawn_block", "&cSorry, you can't unclaim the chunk that contains the village spawn");
 
         map.put("command_village_kick_use", "&cSorry, that is invalid. Try /village kick [name]");
         map.put("command_village_kick_not_found", "&cSorry, the UUID of &9%player% &cwas not found");

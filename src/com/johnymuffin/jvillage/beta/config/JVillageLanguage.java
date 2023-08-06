@@ -1,6 +1,5 @@
 package com.johnymuffin.jvillage.beta.config;
 
-import com.avaje.ebeaninternal.server.jmx.MAdminAutofetch;
 import org.bukkit.util.config.Configuration;
 
 import java.io.File;
@@ -9,12 +8,13 @@ import java.util.HashMap;
 public class JVillageLanguage extends Configuration {
     private HashMap<String, String> map;
 
-    public JVillageLanguage(File file) {
+    public JVillageLanguage(File file, boolean dev) {
         super(file);
         map = new HashMap<String, String>();
         loadDefaults();
-        //TODO: Implement a proper development mode
-//        loadFile();
+        if(!dev) {
+            loadFile();
+        }
     }
 
     private void loadDefaults() {
@@ -30,6 +30,8 @@ public class JVillageLanguage extends Configuration {
         map.put("generic_not_implemented", "&cSorry, that feature is not yet implemented");
         map.put("village_not_found", "&4Sorry, a village with that name couldn't be located");
         map.put("no_village_selected", "&4Sorry, you don't have a village selected");
+        map.put("no_village_selected_or_name_invalid", "&4Sorry, you don't have a village selected or the name you entered is invalid");
+
         map.put("not_in_village", "&4Sorry, you are not in that village");
         map.put("village_owner_leave", "&4Sorry, the owner of a village can't leave it");
         map.put("movement_village_enter", "&bYou have entered the village of &9%village%");
@@ -79,7 +81,7 @@ public class JVillageLanguage extends Configuration {
 
         map.put("command_villageadmin_village_unclaim_use", "&cSorry, that is invalid. Try /villageadmin village unclaim"); //Not needed
         map.put("command_villageadmin_village_unclaim_occurrence", "&bA claim has been removed for %village%");
-        map.put("command_villageadmin_village_unclaim_success", "&bRemoved all claims for the chunk you are standing in.");
+        map.put("command_villageadmin_village_unclaim_success", "&bUnclaimed the chunk you are standing in.");
 
         map.put("command_villageadmin_world_wgcleanup_success", "&bWorldGuard cleanup completed successfully");
 
@@ -102,12 +104,15 @@ public class JVillageLanguage extends Configuration {
                 "\n&8- &7/village join [village] &8- &7Joins a village" +
                 "\n&8- &7/village leave [village]&8- &7Leaves a village" +
                 "\n&8- &7/village autoswitch [on/off] &8- &7Autoswitch town" +
+                "\n&8- &7/village balance [village] &8- &7Shows village balance" +
+                "\n&8- &7/village deposit [village] [amount] &8- &7Withdraw money from village bank" +
                 "\n&8- &7/village spawn &8- &7Teleport to village spawn");
 
         map.put("command_village_assistant_help", "&cJVillage Assistant Commands" +
                 "\n&8- &7/village invite [name] &8- &7Invite a player to your selected town" +
                 "\n&8- &7/village kick [name] &8- &7Kick a player from your selected town" +
                 "\n&8- &7/village claim &8- &7Claim the chunk you are standing in" +
+                "\n&8- &7/village withdraw [village] [amount] &8- &7Withdraw money from village bank" +
                 "\n&8- &7/village unclaim &8- &7Unclaim the chunk you are standing in");
 
         map.put("command_village_owner_help", "&cJVillage Owner Commands" +
@@ -127,17 +132,19 @@ public class JVillageLanguage extends Configuration {
         map.put("command_village_flag_set_success", "&bFlag %flag% has been set to %value%");
 
         map.put("command_village_info_use", "&6Information for %village%" +
-                "\n&7Owner: %owner%" +
-                "\n&7Assistants: %assistants%" +
-                "\n&7Members: %members%" +
-                "\n&7Claims: %claims%" +
-                "\n&7Spawn: %spawn%");
+                "\n&9Owner: &e%owner%" +
+                "\n&9Balance: &a$%balance%" +
+                "\n&9Assistants: &c%assistants%" +
+                "\n&9Members: &b%members%" +
+                "\n&9Claims: &d%claims%" +
+                "\n&9Spawn: &f%spawn%");
 
-        map.put("command_village_list_use", "&9--- &bJVillage List&9---" +
-                "\n&7Village: %village%" +
-                "\n&7Owner: %owner%" +
-                "\n&7Assistants: %assistants%" +
-                "\n&7Members: %members%");
+
+        map.put("command_village_list_use", "&9--- &bJVillage List &9---" +
+                "\n&6Village: &e%village%" +
+                "\n&3Owner: &b%owner%" +
+                "\n&5Assistants: &d%assistants%" +
+                "\n&2Members: &a%members%");
 
         map.put("command_village_flag_list_use", "&9--- &bJVillage Flags&9---" +
                 "%flags%");
@@ -193,11 +200,11 @@ public class JVillageLanguage extends Configuration {
         map.put("command_village_claim_already_claimed", "&cSorry, that chunk is already claimed");
         map.put("command_village_claim_not_neighboring", "&cSorry, you can only claim chunks that are next to your village" +
                 "\n&cIf you want to make an outpost, use /village claim outpost");
-        map.put("command_village_claim_insufficient_funds", "&cSorry, you don't have enough money to claim this chunk. It costs $%cost%");
+        map.put("command_village_claim_insufficient_funds", "&cInsufficient funds for $%cost% chunk.\n&cDeposit more with /village deposit.");
         map.put("command_village_claim_worldguard_denied", "&cSorry, you can't claim this chunk because it is protected by WorldGuard");
 
         map.put("command_village_unclaim_not_claimed", "&cSorry, that chunk is not claimed by &9%village%");
-        map.put("command_village_unclaim_success", "&bYou have unclaimed the chunk you are standing in for &9%village%");
+        map.put("command_village_unclaim_success", "&bUnclaimed the chunk you are standing in. You have been refunded $%refund%");
         map.put("command_village_unclaim_not_assistant", "&cSorry, you are not an assistant or owner of &9%village%&c so you can't unclaim chunks");
         map.put("command_village_unclaim_spawn_block", "&cSorry, you can't unclaim the chunk that contains the village spawn");
 
@@ -243,6 +250,25 @@ public class JVillageLanguage extends Configuration {
 
         map.put("command_village_setspawn_not_owner", "&cSorry, you are not the owner of &9%village%&c so you can't change the spawn");
         map.put("command_village_setspawn_not_in_village", "&cSorry, that location is not within an area claimed by &9%village%");
+
+        //Village Economy
+
+        map.put("command_village_deposit_use", "&cSorry, that is invalid. Try /village deposit <village> [amount]");
+        map.put("command_village_deposit_invalid_amount", "&cSorry, that is an invalid amount. Please only use numbers");
+        map.put("command_village_deposit_success", "&bYou have deposited &9%amount% &binto the bank of &9%village%");
+        map.put("command_village_deposit_broadcast", "&9%player% &bhas deposited &9$%amount% &binto the bank.");
+        map.put("command_village_deposit_no_funds", "&cSorry, you don't have enough money to deposit that much");
+        map.put("command_village_deposit_not_member", "&cSorry, you are not a member of &9%village%&c so you can't deposit money");
+
+        map.put("command_village_withdraw_use", "&cSorry, that is invalid. Try /village withdraw [village] [amount]");
+        map.put("command_village_withdraw_success", "&bYou have withdrawn &9%amount% &bfrom the bank of &9%village%");
+        map.put("command_village_withdraw_broadcast", "&9%player% &bhas withdrawn &9$%amount% &bfrom the bank.");
+        map.put("command_village_withdraw_no_funds", "&cSorry, the village doesn't have enough money to withdraw that much");
+        map.put("command_village_withdraw_no_permission", "&cSorry, you don't have permission to withdraw money from &9%village%");
+
+        map.put("command_village_balance_use", "&cSorry, that is invalid. Try /village balance [village]");
+        map.put("command_village_balance_message", "&bThe village &9%village% &bhas &9$%balance% &bin the bank");
+
 
         map.put("command_resident_info", "&7----- &dResident Menu &7-----" +
                 "\n&6Username: %username%" +

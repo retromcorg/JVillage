@@ -85,6 +85,8 @@ public class JVillageGetVillageRoute extends JVillageNormalRoute {
 
                     villageJSON.put("creationTime", village.getCreationTime());
 
+                    villageJSON.put("balance", village.getBalance());
+
                     //Send response
                     response.setStatus(HttpServletResponse.SC_OK);
                     response.setContentType("application/json");

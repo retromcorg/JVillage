@@ -44,6 +44,9 @@ public class JVillageSettings extends Configuration {
         generateConfigOption("settings.town-create.claim-radius.value", 128);
         generateConfigOption("settings.town-create.claim-radius.info", "How far away a town creation claim has to be from other towns");
 
+        generateConfigOption("settings.always-use-default-lang.info", "If true, the default language will always be used, even if the player has a language set.");
+        generateConfigOption("settings.always-use-default-lang.enabled", false);
+
         getWorldGuardPermissions(); //This is a hack to get the default value to be added to the config file.
 
     }

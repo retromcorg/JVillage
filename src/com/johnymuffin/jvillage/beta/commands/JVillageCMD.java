@@ -5,6 +5,8 @@ import com.johnymuffin.beta.fundamentals.api.FundamentalsAPI;
 import com.johnymuffin.beta.fundamentals.player.FundamentalsPlayer;
 import com.johnymuffin.jvillage.beta.JVillage;
 import com.johnymuffin.jvillage.beta.config.JVillageSettings;
+import com.johnymuffin.jvillage.beta.events.PlayerJoinVillageEvent;
+import com.johnymuffin.jvillage.beta.events.PlayerLeaveVillageEvent;
 import com.johnymuffin.jvillage.beta.models.VCords;
 import com.johnymuffin.jvillage.beta.models.Village;
 import com.johnymuffin.jvillage.beta.models.VillageFlags;
@@ -721,10 +723,14 @@ public class JVillageCMD extends JVBaseCommand {
 
         //Message the player if they are online
         Player targetPlayer = getPlayerFromUUID(uuid);
-        if (targetPlayer != null) {
+        if (targetPlayer != null && targetPlayer.isOnline()) {
             String message = language.getMessage("command_village_kick_message");
             message = message.replace("%village%", village.getTownName());
             targetPlayer.sendMessage(message);
+
+            //PlayerLeaveVillageEvent
+            PlayerLeaveVillageEvent event = new PlayerLeaveVillageEvent(targetPlayer, village);
+            Bukkit.getPluginManager().callEvent(event);
         }
         return true;
     }
@@ -1121,6 +1127,10 @@ public class JVillageCMD extends JVBaseCommand {
             message = message.replace("%village%", village.getTownName());
             commandSender.sendMessage(message);
 
+            //Fire PlayerJoinVillageEvent
+            PlayerJoinVillageEvent event = new PlayerJoinVillageEvent(player, village);
+            Bukkit.getPluginManager().callEvent(event);
+
             //Broadcast join
             String broadcast = language.getMessage("command_village_join_broadcast");
             broadcast = broadcast.replace("%player%", player.getName());
@@ -1238,6 +1248,10 @@ public class JVillageCMD extends JVBaseCommand {
             String message = language.getMessage("command_village_leave_success");
             message.replace("%village%", village.getTownName());
             commandSender.sendMessage(message);
+
+            //PlayerLeaveVillageEvent
+            PlayerLeaveVillageEvent event = new PlayerLeaveVillageEvent(player, village);
+            Bukkit.getPluginManager().callEvent(event);
 
             //Broadcast leave
             String broadcast = language.getMessage("command_village_leave_broadcast");

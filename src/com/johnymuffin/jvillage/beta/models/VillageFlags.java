@@ -6,4 +6,5 @@ public enum VillageFlags {
     MOBS_CAN_SPAWN,
     MEMBERS_CAN_INVITE,
     MOB_SPAWNER_BYPASS,
+    ASSISTANT_CAN_WITHDRAW,
 }

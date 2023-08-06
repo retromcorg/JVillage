@@ -2,7 +2,7 @@ package com.johnymuffin.jvillage.beta.commands;
 
 import com.johnymuffin.beta.fundamentals.api.EconomyAPI;
 import com.johnymuffin.beta.fundamentals.api.FundamentalsAPI;
-import com.johnymuffin.beta.fundamentals.player.FundamentalsPlayer;
+import com.johnymuffin.jvillage.beta.JVUtility;
 import com.johnymuffin.jvillage.beta.JVillage;
 import com.johnymuffin.jvillage.beta.config.JVillageSettings;
 import com.johnymuffin.jvillage.beta.events.PlayerJoinVillageEvent;
@@ -86,6 +86,12 @@ public class JVillageCMD extends JVBaseCommand {
                 return listCommand(commandSender, removeFirstEntry(strings));
             if (subcommand.equalsIgnoreCase("flag") || subcommand.equalsIgnoreCase("flags"))
                 return flagCommand(commandSender, removeFirstEntry(strings));
+            if (subcommand.equalsIgnoreCase("balance") || subcommand.equalsIgnoreCase("bal"))
+                return balanceCommand(commandSender, removeFirstEntry(strings));
+            if (subcommand.equalsIgnoreCase("withdraw") || subcommand.equalsIgnoreCase("with"))
+                return withdrawCommand(commandSender, removeFirstEntry(strings));
+            if (subcommand.equalsIgnoreCase("deposit") || subcommand.equalsIgnoreCase("dep"))
+                return depositCommand(commandSender, removeFirstEntry(strings));
 
         }
 
@@ -112,6 +118,215 @@ public class JVillageCMD extends JVBaseCommand {
         menu = menu.replace("%villagein%", villageIn);
         sendWithNewline(commandSender, menu);
         return true;
+    }
+
+
+    public boolean balanceCommand(CommandSender commandSender, String[] strings) {
+        if (!isAuthorized(commandSender, "jvillage.player.balance")) {
+            commandSender.sendMessage(language.getMessage("no_permission"));
+            return true;
+        }
+
+
+        Village village = null;
+        if (strings.length == 0) {
+            if (!(commandSender instanceof Player)) {
+                commandSender.sendMessage(language.getMessage("unavailable_to_console"));
+                return true;
+            }
+
+            Player player = (Player) commandSender;
+            VPlayer vPlayer = plugin.getPlayerMap().getPlayer(player.getUniqueId());
+
+            village = vPlayer.getSelectedVillage();
+        } else {
+            String villageName = strings[0];
+            village = plugin.getVillageMap().getVillage(villageName);
+        }
+
+        if (village == null) {
+            sendWithNewline(commandSender, language.getMessage("no_village_selected_or_name_invalid"));
+            return true;
+        }
+
+        String message = language.getMessage("command_village_balance_message");
+        double balance = JVUtility.round(village.getBalance(), 2);
+        message = message.replace("%village%", village.getTownName()).replace("%balance%", String.valueOf(balance));
+        sendWithNewline(commandSender, message);
+        return true;
+    }
+
+    ///village deposit <village> [amount]
+    public boolean depositCommand(CommandSender commandSender, String[] strings) {
+        if (!isAuthorized(commandSender, "jvillage.player.deposit")) {
+            commandSender.sendMessage(language.getMessage("no_permission"));
+            return true;
+        }
+
+        if (strings.length == 0) {
+            sendWithNewline(commandSender, language.getMessage("command_village_deposit_use"));
+            return true;
+        }
+
+        if (!(commandSender instanceof Player)) {
+            commandSender.sendMessage(language.getMessage("unavailable_to_console"));
+            return true;
+        }
+
+        Player player = (Player) commandSender;
+        VPlayer vPlayer = plugin.getPlayerMap().getPlayer(player.getUniqueId());
+        Village village = vPlayer.getSelectedVillage();
+
+        String rawAmount = null;
+
+        if (strings.length == 1) {
+            //Assume only amount is provided
+            rawAmount = strings[0];
+        } else {
+            //Assume village and amount are provided
+            village = plugin.getVillageMap().getVillage(strings[0]);
+            rawAmount = strings[1];
+        }
+
+        if (village == null) {
+            commandSender.sendMessage(language.getMessage("no_village_selected_or_name_invalid"));
+            return true;
+        }
+
+        double amount = 0;
+
+        try {
+            amount = Double.parseDouble(rawAmount);
+        } catch (NumberFormatException e) {
+            commandSender.sendMessage(language.getMessage("command_village_deposit_invalid_amount"));
+            return true;
+        }
+
+        amount = JVUtility.round(amount, 2);
+
+        if (amount <= 0) {
+            commandSender.sendMessage(language.getMessage("command_village_deposit_invalid_amount"));
+            return true;
+        }
+
+        //Make sure player is a member of the village
+        if (!village.isMember(player.getUniqueId())) {
+            String message = language.getMessage("command_village_deposit_not_member").replace("%village%", village.getTownName());
+            commandSender.sendMessage(message);
+            return true;
+        }
+
+        //Attempt to withdraw money from player
+        EconomyAPI.EconomyResult result = FundamentalsAPI.getEconomy().subtractBalance(player.getUniqueId(), amount);
+        switch (result) {
+            case successful:
+                village.addBalance(amount);
+                String message = language.getMessage("command_village_deposit_success").replace("%amount%", String.valueOf(amount)).replace("%village%", village.getTownName());
+                commandSender.sendMessage(message);
+                //Send message to all online members
+                String broadcast = language.getMessage("command_village_deposit_broadcast").replace("%amount%", String.valueOf(amount)).replace("%village%", village.getTownName()).replace("%player%", player.getName());
+                village.broadcastToTown(broadcast);
+                plugin.logger(Level.INFO, "Player " + player.getName() + " deposited $" + amount + " into the bank of" + village.getTownName());
+                return true;
+            case notEnoughFunds:
+                commandSender.sendMessage(language.getMessage("command_village_deposit_no_funds"));
+                return true;
+            default:
+                commandSender.sendMessage(language.getMessage("generic_error"));
+                return true;
+        }
+    }
+
+    public boolean withdrawCommand(CommandSender commandSender, String[] strings) {
+        if (!isAuthorized(commandSender, "jvillage.player.withdraw")) {
+            commandSender.sendMessage(language.getMessage("no_permission"));
+            return true;
+        }
+
+        if (strings.length == 0) {
+            sendWithNewline(commandSender, language.getMessage("command_village_withdraw_use"));
+            return true;
+        }
+
+        if (!(commandSender instanceof Player)) {
+            commandSender.sendMessage(language.getMessage("unavailable_to_console"));
+            return true;
+        }
+
+        Player player = (Player) commandSender;
+        VPlayer vPlayer = plugin.getPlayerMap().getPlayer(player.getUniqueId());
+        Village village = vPlayer.getSelectedVillage();
+
+        String rawAmount = null;
+
+        if (strings.length == 1) {
+            //Assume only amount is provided
+            rawAmount = strings[0];
+        } else {
+            //Assume village and amount are provided
+            village = plugin.getVillageMap().getVillage(strings[0]);
+            rawAmount = strings[1];
+        }
+
+        if (village == null) {
+            commandSender.sendMessage(language.getMessage("no_village_selected_or_name_invalid"));
+            return true;
+        }
+
+        double amount = 0;
+
+        try {
+            amount = Double.parseDouble(rawAmount);
+        } catch (NumberFormatException e) {
+            commandSender.sendMessage(language.getMessage("command_village_withdraw_invalid_amount"));
+            return true;
+        }
+
+        if (amount <= 0) {
+            commandSender.sendMessage(language.getMessage("command_village_withdraw_invalid_amount"));
+            return true;
+        }
+
+        amount = JVUtility.round(amount, 2);
+
+        //Check user has permission to withdraw
+        boolean hasPermission = false;
+
+        if (village.isOwner(vPlayer.getUUID())) {
+            hasPermission = true;
+        }
+
+        if (village.getFlags().get(VillageFlags.ASSISTANT_CAN_WITHDRAW) && village.isAssistant(vPlayer.getUUID())) {
+            hasPermission = true;
+        }
+
+        if (!hasPermission) {
+            commandSender.sendMessage(language.getMessage("command_village_withdraw_no_permission"));
+            return true;
+        }
+
+        //Check Village has enough money
+        if (village.getBalance() < amount) {
+            commandSender.sendMessage(language.getMessage("command_village_withdraw_no_funds"));
+            return true;
+        }
+
+        //Attempt to withdraw money from player
+        EconomyAPI.EconomyResult result = FundamentalsAPI.getEconomy().additionBalance(player.getUniqueId(), amount);
+        switch (result) {
+            case successful:
+                village.subtractBalance(amount);
+                String message = language.getMessage("command_village_withdraw_success").replace("%amount%", String.valueOf(amount)).replace("%village%", village.getTownName());
+                commandSender.sendMessage(message);
+                //Send message to all online members
+                String broadcast = language.getMessage("command_village_withdraw_broadcast").replace("%amount%", String.valueOf(amount)).replace("%village%", village.getTownName()).replace("%player%", player.getName());
+                village.broadcastToTown(broadcast);
+                plugin.logger(Level.INFO, "Player " + player.getName() + " withdrew $" + amount + " from the bank of" + village.getTownName());
+                return true;
+            default:
+                commandSender.sendMessage(language.getMessage("generic_error"));
+                return true;
+        }
     }
 
     private boolean flagCommand(CommandSender commandSender, String[] strings) {
@@ -784,12 +999,17 @@ public class JVillageCMD extends JVBaseCommand {
             return true;
         }
 
+        ChunkClaimSettings chunkClaimSettings = village.getChunkClaimSettings(vChunk);
+
+        //Refund the village the cost of the chunk
+        double refund = chunkClaimSettings.getPrice();
+        village.addBalance(refund);
+
         //Unclaim the chunk
         village.removeClaim(new VClaim(village, vChunk));
-        String message = language.getMessage("command_village_unclaim_success");
-        message = message.replace("%village%", village.getTownName());
+        String message = language.getMessage("command_village_unclaim_success").replace("%village%", village.getTownName()).replace("%refund%", String.valueOf(refund));
         commandSender.sendMessage(message);
-        plugin.logger(Level.INFO, vChunk.toString() + " unclaimed by " + player.getName() + " for " + village.getTownName());
+        plugin.logger(Level.INFO, vChunk.toString() + " unclaimed by " + player.getName() + " for " + village.getTownName() + " with a refund of $" + refund);
         return true;
     }
 
@@ -879,28 +1099,35 @@ public class JVillageCMD extends JVBaseCommand {
 
 
         if (creationCost > 0) {
-            EconomyAPI.EconomyResult result = FundamentalsAPI.getEconomy().subtractBalance(player.getUniqueId(), creationCost, player.getWorld().getName());
-            String message;
-            switch (result) {
-                case successful:
-                    break;
-                case notEnoughFunds:
-                    message = language.getMessage("command_village_claim_insufficient_funds");
-                    message = message.replace("%cost%", String.valueOf(creationCost));
-                    commandSender.sendMessage(message);
-                    return true;
-                default:
-                    message = language.getMessage("unknown_economy_error");
-                    commandSender.sendMessage(message);
-                    return true;
+//            EconomyAPI.EconomyResult result = FundamentalsAPI.getEconomy().subtractBalance(player.getUniqueId(), creationCost, player.getWorld().getName());
+//            String message;
+//            switch (result) {
+//                case successful:
+//                    break;
+//                case notEnoughFunds:
+//                    message = language.getMessage("command_village_claim_insufficient_funds");
+//                    message = message.replace("%cost%", String.valueOf(creationCost));
+//                    commandSender.sendMessage(message);
+//                    return true;
+//                default:
+//                    message = language.getMessage("unknown_economy_error");
+//                    commandSender.sendMessage(message);
+//                    return true;
+//            }
+            if(!village.hasEnough(creationCost)) {
+                String message = language.getMessage("command_village_claim_insufficient_funds").replace("%cost%", String.valueOf(creationCost));
+                sendWithNewline(commandSender, message);
+                return true;
             }
+
+            village.subtractBalance(creationCost); //Subtract the cost from the village balance
         }
 
         //Claim the chunk
         village.addClaim(new VClaim(village, vChunk));
 
-        //Metadata for first chunk
-        ChunkClaimSettings claimSettings = new ChunkClaimSettings(village, System.currentTimeMillis() / 1000L, player.getUniqueId(), vChunk);
+        //Metadata for first chunk. Using the normal cost of a chunk at all times prevents exploits with unclaiming outpost chunks which cost more.
+        ChunkClaimSettings claimSettings = new ChunkClaimSettings(village, System.currentTimeMillis() / 1000L, player.getUniqueId(), vChunk, settings.getConfigDouble("settings.town-claim.price.amount"));
         village.addChunkClaimMetadata(claimSettings);
 
         //Send message
@@ -1008,7 +1235,7 @@ public class JVillageCMD extends JVBaseCommand {
         plugin.getVillageMap().addVillageToMap(newVillage);
 
         //Metadata for first chunk
-        ChunkClaimSettings claimSettings = new ChunkClaimSettings(newVillage, System.currentTimeMillis() / 1000L, player.getUniqueId(), vChunk);
+        ChunkClaimSettings claimSettings = new ChunkClaimSettings(newVillage, System.currentTimeMillis() / 1000L, player.getUniqueId(), vChunk, 0);
         newVillage.addChunkClaimMetadata(claimSettings);
 
         //Manually register the villages first chunk
@@ -1065,6 +1292,24 @@ public class JVillageCMD extends JVBaseCommand {
             message = message.replace("%village%", village.getTownName());
             commandSender.sendMessage(message);
             return true;
+        }
+
+        // Refund the player the balance
+        double townBalance = village.getBalance();
+
+        if (townBalance > 0) {
+            EconomyAPI.EconomyResult result = FundamentalsAPI.getEconomy().additionBalance(player.getUniqueId(), townBalance);
+            String message;
+            switch (result) {
+                case successful:
+                    this.plugin.logger(Level.INFO, "Successfully refunded $" + townBalance + " to " + player.getName() + " for deleting village " + village.getTownName());
+                    break;
+                default:
+                    this.plugin.logger(Level.WARNING, "Failed to refund $" + townBalance + " to " + player.getName() + " for deleting village " + village.getTownName());
+                    message = language.getMessage("generic_error");
+                    commandSender.sendMessage(message);
+                    return true;
+            }
         }
 
         // Delete the town
@@ -1422,6 +1667,7 @@ public class JVillageCMD extends JVBaseCommand {
         villageInfo = villageInfo.replace("%assistants%", village.getAssistants().length + "");
         villageInfo = villageInfo.replace("%members%", village.getMembers().length + "");
         villageInfo = villageInfo.replace("%claims%", village.getTotalClaims() + "");
+        villageInfo = villageInfo.replace("%balance%", round(village.getBalance(), 2) + "");
         villageInfo = villageInfo.replace("%spawn%", village.getTownSpawn().toString());
         sendWithNewline(commandSender, villageInfo);
         return true;

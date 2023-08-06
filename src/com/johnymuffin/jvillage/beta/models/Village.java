@@ -35,6 +35,8 @@ public class Village implements ClaimManager {
 
     private final long creationTime;
 
+    private double balance;
+
     private void initializeFlags() {
         for (VillageFlags flag : VillageFlags.values()) {
             flags.put(flag, false);
@@ -96,6 +98,7 @@ public class Village implements ClaimManager {
 //                }
                 addClaim(vClaim);
             }
+            balance = Double.parseDouble(String.valueOf(object.getOrDefault("balance", 0.0)));
         }
 
         //Load chunk claim metadata
@@ -129,6 +132,11 @@ public class Village implements ClaimManager {
         return creationTime;
     }
 
+    public void removeChunkClaimSettings(ChunkClaimSettings settings) {
+        modified = true;
+        claimMetadata.remove(settings);
+    }
+
     public ChunkClaimSettings getChunkClaimSettings(VChunk vChunk) {
         ChunkClaimSettings claim = claimMetadata.get(claimMetadata.indexOf(vChunk));
 
@@ -136,7 +144,7 @@ public class Village implements ClaimManager {
         if (claim == null) {
             //Time of 1st of January 2023
             long time = 1640995200L;
-            claim = new ChunkClaimSettings(this, time, getOwner(), vChunk);
+            claim = new ChunkClaimSettings(this, time, getOwner(), vChunk, 0);
             claimMetadata.add(claim);
         }
 
@@ -200,6 +208,7 @@ public class Village implements ClaimManager {
         object.put("claims", claimsJsonArray);
         object.put("townSpawn", this.townSpawn.getJsonObject());
         object.put("creationTime", this.creationTime);
+        object.put("balance", this.balance);
         return object;
     }
 
@@ -507,5 +516,28 @@ public class Village implements ClaimManager {
 
     public HashMap<VillageFlags, Boolean> getFlags() {
         return flags;
+    }
+
+    public double getBalance() {
+        return balance;
+    }
+
+    public void setBalance(double balance) {
+        this.balance = balance;
+        modified = true; // Indicate that the village has been modified and needs to be saved
+    }
+
+    public void addBalance(double amount) {
+        if(amount < 0) throw new IllegalArgumentException("Amount must be positive");
+        setBalance(getBalance() + amount);
+    }
+
+    public void subtractBalance(double amount) {
+        if(amount < 0) throw new IllegalArgumentException("Amount must be positive");
+        setBalance(getBalance() - amount);
+    }
+
+    public boolean hasEnough(double amount) {
+        return this.balance >= amount;
     }
 }

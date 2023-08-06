@@ -91,8 +91,8 @@ public class JVillage extends JavaPlugin implements ClaimManager, PoseidonCustom
 
 
         //Config files
-        language = new JVillageLanguage(new File(this.getDataFolder(), "language.yml"));
         settings = new JVillageSettings(new File(this.getDataFolder(), "settings.yml"));
+        language = new JVillageLanguage(new File(this.getDataFolder(), "language.yml"), settings.getConfigBoolean("settings.always-use-default-lang.enabled"));
 
         //Generate WorldCLaimManagers
 //        for (World world : Bukkit.getWorlds()) {

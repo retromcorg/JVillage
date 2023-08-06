@@ -21,10 +21,20 @@ public class PlayerSwitchTownEvent extends Event {
         return player;
     }
 
+    /**
+     * Gets the village the player was in before entering the new village.
+     *
+     * @return The village the player was in before switching, or null if the player was in wilderness.
+     */
     public Village getOldVillage() {
         return oldVillage;
     }
 
+    /**
+     * Gets the village the player switched to.
+     *
+     * @return The village the player switched to, or null if the player has entered wilderness.
+     */
     public Village getNewVillage() {
         return newVillage;
     }

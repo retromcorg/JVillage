@@ -1,6 +1,8 @@
 package com.johnymuffin.jvillage.beta.commands;
 
 import com.johnymuffin.jvillage.beta.JVillage;
+import com.johnymuffin.jvillage.beta.events.PlayerJoinVillageEvent;
+import com.johnymuffin.jvillage.beta.events.PlayerLeaveVillageEvent;
 import com.johnymuffin.jvillage.beta.models.VCords;
 import com.johnymuffin.jvillage.beta.models.Village;
 import com.johnymuffin.jvillage.beta.models.chunk.VChunk;
@@ -240,6 +242,13 @@ public class JVilageAdminCMD extends JVBaseCommand {
         }
         village.removeMember(target.getUUID());
 
+        // PlayerLeaveVillageEvent if the player is online
+        Player player = getPlayerFromUUID(target.getUUID());
+        if(player != null && player.isOnline()) {
+            PlayerLeaveVillageEvent event = new PlayerLeaveVillageEvent(player, village);
+            Bukkit.getPluginManager().callEvent(event);
+        }
+
         String message = language.getMessage("command_villageadmin_village_kick_success");
         message = message.replace("%player%", playerName);
         message = message.replace("%village%", villageName);
@@ -361,6 +370,10 @@ public class JVilageAdminCMD extends JVBaseCommand {
             message = message.replace("%admin%", commandSender.getName());
             targetPlayer.sendMessage(message);
         }
+
+        //Fire PlayerJoinVillageEvent
+        PlayerJoinVillageEvent event = new PlayerJoinVillageEvent(targetPlayer, village);
+        Bukkit.getPluginManager().callEvent(event);
 
         String message = language.getMessage("command_villageadmin_village_add_success");
         message = message.replace("%username%", playerName);

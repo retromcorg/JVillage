@@ -11,10 +11,11 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.entity.EntityInteractEvent;
 import org.bukkit.event.painting.PaintingBreakByEntityEvent;
 import org.bukkit.event.painting.PaintingBreakEvent;
 import org.bukkit.event.painting.PaintingPlaceEvent;
+import org.bukkit.event.player.PlayerBucketEmptyEvent;
+import org.bukkit.event.player.PlayerBucketFillEvent;
 
 import static com.johnymuffin.jvillage.beta.JVUtility.isAuthorized;
 
@@ -110,7 +111,38 @@ public class JVPlayerAlterListener implements Listener {
         String message = plugin.getLanguage().getMessage("destroy_denied").replace("%village%", village.getTownName());
         player.sendMessage(message);
         event.setCancelled(true);
+    }
 
+    @EventHandler(ignoreCancelled = true, priority = Event.Priority.Lowest)
+    public void onPlayerBucketEmptyEvent(PlayerBucketEmptyEvent event) {
+        if (event.isCancelled()) {
+            return;
+        }
+
+        if (isAuthorizedToAlter(event.getPlayer())) {
+            return;
+        }
+
+        Village village = plugin.getVillageAtLocation(event.getBlockClicked().getLocation());
+        String message = plugin.getLanguage().getMessage("build_denied").replace("%village%", village.getTownName());
+        event.getPlayer().sendMessage(message);
+        event.setCancelled(true);
+    }
+
+    @EventHandler(ignoreCancelled = true, priority = Event.Priority.Lowest)
+    public void onPlayerBucketEmptyEvent(PlayerBucketFillEvent event) {
+        if (event.isCancelled()) {
+            return;
+        }
+
+        if (isAuthorizedToAlter(event.getPlayer())) {
+            return;
+        }
+
+        Village village = plugin.getVillageAtLocation(event.getBlockClicked().getLocation());
+        String message = plugin.getLanguage().getMessage("destroy_denied").replace("%village%", village.getTownName());
+        event.getPlayer().sendMessage(message);
+        event.setCancelled(true);
     }
 
 

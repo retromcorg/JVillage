@@ -15,11 +15,10 @@ import com.johnymuffin.jvillage.beta.listeners.JVPlayerAlterListener;
 import com.johnymuffin.jvillage.beta.listeners.JVPlayerMoveListener;
 import com.johnymuffin.jvillage.beta.maps.JPlayerMap;
 import com.johnymuffin.jvillage.beta.maps.JVillageMap;
-import com.johnymuffin.jvillage.beta.models.*;
+import com.johnymuffin.jvillage.beta.models.VCords;
+import com.johnymuffin.jvillage.beta.models.Village;
 import com.johnymuffin.jvillage.beta.models.chunk.VChunk;
 import com.johnymuffin.jvillage.beta.models.chunk.VClaim;
-//import com.johnymuffin.jvillage.beta.overviewer.RegionGenerator;
-//import com.johnymuffin.jvillage.beta.overviewer.OverviewerExporter;
 import com.johnymuffin.jvillage.beta.player.VPlayer;
 import com.johnymuffin.jvillage.beta.routes.api.v1.JVillageGetPlayerRoute;
 import com.johnymuffin.jvillage.beta.routes.api.v1.JVillageGetVillageList;
@@ -37,7 +36,6 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
@@ -45,12 +43,12 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import static com.johnymuffin.jvillage.beta.JVUtility.formatVillageList;
 
 public class JVillage extends JavaPlugin implements ClaimManager, PoseidonCustomListener {
     //Basic Plugin Info
@@ -350,24 +348,30 @@ public class JVillage extends JavaPlugin implements ClaimManager, PoseidonCustom
             return true; //Assume yes if worldguard is disabled
         }
 
-        if(!this.getSettings().getConfigBoolean("settings.world-guard.blocked-regions.enabled")) {
+        if (!this.getSettings().getConfigBoolean("settings.world-guard.blocked-regions.enabled")) {
             return true;
         }
 
-        WorldGuardPlugin worldGuardPlugin = (WorldGuardPlugin) Bukkit.getPluginManager().getPlugin("WorldGuard");
-        RegionManager regionManager = worldGuardPlugin.getRegionManager(Bukkit.getWorld(vCords.getWorldName()));
-        ApplicableRegionSet regionSet = regionManager.getApplicableRegions(vCords.getLocation());
-        List<String> blockedRegions = settings.getWorldGuardPermissions();
+        try {
+            WorldGuardPlugin worldGuardPlugin = (WorldGuardPlugin) Bukkit.getPluginManager().getPlugin("WorldGuard");
+            RegionManager regionManager = worldGuardPlugin.getRegionManager(Bukkit.getWorld(vCords.getWorldName()));
+            ApplicableRegionSet regionSet = regionManager.getApplicableRegions(vCords.getLocation());
+            List<String> blockedRegions = settings.getWorldGuardPermissions();
 
-        for (ProtectedRegion protectedRegion : regionSet) {
-            for (String blockedRegion : blockedRegions) {
-                if (protectedRegion.getId().equalsIgnoreCase(blockedRegion)) {
-                    return false;
+            for (ProtectedRegion protectedRegion : regionSet) {
+                for (String blockedRegion : blockedRegions) {
+                    if (protectedRegion.getId().equalsIgnoreCase(blockedRegion)) {
+                        return false;
+                    }
                 }
             }
-        }
 
-        return true; //Claim is allowed
+            return true; //Claim is allowed
+        } catch (Exception e) {
+            logger(Level.WARNING, "Error checking WorldGuard region to see if a claim is allowed. Are you running a compatible WorldGuard version? JVillage will allow the claim as a result of this error.");
+            e.printStackTrace();
+            return true; //Assume yes if worldguard is disabled
+        }
     }
 
     public void logger(Level level, String message) {

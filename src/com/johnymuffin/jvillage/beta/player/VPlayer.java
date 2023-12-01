@@ -160,6 +160,8 @@ public class VPlayer {
                 selectedVillage = null;
             }
 
+            // Remove from memberships
+            memberships.remove(village);
             return true;
         }
         return false;

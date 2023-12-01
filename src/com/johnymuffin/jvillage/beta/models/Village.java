@@ -13,7 +13,6 @@ import org.json.simple.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.UUID;
 
 public class Village implements ClaimManager {
@@ -138,7 +137,13 @@ public class Village implements ClaimManager {
     }
 
     public ChunkClaimSettings getChunkClaimSettings(VChunk vChunk) {
-        ChunkClaimSettings claim = claimMetadata.get(claimMetadata.indexOf(vChunk));
+        ChunkClaimSettings claim = null;
+
+        //Attempt to find metadata for chunk
+        int index = claimMetadata.indexOf(vChunk);
+        if (index != -1) {
+            claim = claimMetadata.get(index);
+        }
 
         //Generate new Metadata if it doesn't exist
         if (claim == null) {

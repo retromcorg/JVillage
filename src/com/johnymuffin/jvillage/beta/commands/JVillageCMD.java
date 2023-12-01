@@ -1189,6 +1189,13 @@ public class JVillageCMD extends JVBaseCommand {
 
         VChunk vChunk = new VChunk(player.getLocation().getWorld().getName(), player.getLocation().getBlock().getChunk().getX(), player.getLocation().getBlock().getChunk().getZ());
 
+        if (!plugin.worldGuardIsClaimAllowed(getChunkCenter(vChunk))) {
+            String message = language.getMessage("command_village_claim_worldguard_denied");
+            message = message.replace("%village%", village.getTownName());
+            commandSender.sendMessage(message);
+            return true;
+        }
+
         if (plugin.isClaimed(vChunk)) {
             commandSender.sendMessage(language.getMessage("command_village_create_already_claimed"));
             return true;

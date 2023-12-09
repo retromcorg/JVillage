@@ -44,6 +44,15 @@ public class JVillageSettings extends Configuration {
         generateConfigOption("settings.town-create.claim-radius.value", 128);
         generateConfigOption("settings.town-create.claim-radius.info", "How far away a town creation claim has to be from other towns");
 
+        //Maximum claim size for /village claim rect and /village claim circle
+//        generateConfigOption("settings.town-claim.maximum-claim-size.circle.enabled", true);
+//        generateConfigOption("settings.town-claim.maximum-claim-size.circle.value", 6);
+//        generateConfigOption("settings.town-claim.maximum-claim-size.circle.info", "The maximum chunk radius of a circle claiming permitted.");
+
+        generateConfigOption("settings.town-claim.maximum-claim-size.rect.enabled", true);
+        generateConfigOption("settings.town-claim.maximum-claim-size.rect.value", 6);
+        generateConfigOption("settings.town-claim.maximum-claim-size.rect.info", "The maximum chunk radius of a rectangle claiming permitted.");
+
         generateConfigOption("settings.always-use-default-lang.info", "If true, the default language will always be used, even if the player has a language set.");
         generateConfigOption("settings.always-use-default-lang.enabled", false);
 

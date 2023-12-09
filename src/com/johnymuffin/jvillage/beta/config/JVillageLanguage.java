@@ -88,6 +88,8 @@ public class JVillageLanguage extends Configuration {
         //JVillage player command
 
         //JVillage player help commands
+        map.put("command_village_unknown", "&cSorry, that is invalid. Try /v and /v help");
+
         map.put("command_village_use", "&9--- &bJVillage Menu&9---" +
                 "\n&7Village In: %villagein%" +
                 "\n&7Village Selected: %village%" +

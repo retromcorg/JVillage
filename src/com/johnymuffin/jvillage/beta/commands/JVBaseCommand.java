@@ -2,6 +2,7 @@ package com.johnymuffin.jvillage.beta.commands;
 
 import com.johnymuffin.jvillage.beta.JVillage;
 import com.johnymuffin.jvillage.beta.config.JVillageLanguage;
+import com.johnymuffin.jvillage.beta.config.JVillageSettings;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -13,9 +14,12 @@ public abstract class JVBaseCommand implements CommandExecutor {
 
     protected JVillageLanguage language;
 
+    protected JVillageSettings settings;
+
     public JVBaseCommand(JVillage plugin) {
         this.plugin = plugin;
         this.language = plugin.getLanguage();
+        this.settings = plugin.getSettings();
     }
 
     protected boolean isAuthorized(CommandSender commandSender, String permission) {

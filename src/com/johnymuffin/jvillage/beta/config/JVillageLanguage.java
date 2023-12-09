@@ -31,6 +31,7 @@ public class JVillageLanguage extends Configuration {
         map.put("village_not_found", "&4Sorry, a village with that name couldn't be located");
         map.put("no_village_selected", "&4Sorry, you don't have a village selected");
         map.put("no_village_selected_or_name_invalid", "&4Sorry, you don't have a village selected or the name you entered is invalid");
+        map.put("command_invalid_argument_provide_integer", "&4Sorry, that is not a valid number. Please provide an integer");
 
         map.put("not_in_village", "&4Sorry, you are not in that village");
         map.put("village_owner_leave", "&4Sorry, the owner of a village can't leave it");
@@ -114,6 +115,7 @@ public class JVillageLanguage extends Configuration {
                 "\n&8- &7/village invite [name] &8- &7Invite a player to your selected town" +
                 "\n&8- &7/village kick [name] &8- &7Kick a player from your selected town" +
                 "\n&8- &7/village claim &8- &7Claim the chunk you are standing in" +
+                "\n&8- &7/village claim rectangle [chunk radius] &8- &7Claim a rectangle of chunks" +
                 "\n&8- &7/village withdraw [village] [amount] &8- &7Withdraw money from village bank" +
                 "\n&8- &7/village unclaim &8- &7Unclaim the chunk you are standing in");
 
@@ -197,6 +199,7 @@ public class JVillageLanguage extends Configuration {
         map.put("command_village_create_message", "&b%player% &bhas created the village &9%village%");
         map.put("command_village_create_too_close", "&cSorry, you are too close to another village. You need to be at least %min% blocks away");
 
+
         map.put("command_village_claim_not_assistant", "&cSorry, you are not an assistant or owner of &9%village%&c so you can't claim chunks");
         map.put("command_village_claim_success", "&bYou have claimed the chunk you are standing in for &9%village%. &bIt cost &9$%cost%");
         map.put("command_village_claim_already_claimed", "&cSorry, that chunk is already claimed");
@@ -204,6 +207,17 @@ public class JVillageLanguage extends Configuration {
                 "\n&cIf you want to make an outpost, use /village claim outpost");
         map.put("command_village_claim_insufficient_funds", "&cInsufficient funds for $%cost% chunk.\n&cDeposit more with /village deposit.");
         map.put("command_village_claim_worldguard_denied", "&cSorry, you can't claim this chunk because it is protected by WorldGuard");
+        //Area Claiming Messages
+        map.put("command_village_claim_rectangle_not_enough_arguments", "&cSorry, that is invalid. Try /village claim rectangle [chunk radius]");
+        //map.put("command_village_claim_circle_not_enough_arguments", "&cSorry, that is invalid. Try /village claim circle [chunk radius]");
+        map.put("command_village_claim_rectangle_too_big", "&cSorry, the maximum rectangular chunk radius is %size%");
+        map.put("command_village_claim_rectangle_already_claimed", "&cSorry, one of the chunks you are trying to claim is already claimed. %chunk% by %village%");
+        map.put("command_village_claim_rectangle_insufficient_funds", "&cInsufficient funds for claiming %chunks% chunks. Cost: $%cost%");
+        map.put("command_village_claim_rectangle_success", "&bYou have claimed %chunks% chunks for &9%village%. &bIt cost &9$%cost%");
+        map.put("command_village_claim_rectangle_not_in_claim", "&cSorry, the chunk your standing in needs to be claimed by your village to use this command");
+        map.put("command_village_claim_rectangle_already_claimed", "&cSorry, all the chunks you are trying to claim are already claimed by your village");
+        map.put("command_village_claim_rectangle_broadcast", "&b%player% &bhas done a rectangle claim, claiming %chunks% chunks for a total of &9$%cost%");
+
 
         map.put("command_village_unclaim_not_claimed", "&cSorry, that chunk is not claimed by &9%village%");
         map.put("command_village_unclaim_success", "&bUnclaimed the chunk you are standing in. You have been refunded $%refund%");

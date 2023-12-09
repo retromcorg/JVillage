@@ -1191,7 +1191,7 @@ public class JVillageCMD extends JVBaseCommand {
 
         if (!plugin.worldGuardIsClaimAllowed(getChunkCenter(vChunk))) {
             String message = language.getMessage("command_village_claim_worldguard_denied");
-            message = message.replace("%village%", village.getTownName());
+            message = message.replace("%village%", villageName);
             commandSender.sendMessage(message);
             return true;
         }

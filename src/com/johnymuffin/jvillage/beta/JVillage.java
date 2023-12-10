@@ -23,6 +23,7 @@ import com.johnymuffin.jvillage.beta.player.VPlayer;
 import com.johnymuffin.jvillage.beta.routes.api.v1.JVillageGetPlayerRoute;
 import com.johnymuffin.jvillage.beta.routes.api.v1.JVillageGetVillageList;
 import com.johnymuffin.jvillage.beta.routes.api.v1.JVillageGetVillageRoute;
+import com.johnymuffin.jvillage.beta.tasks.AutoClaimingTask;
 import com.legacyminecraft.poseidon.event.PoseidonCustomListener;
 import com.palmergames.bukkit.towny.Towny;
 import com.palmergames.bukkit.towny.object.Resident;
@@ -90,6 +91,7 @@ public class JVillage extends JavaPlugin implements ClaimManager, PoseidonCustom
 
         //Config files
         settings = new JVillageSettings(new File(this.getDataFolder(), "settings.yml"));
+        debugMode = settings.getConfigBoolean("settings.debug-mode.enabled"); //Set debug mode from config
         language = new JVillageLanguage(new File(this.getDataFolder(), "language.yml"), settings.getConfigBoolean("settings.always-use-default-lang.enabled"));
 
         //Generate WorldCLaimManagers
@@ -218,7 +220,8 @@ public class JVillage extends JavaPlugin implements ClaimManager, PoseidonCustom
 //        long endTime = System.currentTimeMillis();
 //        logger(Level.INFO, "Took " + (endTime - startTime) + "ms to find 100 closest claims");
 
-
+        //Run auto claim task
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new AutoClaimingTask(plugin), 1, this.getSettings().getConfigInteger("settings.auto-claim.timer") * 20);
     }
 
     public void removeAPIRoutes() {
@@ -376,6 +379,21 @@ public class JVillage extends JavaPlugin implements ClaimManager, PoseidonCustom
 
     public void logger(Level level, String message) {
         Bukkit.getLogger().log(level, "[" + plugin.getDescription().getName() + "] " + message);
+    }
+
+    public boolean isDebugMode() {
+        return debugMode;
+    }
+
+    public void setDebugMode(boolean debugMode) {
+        this.debugMode = debugMode;
+    }
+
+    private boolean debugMode = false;
+    public void debugLogger(Level level, String message) {
+        if (debugMode) {
+            Bukkit.getLogger().log(level, "[" + plugin.getDescription().getName() + "] [DEBUG] " + message);
+        }
     }
 
     public JVillageLanguage getLanguage() {

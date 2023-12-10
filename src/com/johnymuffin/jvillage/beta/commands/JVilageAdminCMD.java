@@ -14,6 +14,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;
+import java.util.logging.Level;
 
 import static com.johnymuffin.jvillage.beta.JVUtility.getChunkCenter;
 import static com.johnymuffin.jvillage.beta.JVUtility.getPlayerFromUUID;
@@ -396,9 +397,30 @@ public class JVilageAdminCMD extends JVBaseCommand {
                 return pluginReloadCommand(commandSender, removeFirstEntry(strings));
             if (subcommand.endsWith("import"))
                 return pluginImportCommand(commandSender, removeFirstEntry(strings));
+            if (subcommand.equalsIgnoreCase("debug"))
+                return pluginToggleDebug(commandSender, removeFirstEntry(strings));
         }
 
         commandSender.sendMessage(language.getMessage("command_villageadmin_plugin_use"));
+        return true;
+    }
+
+    private boolean pluginToggleDebug(CommandSender commandSender, String[] strings) {
+        if (!isAuthorized(commandSender, "jvillage.admin.plugin.debug")) {
+            commandSender.sendMessage(language.getMessage("no_permission"));
+            return true;
+        }
+
+        boolean debugMode = plugin.isDebugMode();
+        plugin.getSettings().setProperty("settings.debug-mode.enabled", !debugMode);
+        plugin.getSettings().save();
+        plugin.setDebugMode(!debugMode);
+
+        String message = language.getMessage("command_villageadmin_plugin_debug_change");
+        message = message.replace("%state%", !debugMode ? "enabled" : "disabled");
+        commandSender.sendMessage(message);
+
+        this.plugin.logger(Level.INFO, "Debug mode is now " + (!debugMode ? "enabled" : "disabled") + " by " + commandSender.getName());
         return true;
     }
 

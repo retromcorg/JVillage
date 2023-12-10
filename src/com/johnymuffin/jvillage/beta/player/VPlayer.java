@@ -12,6 +12,8 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.UUID;
 
+import static com.johnymuffin.jvillage.beta.JVUtility.getPlayerFromUUID;
+
 public class VPlayer {
     //Start - Village Memberships
     private ArrayList<Village> memberships = new ArrayList<>();
@@ -23,6 +25,8 @@ public class VPlayer {
     private Village currentlyLocatedIn = null;
 
     private Village selectedVillage = null;
+
+    private boolean isAutoClaimingEnabled = false;
 
 //    private ArrayList<Village> invitedTo = new ArrayList<>();
 
@@ -222,11 +226,55 @@ public class VPlayer {
     }
 
     public void setSelectedVillage(Village selectedVillage) {
+        //Disable auto claim
+        if (this.isAutoClaimingEnabled) {
+            this.isAutoClaimingEnabled = false;
+
+            String message = this.plugin.getLanguage().getMessage("autoswitch_selected_village_disabled");
+            message = message.replace("%village%", this.selectedVillage != null ? this.selectedVillage.getTownName() : "Wilderness");
+            this.sendMessage(message);
+        }
+
         this.selectedVillage = selectedVillage;
     }
 
     public void joinVillage(Village village) {
         memberships.add(village);
         village.addMember(uuid);
+    }
+
+    public boolean isPlayerOnline() {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            if (player.getUniqueId().equals(uuid)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean sendMessage(String message) {
+        if (this.isPlayerOnline()) {
+            Player player = getPlayerFromUUID(uuid);
+            player.sendMessage(message);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isAutoClaimingEnabled() {
+        return this.isAutoClaimingEnabled;
+    }
+
+    public void setAutoClaimingEnabled(boolean autoClaimingEnabled, boolean sendMessage) {
+        if (this.isAutoClaimingEnabled == autoClaimingEnabled) {
+            return;
+        }
+
+
+        this.isAutoClaimingEnabled = autoClaimingEnabled;
+        if (!this.isAutoClaimingEnabled && sendMessage) {
+            String message = this.plugin.getLanguage().getMessage("autoclaim_disabled");
+            this.sendMessage(message);
+        }
     }
 }

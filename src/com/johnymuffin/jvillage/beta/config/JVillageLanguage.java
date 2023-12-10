@@ -51,13 +51,15 @@ public class JVillageLanguage extends Configuration {
 
         //JVillage Admin command
         map.put("command_villageadmin_general_use", "&cSorry, that is invalid. Try /villageadmin (plugin|world|village|player)");
-        map.put("command_villageadmin_plugin_use", "&cSorry, that is invalid. Try /villageadmin plugin (reload|save|version|import)");
+        map.put("command_villageadmin_plugin_use", "&cSorry, that is invalid. Try /villageadmin plugin (reload|save|version|import|debug)");
         map.put("command_villageadmin_plugin_import_use", "&cSorry, that is invalid. Try /villageadmin plugin import (towny|factions)");
         map.put("command_villageadmin_world_use", "&cSorry, that is invalid. Try /villageadmin world (wgcleanup)");
 
         map.put("command_villageadmin_plugin_import_towny_start", "&bImporting Towny data. The server might freeze while this is happening.");
         map.put("command_villageadmin_plugin_import_towny_success", "&bImporting Towny data completed successfully. The debug is available in the console.");
         map.put("command_villageadmin_plugin_import_towny_fail", "&bImporting Towny data failed. The debug is available in the console.");
+
+        map.put("command_villageadmin_plugin_debug_change", "&bDebug mode has been changed to &9%state%");
 
         map.put("command_villageadmin_village_use", "&cSorry, that is invalid. Try /villageadmin village (add|kick|setowner|delete|unclaim)");
 
@@ -108,7 +110,7 @@ public class JVillageLanguage extends Configuration {
                 "\n&8- &7/village leave [village]&8- &7Leaves a village" +
                 "\n&8- &7/village autoswitch [on/off] &8- &7Autoswitch town" +
                 "\n&8- &7/village balance [village] &8- &7Shows village balance" +
-                "\n&8- &7/village deposit [village] [amount] &8- &7Withdraw money from village bank" +
+                "\n&8- &7/village deposit [village] [amount] &8- &7Deposit money into village bank" +
                 "\n&8- &7/village spawn &8- &7Teleport to village spawn");
 
         map.put("command_village_assistant_help", "&cJVillage Assistant Commands" +
@@ -217,6 +219,8 @@ public class JVillageLanguage extends Configuration {
         map.put("command_village_claim_rectangle_not_in_claim", "&cSorry, the chunk your standing in needs to be claimed by your village to use this command");
         map.put("command_village_claim_rectangle_already_claimed", "&cSorry, all the chunks you are trying to claim are already claimed by your village");
         map.put("command_village_claim_rectangle_broadcast", "&b%player% &bhas done a rectangle claim, claiming %chunks% chunks for a total of &9$%cost%");
+        map.put("command_village_claim_autoclaim_on", "&bYou have turned on autoclaim. You will now automatically claim chunks as you walk around");
+        map.put("command_village_claim_autoclaim_off", "&bYou have turned off autoclaim. You will no longer automatically claim chunks as you walk around");
 
 
         map.put("command_village_unclaim_not_claimed", "&cSorry, that chunk is not claimed by &9%village%");
@@ -291,6 +295,14 @@ public class JVillageLanguage extends Configuration {
                 "\n&bOwner of: %owner%" +
                 "\n&aAssistant of: %assistant%" +
                 "\n&eMember of: %member%");
+
+
+        map.put("autoclaim_selected_village_disabled", "&cSorry, autoclaim has been disabled as your selected village has changed");
+        map.put("autoclaim_disabled", "&cAutoclaim has been disabled");
+        map.put("autoclaim_enter_worldguard_disabled", "&cSorry, autoclaim has been disabled as you have entered a protected World Guard region");
+        map.put("autoclaim_not_neighbouring_disabled", "&cSorry, autoclaim has been disabled as you are not neighbouring %village%");
+        map.put("autoclaim_not_enough_money_disabled", "&cSorry, autoclaim has been disabled as you don't have enough money to claim land");
+        map.put("autoclaim_claim_success", "&bYou have claimed [%chunk%] for &9%village% &bfor &9$%cost%");
 
     }
 

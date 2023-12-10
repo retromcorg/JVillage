@@ -53,8 +53,14 @@ public class JVillageSettings extends Configuration {
         generateConfigOption("settings.town-claim.maximum-claim-size.rect.value", 6);
         generateConfigOption("settings.town-claim.maximum-claim-size.rect.info", "The maximum chunk radius of a rectangle claiming permitted.");
 
-        generateConfigOption("settings.always-use-default-lang.info", "If true, the default language will always be used, even if the player has a language set.");
+        generateConfigOption("settings.auto-claim.timer", 2);
+        generateConfigOption("settings.auto-claim.info", "The amount of time in seconds between checks for auto-claiming.");
+
+        generateConfigOption("settings.always-use-default-lang.info", "If true, the default language file will always be used. The plugin will ignore the language file.");
         generateConfigOption("settings.always-use-default-lang.enabled", false);
+
+        generateConfigOption("settings.debug-mode.info", "If true, the plugin will output debug messages to the console.");
+        generateConfigOption("settings.debug-mode.enabled", false);
 
         getWorldGuardPermissions(); //This is a hack to get the default value to be added to the config file.
 

@@ -58,7 +58,27 @@ public class JClaimCommand extends JVBaseCommand implements CommandExecutor {
             if (strings[0].equalsIgnoreCase("outpost") || strings[0].equalsIgnoreCase("o")) {
                 outpostClaim = true;
             }
-            //TODO: Implement auto claiming
+
+            //Auto claiming toggle
+            if (strings[0].equalsIgnoreCase("auto") || strings[0].equalsIgnoreCase("a") || strings[0].equalsIgnoreCase("ac") || strings[0].equalsIgnoreCase("autoclaim")) {
+                if(!isAuthorized(commandSender, "jvillage.player.claim.auto")) {
+                    commandSender.sendMessage(language.getMessage("no_permission"));
+                    return true;
+                }
+
+                if (vPlayer.isAutoClaimingEnabled()) {
+                    vPlayer.setAutoClaimingEnabled(false, false);
+                    String message = language.getMessage("command_village_claim_autoclaim_off");
+                    message = message.replace("%village%", village.getTownName());
+                    commandSender.sendMessage(message);
+                } else {
+                    vPlayer.setAutoClaimingEnabled(true, false);
+                    String message = language.getMessage("command_village_claim_autoclaim_on");
+                    message = message.replace("%village%", village.getTownName());
+                    commandSender.sendMessage(message);
+                }
+                return true;
+            }
 
             //Rectangle claiming
             if (strings[0].equalsIgnoreCase("rectangle") || strings[0].equalsIgnoreCase("rect")) {

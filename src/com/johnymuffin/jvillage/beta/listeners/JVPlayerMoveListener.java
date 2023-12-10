@@ -36,22 +36,45 @@ public class JVPlayerMoveListener extends CustomEventListener implements Listene
     @EventHandler(ignoreCancelled = true, priority = Event.Priority.Highest)
     public void onPlayerTeleportEvent(final PlayerTeleportEvent event) {
         updatePlayerLocation(event.getPlayer(), event.getTo());
+
+        //Disable auto claiming when a player teleports if they have it enabled
+        VPlayer vPlayer = plugin.getPlayerMap().getPlayer(event.getPlayer().getUniqueId());
+        vPlayer.setAutoClaimingEnabled(false, true);
     }
 
     @EventHandler(ignoreCancelled = true, priority = Event.Priority.Highest)
     public void onPlayerRespawnEvent(final PlayerRespawnEvent event) {
         updatePlayerLocation(event.getPlayer(), event.getRespawnLocation());
+
+        //Disable auto claiming when a player respawns if they have it enabled
+        VPlayer vPlayer = plugin.getPlayerMap().getPlayer(event.getPlayer().getUniqueId());
+        vPlayer.setAutoClaimingEnabled(false, true);
     }
 
     @EventHandler(ignoreCancelled = true, priority = Event.Priority.Highest)
     public void onPlayerJoinEvent(final PlayerJoinEvent event) {
         updatePlayerLocation(event.getPlayer(), event.getPlayer().getLocation());
+
+        //Disable auto claiming when a player joins if they have it enabled
+        VPlayer vPlayer = plugin.getPlayerMap().getPlayer(event.getPlayer().getUniqueId());
+        vPlayer.setAutoClaimingEnabled(false, false); //Don't send message as it shouldn't be enabled anyway
     }
 
     //TODO: This might not be needed, decide if it is or not
     @EventHandler(ignoreCancelled = true, priority = Event.Priority.Highest)
     public void onPlayerChangedWorldEvent(final PlayerChangedWorldEvent event) {
         updatePlayerLocation(event.getPlayer(), event.getPlayer().getLocation());
+
+        //Disable auto claiming when a player changes world if they have it enabled
+        VPlayer vPlayer = plugin.getPlayerMap().getPlayer(event.getPlayer().getUniqueId());
+        vPlayer.setAutoClaimingEnabled(false, true);
+    }
+
+    @EventHandler
+    public void onPlayerQuitEvent(final PlayerQuitEvent event) {
+        //Disable auto claiming when a player quits if they have it enabled
+        VPlayer vPlayer = plugin.getPlayerMap().getPlayer(event.getPlayer().getUniqueId());
+        vPlayer.setAutoClaimingEnabled(false, false);
     }
 
     private void updatePlayerLocation(Player player, Location location) {
@@ -62,8 +85,8 @@ public class JVPlayerMoveListener extends CustomEventListener implements Listene
     public void onPlayerSwitchTownEvent(final PlayerSwitchTownEvent event) {
         //Autoswitch to the new village
         boolean switchMessageSent = false;
+        VPlayer vPlayer = plugin.getPlayerMap().getPlayer(event.getPlayer().getUniqueId());
         if (event.getNewVillage() != null) {
-            VPlayer vPlayer = plugin.getPlayerMap().getPlayer(event.getPlayer().getUniqueId());
             //If player has auto switch enabled
             if (vPlayer.autoSwitchSelected()) {
                 //If player is member of the town they have entered
@@ -83,12 +106,24 @@ public class JVPlayerMoveListener extends CustomEventListener implements Listene
         //Send cross border message if they didn't get the auto switch message
         if (!switchMessageSent) {
             if (event.getNewVillage() != null) {
+                vPlayer.setAutoClaimingEnabled(false, true); //Disable auto claiming when a player crosses a border to another village
                 String message = plugin.getLanguage().getMessage("movement_village_enter");
                 message = message.replace("%village%", event.getNewVillage().getTownName());
                 event.getPlayer().sendMessage(message);
             } else {
                 String message = plugin.getLanguage().getMessage("movement_wilderness_enter");
                 event.getPlayer().sendMessage(message);
+
+                //Auto Claiming logic if enabled
+//                if (vPlayer.isAutoClaimingEnabled()) {
+//                    Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            //Auto claim after one tick to prevent exceptions
+//                        }
+//                    }, 1L);
+//
+//                }
             }
         }
     }

@@ -75,6 +75,10 @@ permissions:
     description: Allows access to JVillage admin plugin import towny commands
     default: op
 
+  jvillage.admin.plugin.debug:
+    description: Toggles debug mode for JVillage
+    default: op
+
   jvillage.player:
     description: Allows access to all JVillage player commands
     default: true
@@ -99,6 +103,8 @@ permissions:
       jvillage.player.balance: true
       jvillage.player.deposit: true
       jvillage.player.withdraw: true
+      jvillage.player.claim.auto: true
+      jvillage.player.claim.rectangle: true
 
   jvillage.player.balance:
     description: Allows access to JVillage player balance command

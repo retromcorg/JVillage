@@ -213,7 +213,7 @@ public class JVillageLanguage extends Configuration {
         map.put("command_village_claim_rectangle_not_enough_arguments", "&cSorry, that is invalid. Try /village claim rectangle [chunk radius]");
         //map.put("command_village_claim_circle_not_enough_arguments", "&cSorry, that is invalid. Try /village claim circle [chunk radius]");
         map.put("command_village_claim_rectangle_too_big", "&cSorry, the maximum rectangular chunk radius is %size%");
-        map.put("command_village_claim_rectangle_already_claimed", "&cSorry, one of the chunks you are trying to claim is already claimed. %chunk% by %village%");
+        map.put("command_village_claim_rectangle_other_already_claimed", "&cSorry, one of the chunks you are trying to claim is already claimed. %chunk% by %village%");
         map.put("command_village_claim_rectangle_insufficient_funds", "&cInsufficient funds for claiming %chunks% chunks. Cost: $%cost%");
         map.put("command_village_claim_rectangle_success", "&bYou have claimed %chunks% chunks for &9%village%. &bIt cost &9$%cost%");
         map.put("command_village_claim_rectangle_not_in_claim", "&cSorry, the chunk your standing in needs to be claimed by your village to use this command");

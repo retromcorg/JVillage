@@ -241,7 +241,7 @@ public class JClaimCommand extends JVBaseCommand implements CommandExecutor {
                     iterator.remove();
                 } else {
                     // Chunk is claimed by another village
-                    String message = language.getMessage("command_village_claim_rectangle_already_claimed");
+                    String message = language.getMessage("command_village_claim_rectangle_other_already_claimed");
                     message = message.replace("%village%", claim.getTownName());
                     message = message.replace("%chunk%", chunk.toString());
                     commandSender.sendMessage(message);

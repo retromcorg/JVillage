@@ -476,9 +476,15 @@ public class JVilageAdminCMD extends JVBaseCommand {
             return true;
         }
 
-        //TODO: Implement this command
-        commandSender.sendMessage(language.getMessage("generic_not_implemented"));
+        commandSender.sendMessage(language.getMessage("command_villageadmin_plugin_import_factions_start"));
+        if (plugin.factionsImport()) {
+            commandSender.sendMessage(language.getMessage("command_villageadmin_plugin_import_factions_success"));
+        } else {
+            commandSender.sendMessage(language.getMessage("command_villageadmin_plugin_import_factions_fail"));
+        }
+
         return true;
+
     }
 
 }

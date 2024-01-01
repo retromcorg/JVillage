@@ -3,6 +3,7 @@ package com.johnymuffin.jvillage.beta;
 import com.johnymuffin.jvillage.beta.models.VCords;
 import com.johnymuffin.jvillage.beta.models.Village;
 import com.johnymuffin.jvillage.beta.models.chunk.VChunk;
+import com.projectposeidon.api.PoseidonUUID;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -92,6 +93,16 @@ public class JVUtility {
             }
         }
         return stringBuilder.toString();
+    }
+
+    public static UUID getUUIDFromPoseidonCache(String username) {
+        UUID uuid = PoseidonUUID.getPlayerUUIDFromCache(username, true);
+
+        if(uuid == null) {
+            uuid = PoseidonUUID.getPlayerUUIDFromCache(username, false);
+        }
+
+        return uuid;
     }
 
 

@@ -59,6 +59,10 @@ public class JVillageLanguage extends Configuration {
         map.put("command_villageadmin_plugin_import_towny_success", "&bImporting Towny data completed successfully. The debug is available in the console.");
         map.put("command_villageadmin_plugin_import_towny_fail", "&bImporting Towny data failed. The debug is available in the console.");
 
+        map.put("command_villageadmin_plugin_import_factions_start", "&bImporting Factions data. The server might freeze while this is happening.");
+        map.put("command_villageadmin_plugin_import_factions_success", "&bImporting Factions data completed successfully. The debug is available in the console.");
+        map.put("command_villageadmin_plugin_import_factions_fail", "&bImporting Factions data failed. The debug is available in the console.");
+
         map.put("command_villageadmin_plugin_debug_change", "&bDebug mode has been changed to &9%state%");
 
         map.put("command_villageadmin_village_use", "&cSorry, that is invalid. Try /villageadmin village (add|kick|setowner|delete|unclaim)");

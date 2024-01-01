@@ -1,7 +1,7 @@
 name: JVillage
 description: A claim plugin designed for Project Poseidon
 main: com.johnymuffin.jvillage.beta.JVillage
-version: 1.0.12
+version: ${project.version}
 authors:
   - JohnyMuffin
 softdepend:

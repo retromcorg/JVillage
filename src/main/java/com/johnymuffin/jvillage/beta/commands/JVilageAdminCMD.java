@@ -217,7 +217,7 @@ public class JVilageAdminCMD extends JVBaseCommand {
             return true;
         }
 
-        UUID uuid = plugin.getFundamentals().getPlayerCache().getUUIDFromUsername(playerName);
+        UUID uuid = plugin.getUUIDFromUsername(playerName);
         if (uuid == null) {
             String message = language.getMessage("player_not_found_full");
             message = message.replace("%player%", playerName);
@@ -278,7 +278,7 @@ public class JVilageAdminCMD extends JVBaseCommand {
             return true;
         }
 
-        UUID uuid = plugin.getFundamentals().getPlayerCache().getUUIDFromUsername(playerName);
+        UUID uuid = plugin.getUUIDFromUsername(playerName);
         if (uuid == null) {
             String message = language.getMessage("player_not_found_full");
             message = message.replace("%player%", playerName);
@@ -341,7 +341,7 @@ public class JVilageAdminCMD extends JVBaseCommand {
             return true;
         }
 
-        UUID uuid = plugin.getFundamentals().getPlayerCache().getUUIDFromUsername(playerName);
+        UUID uuid = plugin.getUUIDFromUsername(playerName);
         if (uuid == null) {
             String message = language.getMessage("player_not_found_full");
             message = message.replace("%player%", playerName);

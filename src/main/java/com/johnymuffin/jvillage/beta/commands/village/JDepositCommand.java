@@ -80,6 +80,11 @@ public class JDepositCommand extends JVBaseCommand implements CommandExecutor {
             return true;
         }
 
+        if (!this.plugin.isFundamentalsEnabled()) {
+            sendWithNewline(commandSender, language.getMessage("economy_disabled"));
+            return true;
+        }
+
         //Attempt to withdraw money from player
         EconomyAPI.EconomyResult result = FundamentalsAPI.getEconomy().subtractBalance(player.getUniqueId(), amount);
         switch (result) {

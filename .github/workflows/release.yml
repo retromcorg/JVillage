@@ -34,10 +34,26 @@ jobs:
       - name: Build with Maven
         run: mvn clean package
 
-      - name: Create Release
-        uses: softprops/action-gh-release@v1
-        if: success()
+      - name: Create Release Tag
+        if: ${{ !endsWith(env.PROJECT_VERSION, '-SNAPSHOT') }}
+        uses: actions/github-script@v5
         with:
-          files: target/yourartifact-${{ env.PROJECT_VERSION }}.jar
+          script: |
+            const tagName = '${{ env.PROJECT_VERSION }}';
+            const ref = 'refs/tags/' + tagName;
+            await github.git.createRef({
+              ...context.repo,
+              ref: ref,
+              sha: context.sha
+            });
+            console.log('Tag created: ' + tagName);
+
+      - name: Create GitHub Release
+        if: ${{ !endsWith(env.PROJECT_VERSION, '-SNAPSHOT') }}
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ env.PROJECT_VERSION }}
+          files: |
+            target/*.jar
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -25,12 +25,18 @@ import com.johnymuffin.jvillage.beta.routes.api.v1.JVillageGetVillageList;
 import com.johnymuffin.jvillage.beta.routes.api.v1.JVillageGetVillageRoute;
 import com.johnymuffin.jvillage.beta.tasks.AutoClaimingTask;
 import com.legacyminecraft.poseidon.event.PoseidonCustomListener;
+import com.massivecraft.factions.FLocation;
+import com.massivecraft.factions.FPlayer;
+import com.massivecraft.factions.Faction;
+import com.massivecraft.factions.Factions;
+import com.massivecraft.factions.struct.Role;
 import com.palmergames.bukkit.towny.Towny;
 import com.palmergames.bukkit.towny.object.Resident;
 import com.palmergames.bukkit.towny.object.Town;
 import com.palmergames.bukkit.towny.object.TownBlock;
 import com.palmergames.bukkit.towny.object.TownyWorld;
 import com.projectposeidon.api.PoseidonUUID;
+import com.projectposeidon.johnymuffin.UUIDManager;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.managers.RegionManager;
@@ -44,12 +50,12 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.lang.reflect.Field;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static com.johnymuffin.jvillage.beta.JVUtility.getUUIDFromPoseidonCache;
 
 public class JVillage extends JavaPlugin implements ClaimManager, PoseidonCustomListener {
     //Basic Plugin Info
@@ -472,6 +478,15 @@ public class JVillage extends JavaPlugin implements ClaimManager, PoseidonCustom
             return false;
         }
 
+        UUID placeholderUUID = UUID.fromString(settings.getConfigString("settings.import-placeholder-account.uuid"));
+        String placeholderUsername = settings.getConfigString("settings.import-placeholder-account.name");
+        //Add UUID to Poseidon UUIDManager
+        try {
+            UUIDManager.getInstance().receivedUUID(placeholderUsername, placeholderUUID, (System.currentTimeMillis() / 1000L), true);
+        } catch (Exception exception) {
+            logger(Level.WARNING, "Could not add placeholder UUID to Poseidon UUIDCache. This could cause Unknown User to be shown for some imported Villages.");
+        }
+
         Towny towny = (Towny) getServer().getPluginManager().getPlugin("Towny");
         Fundamentals fundamentals = (Fundamentals) getServer().getPluginManager().getPlugin("Fundamentals");
 
@@ -527,10 +542,9 @@ public class JVillage extends JavaPlugin implements ClaimManager, PoseidonCustom
                 townOwnerUUID = PoseidonUUID.getPlayerUUIDFromCache(townOwnerUsername, false);
             }
             if (townOwnerUUID == null) {
-//                log.warning("[" + pluginName + "] Could not find UUID for town owner: " + townOwnerUsername + ". The town will not be imported.");
-//                townsSkipped++;
-                townOwnerUUID = UUID.fromString("ca5c33ce-5825-45e3-ab92-0127c05c2016"); //UUID for jetpackingwolf
-                continue;
+                log.warning("[" + pluginName + "] Could not find UUID for town owner: " + townOwnerUsername + ". The town will not be imported.");
+                townsSkipped++;
+                townOwnerUUID = placeholderUUID; //UUID for jetpackingwolf
             }
 
             //Import Assistants
@@ -538,7 +552,7 @@ public class JVillage extends JavaPlugin implements ClaimManager, PoseidonCustom
                 String assistantUsername = resident.getName();
                 UUID assistantUUID = fundamentals.getPlayerCache().getUUIDFromUsername(assistantUsername);
                 if (assistantUUID == null) {
-//                    log.warning("[" + pluginName + "] Could not find UUID for town assistant: " + assistantUsername + ". The assistant will not be imported for town " + newTownName + ".");
+                    log.warning("[" + pluginName + "] Could not find UUID for town assistant: " + assistantUsername + ". The assistant will not be imported for town " + newTownName + ".");
                     continue;
                 }
                 assistants.add(assistantUUID);
@@ -549,7 +563,7 @@ public class JVillage extends JavaPlugin implements ClaimManager, PoseidonCustom
                 String residentUsername = resident.getName();
                 UUID residentUUID = fundamentals.getPlayerCache().getUUIDFromUsername(residentUsername);
                 if (residentUUID == null) {
-//                    log.warning("[" + pluginName + "] Could not find UUID for town resident: " + residentUsername + ". The resident will not be imported for town " + newTownName + ".");
+                    log.warning("[" + pluginName + "] Could not find UUID for town resident: " + residentUsername + ". The resident will not be imported for town " + newTownName + ".");
                     residentsSkipped++;
                     continue;
                 }
@@ -589,10 +603,7 @@ public class JVillage extends JavaPlugin implements ClaimManager, PoseidonCustom
             try {
                 townSpawn = new VCords(town.getSpawn().getBlockX(), town.getSpawn().getBlockY(), town.getSpawn().getBlockZ(), town.getSpawn().getWorld().getName());
             } catch (Exception exception) {
-//                exception.printStackTrace();
-//                log.warning("[" + pluginName + "] Could not find town spawn for town " + newTownName + ". The town will not be imported.");
-//                townsSkipped++;
-//                continue;
+                log.warning("[" + pluginName + "] Could not find town spawn for town " + newTownName + ". World spawn will be used instead.");
                 logger(Level.WARNING, "Could not find town spawn for town " + newTownName + ". The town spawn will be set to the world spawn.");
                 townSpawn = new VCords(Bukkit.getWorlds().get(0).getSpawnLocation().getBlockX(), Bukkit.getWorlds().get(0).getSpawnLocation().getBlockY(), Bukkit.getWorlds().get(0).getSpawnLocation().getBlockZ(), Bukkit.getWorlds().get(0).getName());
             }
@@ -618,8 +629,6 @@ public class JVillage extends JavaPlugin implements ClaimManager, PoseidonCustom
             for (UUID residentUUID : residents) {
                 village.addMember(residentUUID);
             }
-            //Register claims
-
 
             logger(Level.INFO, "Towny Import: Imported town " + newTownName + " with " + townClaims.size() + " claims. Owner Name: " + townOwnerUsername + " Assistants: " + assistants.size() + " Residents: " + residents.size());
         }
@@ -655,6 +664,182 @@ public class JVillage extends JavaPlugin implements ClaimManager, PoseidonCustom
 
         return true;
 
+    }
+
+    public boolean factionsImport() {
+        logger(Level.INFO, "Factions Import: Starting import of Factions data.");
+
+        UUID placeholderUUID = UUID.fromString(settings.getConfigString("settings.import-placeholder-account.uuid"));
+        String placeholderUsername = settings.getConfigString("settings.import-placeholder-account.name");
+        //Add UUID to Poseidon UUIDManager
+        try {
+            UUIDManager.getInstance().receivedUUID(placeholderUsername, placeholderUUID, (System.currentTimeMillis() / 1000L), true);
+        } catch (Exception exception) {
+            logger(Level.WARNING, "Could not add placeholder UUID to Poseidon UUIDCache. This could cause Unknown User to be shown for some imported Villages.");
+        }
+
+        if (Bukkit.getServer().getPluginManager().getPlugin("Factions") == null) {
+            log.log(Level.WARNING, "[" + pluginName + "] Factions not found, cancelling towny import.");
+            return false;
+        }
+
+        Factions factions = (Factions) Bukkit.getServer().getPluginManager().getPlugin("Factions");
+
+        int factionsImported = 0;
+        int factionsSkipped = 0;
+        int membersImported = 0;
+        int membersSkipped = 0;
+        int claimsImported = 0;
+
+
+        Set<String> factionTags = factions.getFactionTags();
+
+        for (String tag : factionTags) {
+            Faction faction = Faction.findByTag(tag);
+            String originalFactionName = faction.getTag();
+            String newVillageName = originalFactionName;
+
+            int i = 0;
+            while (!this.villageNameAvailable(newVillageName)) {
+                i++;
+                newVillageName = originalFactionName + "-" + i;
+            }
+
+            //Print out the new name if it was changed
+            if (!originalFactionName.equals(newVillageName)) {
+                logger(Level.INFO, "Faction Import: Village " + originalFactionName + " already exists. Changing name to " + newVillageName);
+            }
+
+            //Get Village UUID
+            UUID factionUUID = UUID.randomUUID();
+
+
+            UUID villageOwnerUUID = null;
+            ArrayList<UUID> assistants = new ArrayList<>();
+            ArrayList<UUID> members = new ArrayList<>();
+
+            Set<String> factionMembers = factions.getPlayersInFaction(tag);
+
+
+            String ownerUsername = null;
+            ArrayList<String> assistantUsernames = new ArrayList<>();
+            ArrayList<String> memberUsernames = new ArrayList<>();
+
+            //Find owner
+            for (String member : factionMembers) {
+                FPlayer fPlayer = FPlayer.find(member);
+                if (fPlayer.getRole() == Role.ADMIN) {
+                    ownerUsername = fPlayer.getName();
+                } else if (fPlayer.getRole() == Role.MODERATOR) {
+                    assistantUsernames.add(fPlayer.getName());
+                } else {
+                    memberUsernames.add(fPlayer.getName());
+                }
+            }
+
+            //Skip if owner is null
+            if (ownerUsername == null) {
+                log.warning("[" + pluginName + "] Could not find owner for faction " + newVillageName + ". The faction will not be imported.");
+                factionsSkipped++;
+                continue;
+            }
+
+            villageOwnerUUID = getUUIDFromPoseidonCache(ownerUsername);
+
+            if (villageOwnerUUID == null) {
+                log.warning("[" + pluginName + "] Could not find UUID for faction (" + newVillageName + ") owner: " + ownerUsername + ". Ownership will be given to " + placeholderUsername + " (" + placeholderUUID + ").");
+                villageOwnerUUID = placeholderUUID;
+            }
+
+            //Import Assistants
+            for (String assistantUsername : assistantUsernames) {
+                UUID assistantUUID = getUUIDFromPoseidonCache(assistantUsername);
+                if (assistantUUID == null) {
+                    log.warning("[" + pluginName + "] Could not find UUID for faction (" + newVillageName + ") assistant: " + assistantUsername + ". The assistant will not be imported.");
+                    continue;
+                }
+                assistants.add(assistantUUID);
+            }
+
+            //Import Members
+            for (String memberUsername : memberUsernames) {
+                UUID memberUUID = getUUIDFromPoseidonCache(memberUsername);
+                if (memberUUID == null) {
+                    log.warning("[" + pluginName + "] Could not find UUID for faction (" + newVillageName + ") member: " + memberUsername + ". The member will not be imported.");
+                    continue;
+                }
+                members.add(memberUUID);
+                membersImported++;
+            }
+
+
+            //Import Claims
+
+            //Use reflection to get claimOwnership field from Faction
+            Map<FLocation, Set<String>> claimOwnership;
+            Field claimOwnershipField = null;
+            try {
+                claimOwnershipField = faction.getClass().getDeclaredField("claimOwnership");
+                claimOwnershipField.setAccessible(true);
+                claimOwnership = (Map<FLocation, Set<String>>) claimOwnershipField.get(faction);
+            } catch (Exception e) {
+                log.severe("[" + pluginName + "] Could not get claimOwnership field from Faction class. Factions import will not continue. Please note this import function is only compatible with Java 8 due to the use of reflection.");
+                e.printStackTrace();
+                return false;
+            }
+
+            if (claimOwnership == null) {
+                log.warning("[" + pluginName + "] claimOwnership variable is null. Factions import will not continue.");
+                return false;
+            }
+
+            ArrayList<VChunk> villageClaims = new ArrayList<>();
+
+            for (Map.Entry<FLocation, Set<String>> entry : claimOwnership.entrySet()) {
+                FLocation fLocation = entry.getKey();
+                VChunk vChunk = new VChunk(fLocation.getWorldName(), (int) fLocation.getX(), (int) fLocation.getZ());
+                villageClaims.add(vChunk);
+                claimsImported++;
+            }
+
+            //Skip if no claims
+            if (villageClaims.size() == 0) {
+                log.warning("[" + pluginName + "] Faction " + newVillageName + " has no claims. The faction will not be imported.");
+                factionsSkipped++;
+                continue;
+            }
+
+
+            //Faction Spawn
+            Location factionSpawn = faction.getHome();
+
+            VChunk spawnChunk = new VChunk(factionSpawn);
+
+
+            //Create Village
+            Village village = new Village(plugin, newVillageName, factionUUID, villageOwnerUUID, spawnChunk, new VCords(factionSpawn));
+            factionsImported++;
+            this.villageMap.addVillageToMap(village);
+            //Register claims
+            for (VChunk vChunk : villageClaims) {
+                village.addClaim(new VClaim(village, vChunk));
+            }
+            //Register assistants
+            for (UUID assistantUUID : assistants) {
+                village.addAssistant(assistantUUID);
+            }
+            //Register members
+            for (UUID memberUUID : members) {
+                village.addMember(memberUUID);
+            }
+
+            logger(Level.INFO, "Faction Import: Imported faction " + newVillageName + " with " + villageClaims.size() + " claims, " + assistants.size() + " assistants, and " + members.size() + " members.");
+        }
+
+        logger(Level.INFO, "Faction Import: Imported " + factionsImported + " factions with " + claimsImported + " claims and " + membersImported + " members. Skipped " + factionsSkipped + " factions.");
+
+
+        return true;
     }
 
 

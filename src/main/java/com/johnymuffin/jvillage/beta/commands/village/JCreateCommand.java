@@ -105,7 +105,7 @@ public class JCreateCommand extends JVBaseCommand implements CommandExecutor {
 
         //Check if player has enough money
         double creationCost = settings.getConfigDouble("settings.town-create.price.amount");
-        if (creationCost > 0) {
+        if (creationCost > 0 && plugin.isFundamentalsEnabled()) {
             EconomyAPI.EconomyResult result = FundamentalsAPI.getEconomy().subtractBalance(player.getUniqueId(), creationCost, player.getWorld().getName());
             String message;
             switch (result) {

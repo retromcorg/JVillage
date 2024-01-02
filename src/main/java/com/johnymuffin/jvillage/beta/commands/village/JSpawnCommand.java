@@ -10,7 +10,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import static com.johnymuffin.beta.fundamentals.util.Utils.getSafeDestination;
+import static com.johnymuffin.jvillage.beta.JVUtility.getSafeDestination;
 
 public class JSpawnCommand extends JVBaseCommand implements CommandExecutor {
     public JSpawnCommand(JVillage plugin) {

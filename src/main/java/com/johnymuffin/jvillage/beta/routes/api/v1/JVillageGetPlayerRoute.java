@@ -39,7 +39,7 @@ public class JVillageGetPlayerRoute extends JVillageNormalRoute {
                 try {
                     UUID playerUUID = UUID.fromString(uuid);
                     JSONObject playerJSON = new JSONObject();
-                    if (!jVillage.getFundamentals().getPlayerMap().isPlayerKnown(playerUUID)) {
+                    if (!jVillage.getPlayerData().isPlayerKnown(playerUUID)) {
                         playerJSON.put("found", false);
                         playerJSON.put("error", false);
                         response.setStatus(HttpServletResponse.SC_NOT_FOUND);

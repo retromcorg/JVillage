@@ -27,10 +27,7 @@ import com.johnymuffin.jvillage.beta.tasks.AutoClaimingTask;
 import com.johnymuffin.jvillage.beta.tasks.AutomaticSaving;
 import com.johnymuffin.jvillage.beta.tasks.Metrics;
 import com.legacyminecraft.poseidon.event.PoseidonCustomListener;
-import com.massivecraft.factions.FLocation;
-import com.massivecraft.factions.FPlayer;
-import com.massivecraft.factions.Faction;
-import com.massivecraft.factions.Factions;
+import com.massivecraft.factions.*;
 import com.massivecraft.factions.struct.Role;
 import com.palmergames.bukkit.towny.Towny;
 import com.palmergames.bukkit.towny.object.Resident;
@@ -664,6 +661,24 @@ public class JVillage extends JavaPlugin implements ClaimManager, PoseidonCustom
             logger(Level.WARNING, "Could not add placeholder UUID to Poseidon UUIDCache. This could cause Unknown User to be shown for some imported Villages.");
         }
 
+        //Get Private Factions Board
+        HashMap<FLocation, Integer> factionClaims;
+        try {
+            Field flocationIdsField = Board.class.getDeclaredField("flocationIds");
+            flocationIdsField.setAccessible(true);
+            factionClaims = (HashMap<FLocation, Integer>) flocationIdsField.get(null);
+        } catch (Exception exception) {
+            logger(Level.WARNING, "Could not get Factions board. Factions import will be skipped. Please note Factions import is only supported on Java 8 due to the use of reflections.");
+            return false;
+        }
+
+        if(factionClaims == null) {
+            logger(Level.WARNING, "Could not get Factions board. Factions import will be skipped.");
+            return false;
+        }
+
+
+
         if (Bukkit.getServer().getPluginManager().getPlugin("Factions") == null) {
             log.log(Level.WARNING, "[" + pluginName + "] Factions not found, cancelling towny import.");
             return false;
@@ -760,32 +775,20 @@ public class JVillage extends JavaPlugin implements ClaimManager, PoseidonCustom
 
 
             //Import Claims
-
-            //Use reflection to get claimOwnership field from Faction
-            Map<FLocation, Set<String>> claimOwnership;
-            Field claimOwnershipField = null;
-            try {
-                claimOwnershipField = faction.getClass().getDeclaredField("claimOwnership");
-                claimOwnershipField.setAccessible(true);
-                claimOwnership = (Map<FLocation, Set<String>>) claimOwnershipField.get(faction);
-            } catch (Exception e) {
-                log.severe("[" + pluginName + "] Could not get claimOwnership field from Faction class. Factions import will not continue. Please note this import function is only compatible with Java 8 due to the use of reflection.");
-                e.printStackTrace();
-                return false;
-            }
-
-            if (claimOwnership == null) {
-                log.warning("[" + pluginName + "] claimOwnership variable is null. Factions import will not continue.");
-                return false;
-            }
-
             ArrayList<VChunk> villageClaims = new ArrayList<>();
 
-            for (Map.Entry<FLocation, Set<String>> entry : claimOwnership.entrySet()) {
+
+            int factionId = faction.getId();
+
+            //Loop through factionClaims
+            for (Map.Entry<FLocation, Integer> entry : factionClaims.entrySet()) {
                 FLocation fLocation = entry.getKey();
-                VChunk vChunk = new VChunk(fLocation.getWorldName(), (int) fLocation.getX(), (int) fLocation.getZ());
-                villageClaims.add(vChunk);
-                claimsImported++;
+                int id = entry.getValue();
+                if(id == factionId) {
+                    VChunk vChunk = new VChunk(fLocation.getWorldName(), (int) fLocation.getX(), (int) fLocation.getZ());
+                    villageClaims.add(vChunk);
+                    claimsImported++;
+                }
             }
 
             //Skip if no claims
@@ -798,12 +801,20 @@ public class JVillage extends JavaPlugin implements ClaimManager, PoseidonCustom
 
             //Faction Spawn
             Location factionSpawn = faction.getHome();
-
-            VChunk spawnChunk = new VChunk(factionSpawn);
+            VCords villageSpawn = null;
+            VChunk spawnChunk = null;
+            if(factionSpawn == null) {
+                log.warning("[" + pluginName + "] Faction " + newVillageName + " has no spawn. The world spawn will be used instead.");
+                spawnChunk = new VChunk(Bukkit.getWorlds().get(0).getSpawnLocation());
+                villageSpawn = new VCords(Bukkit.getWorlds().get(0).getSpawnLocation());
+            } else {
+                spawnChunk = new VChunk(factionSpawn);
+                villageSpawn = new VCords(factionSpawn);
+            }
 
 
             //Create Village
-            Village village = new Village(plugin, newVillageName, factionUUID, villageOwnerUUID, spawnChunk, new VCords(factionSpawn));
+            Village village = new Village(plugin, newVillageName, factionUUID, villageOwnerUUID, spawnChunk, villageSpawn);
             factionsImported++;
             this.villageMap.addVillageToMap(village);
             //Register claims
@@ -964,7 +975,7 @@ public class JVillage extends JavaPlugin implements ClaimManager, PoseidonCustom
         }
 
         //Check if Fundamentals is enabled and if so, use it's cache
-        if(fundamentalsEnabled && Bukkit.getPluginManager().isPluginEnabled("Fundamentals")) {
+        if(uuid == null && fundamentalsEnabled && Bukkit.getPluginManager().isPluginEnabled("Fundamentals")) {
             Fundamentals fundamentals = (Fundamentals) Bukkit.getPluginManager().getPlugin("Fundamentals");
             uuid = fundamentals.getPlayerCache().getUUIDFromUsername(username);
         }
@@ -981,7 +992,7 @@ public class JVillage extends JavaPlugin implements ClaimManager, PoseidonCustom
         }
 
         //Check if Fundamentals is enabled and if so, use it's cache
-        if(fundamentalsEnabled && Bukkit.getPluginManager().isPluginEnabled("Fundamentals")) {
+        if(uuid == null && fundamentalsEnabled && Bukkit.getPluginManager().isPluginEnabled("Fundamentals")) {
             Fundamentals fundamentals = (Fundamentals) Bukkit.getPluginManager().getPlugin("Fundamentals");
             username = fundamentals.getPlayerCache().getUsernameFromUUID(uuid);
         }

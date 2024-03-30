@@ -217,7 +217,7 @@ public class JVilageAdminCMD extends JVBaseCommand {
             return true;
         }
 
-        UUID uuid = plugin.getFundamentals().getPlayerCache().getUUIDFromUsername(playerName);
+        UUID uuid = plugin.getUUIDFromUsername(playerName);
         if (uuid == null) {
             String message = language.getMessage("player_not_found_full");
             message = message.replace("%player%", playerName);
@@ -278,7 +278,7 @@ public class JVilageAdminCMD extends JVBaseCommand {
             return true;
         }
 
-        UUID uuid = plugin.getFundamentals().getPlayerCache().getUUIDFromUsername(playerName);
+        UUID uuid = plugin.getUUIDFromUsername(playerName);
         if (uuid == null) {
             String message = language.getMessage("player_not_found_full");
             message = message.replace("%player%", playerName);
@@ -341,7 +341,7 @@ public class JVilageAdminCMD extends JVBaseCommand {
             return true;
         }
 
-        UUID uuid = plugin.getFundamentals().getPlayerCache().getUUIDFromUsername(playerName);
+        UUID uuid = plugin.getUUIDFromUsername(playerName);
         if (uuid == null) {
             String message = language.getMessage("player_not_found_full");
             message = message.replace("%player%", playerName);
@@ -476,9 +476,15 @@ public class JVilageAdminCMD extends JVBaseCommand {
             return true;
         }
 
-        //TODO: Implement this command
-        commandSender.sendMessage(language.getMessage("generic_not_implemented"));
+        commandSender.sendMessage(language.getMessage("command_villageadmin_plugin_import_factions_start"));
+        if (plugin.factionsImport()) {
+            commandSender.sendMessage(language.getMessage("command_villageadmin_plugin_import_factions_success"));
+        } else {
+            commandSender.sendMessage(language.getMessage("command_villageadmin_plugin_import_factions_fail"));
+        }
+
         return true;
+
     }
 
 }

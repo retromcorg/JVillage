@@ -33,7 +33,7 @@ public class VResidentCommand extends JVBaseCommand {
 
         if (strings.length > 0) {
             String targetPlayerName = strings[0];
-            targetPlayerUUID = plugin.getFundamentals().getPlayerCache().getUUIDFromUsername(targetPlayerName);
+            targetPlayerUUID = plugin.getUUIDFromUsername(targetPlayerName);
             if (targetPlayerUUID == null) {
                 String message = language.getMessage("player_not_found_full");
                 message = message.replace("%username%", targetPlayerName);

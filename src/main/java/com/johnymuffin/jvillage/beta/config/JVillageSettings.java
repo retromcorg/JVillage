@@ -1,6 +1,5 @@
 package com.johnymuffin.jvillage.beta.config;
 
-import com.johnymuffin.jvillage.beta.JVillage;
 import org.bukkit.util.config.Configuration;
 
 import java.io.File;
@@ -61,6 +60,11 @@ public class JVillageSettings extends Configuration {
 
         generateConfigOption("settings.debug-mode.info", "If true, the plugin will output debug messages to the console.");
         generateConfigOption("settings.debug-mode.enabled", false);
+
+        generateConfigOption("settings.import-placeholder-account.uuid", "f84c6a79-0a4e-45e0-879b-cd49ebd4c4e2");
+        generateConfigOption("settings.import-placeholder-account.name", "Herobrine");
+        generateConfigOption("settings.import-placeholder-account.info", "This is the account that will be given ownership of Villages imported from Towny and Factions that do not have a valid owner. This should be a VALID Mojang account.");
+
 
         getWorldGuardPermissions(); //This is a hack to get the default value to be added to the config file.
 

@@ -1,12 +1,12 @@
 package com.johnymuffin.jvillage.beta;
 
 import com.johnymuffin.beta.fundamentals.Fundamentals;
-import com.johnymuffin.beta.fundamentals.player.FundamentalsPlayer;
 import com.johnymuffin.beta.webapi.JWebAPI;
 import com.johnymuffin.beta.webapi.event.JWebAPIDisable;
 import com.johnymuffin.jvillage.beta.commands.JVilageAdminCMD;
 import com.johnymuffin.jvillage.beta.commands.JVillageCMD;
 import com.johnymuffin.jvillage.beta.commands.VResidentCommand;
+import com.johnymuffin.jvillage.beta.config.JPlayerData;
 import com.johnymuffin.jvillage.beta.config.JVillageLanguage;
 import com.johnymuffin.jvillage.beta.config.JVillageSettings;
 import com.johnymuffin.jvillage.beta.interfaces.ClaimManager;
@@ -24,13 +24,18 @@ import com.johnymuffin.jvillage.beta.routes.api.v1.JVillageGetPlayerRoute;
 import com.johnymuffin.jvillage.beta.routes.api.v1.JVillageGetVillageList;
 import com.johnymuffin.jvillage.beta.routes.api.v1.JVillageGetVillageRoute;
 import com.johnymuffin.jvillage.beta.tasks.AutoClaimingTask;
+import com.johnymuffin.jvillage.beta.tasks.AutomaticSaving;
+import com.johnymuffin.jvillage.beta.tasks.Metrics;
 import com.legacyminecraft.poseidon.event.PoseidonCustomListener;
+import com.massivecraft.factions.*;
+import com.massivecraft.factions.struct.Role;
 import com.palmergames.bukkit.towny.Towny;
 import com.palmergames.bukkit.towny.object.Resident;
 import com.palmergames.bukkit.towny.object.Town;
 import com.palmergames.bukkit.towny.object.TownBlock;
 import com.palmergames.bukkit.towny.object.TownyWorld;
 import com.projectposeidon.api.PoseidonUUID;
+import com.projectposeidon.johnymuffin.UUIDManager;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.ApplicableRegionSet;
 import com.sk89q.worldguard.protection.managers.RegionManager;
@@ -43,13 +48,14 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import javax.annotation.Nullable;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.lang.reflect.Field;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static com.johnymuffin.jvillage.beta.JVUtility.getUUIDFromPoseidonCache;
 
 public class JVillage extends JavaPlugin implements ClaimManager, PoseidonCustomListener {
     //Basic Plugin Info
@@ -65,12 +71,18 @@ public class JVillage extends JavaPlugin implements ClaimManager, PoseidonCustom
     private JVillageLanguage language;
     private JVillageSettings settings;
 
+    private JPlayerData playerData;
+
     private boolean errored = false;
 
     private JVillageMap villageMap;
     private JPlayerMap playerMap;
 
     private boolean apiEnabled = false;
+
+    private Metrics metrics;
+
+    private boolean fundamentalsEnabled = false;
 
     @Override
     public void onEnable() {
@@ -82,10 +94,11 @@ public class JVillage extends JavaPlugin implements ClaimManager, PoseidonCustom
 
         //Check for Fundamentals
         if (Bukkit.getPluginManager().getPlugin("Fundamentals") == null) {
-            log.severe("[" + pluginName + "] Fundamentals is not installed, disabling plugin");
-            errored = true;
-            this.getServer().getPluginManager().disablePlugin(this);
-            return;
+            fundamentalsEnabled = false;
+            log.warning("[" + pluginName + "] Fundamentals is not installed or not enabled, economy features will be disabled");
+        } else {
+            log.info("[" + pluginName + "] Fundamentals is installed and enabled, economy features will be enabled");
+            fundamentalsEnabled = true;
         }
 
 
@@ -133,17 +146,24 @@ public class JVillage extends JavaPlugin implements ClaimManager, PoseidonCustom
 //
 //        logger(Level.INFO, "Checked " + claimsLoaded + " claims in " + (endTime - startTime) + "ms. Found " + duplicateClaims + " duplicate claims.");
 
+        this.playerData = new JPlayerData(this); // Load player data from file
 
         int playersLoaded = 0;
         //Load players
         playerMap = new JPlayerMap(this);
-        //Load Fundamentals players
-        for (UUID uuid : getFundamentals().getPlayerMap().getKnownPlayers()) {
+        //TODO: This really isn't needed anymore, but I'm keeping it here for now. Lazy loading is a thing now.
+        for(UUID uuid : playerData.getAllPlayers()) {
             playerMap.getPlayer(uuid);
             playersLoaded++;
         }
 
-        logger(Level.INFO, "Loaded " + playersLoaded + " players from Fundamentals.");
+        //Load Fundamentals players
+        //for (UUID uuid : getFundamentals().getPlayerMap().getKnownPlayers()) {
+        //    playerMap.getPlayer(uuid);
+         //   playersLoaded++;
+        //}
+
+        logger(Level.INFO, "Loaded " + playersLoaded + " players from player data file.");
 
         //Register commands
         this.getCommand("villageadmin").setExecutor(new JVilageAdminCMD(this));
@@ -159,38 +179,6 @@ public class JVillage extends JavaPlugin implements ClaimManager, PoseidonCustom
 
         JVMobListener mobListener = new JVMobListener(this);
         Bukkit.getPluginManager().registerEvents(mobListener, plugin);
-
-        //Scheduled Tasks
-
-        //Save all villages every 5 minutes
-//        Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
-//            @Override
-//            public void run() {
-//                plugin.logger(Level.INFO, "Saving all villages");
-//                villageMap.saveData();
-//            }
-//        }, 20 * 60 * 5, 20 * 60 * 5);
-//
-//        try {
-//            exportOverviewerRegions();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-
-//        ArrayList<VClaim> claims = this.getVillageMap().getVillage("Kekistan").getClaims();
-//        RegionGenerator regionGenerator = new RegionGenerator(this);
-//        regionGenerator.generateMapRegionsForClaims(Bukkit.getWorlds().get(0), claims);
-
-//        OverviewerExporter exporter = new OverviewerExporter(this);
-//        String regions = exporter.generateOverviewerRegions();
-//        //Write string to file
-//        File filePath = new File(this.getDataFolder(), "regions.js");
-//        try (FileWriter file = new FileWriter(filePath)) {
-//            file.write(regions);
-//            file.flush();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
 
         //Register API routes if JWebAPI is installed
         if (Bukkit.getPluginManager().getPlugin("JWebAPI") != null) {
@@ -222,6 +210,12 @@ public class JVillage extends JavaPlugin implements ClaimManager, PoseidonCustom
 
         //Run auto claim task
         Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new AutoClaimingTask(plugin), 1, this.getSettings().getConfigInteger("settings.auto-claim.timer") * 20);
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new AutomaticSaving(plugin), 1, 20 * 60 * 10); //Save every 10 minutes
+
+        //bstats metrics
+        int pluginId = 20618; //JVillage plugin ID
+        this.metrics = new Metrics(plugin, pluginId);
+
     }
 
     public void removeAPIRoutes() {
@@ -254,7 +248,9 @@ public class JVillage extends JavaPlugin implements ClaimManager, PoseidonCustom
     public void onDisable() {
         logger(Level.INFO, "Saving all villages");
         villageMap.saveData();
+        playerData.save();
 
+        metrics.shutdown(); //Disable bstats metrics incase a reload is done
         removeAPIRoutes();
 
         if (errored) {
@@ -285,10 +281,6 @@ public class JVillage extends JavaPlugin implements ClaimManager, PoseidonCustom
 //        exporter.generateOverviewerRegions();
 //        logger(Level.INFO, "Exported Overviewer Regions");
 //    }
-
-    public Fundamentals getFundamentals() {
-        return (Fundamentals) Bukkit.getPluginManager().getPlugin("Fundamentals");
-    }
 
     public JVillageMap getVillageMap() {
         return villageMap;
@@ -467,13 +459,21 @@ public class JVillage extends JavaPlugin implements ClaimManager, PoseidonCustom
 //    }
 
     public boolean townyImport() {
-        if (Bukkit.getServer().getPluginManager().getPlugin("Towny") == null || Bukkit.getServer().getPluginManager().getPlugin("Fundamentals") == null) {
-            log.log(Level.WARNING, "[" + pluginName + "] Towny or Fundamentals not found, cancelling towny import.");
+        if (Bukkit.getServer().getPluginManager().getPlugin("Towny") == null) {
+            log.log(Level.WARNING, "[" + pluginName + "] Towny not found, cancelling towny import.");
             return false;
         }
 
+        UUID placeholderUUID = UUID.fromString(settings.getConfigString("settings.import-placeholder-account.uuid"));
+        String placeholderUsername = settings.getConfigString("settings.import-placeholder-account.name");
+        //Add UUID to Poseidon UUIDManager
+        try {
+            UUIDManager.getInstance().receivedUUID(placeholderUsername, placeholderUUID, (System.currentTimeMillis() / 1000L), true);
+        } catch (Exception exception) {
+            logger(Level.WARNING, "Could not add placeholder UUID to Poseidon UUIDCache. This could cause Unknown User to be shown for some imported Villages.");
+        }
+
         Towny towny = (Towny) getServer().getPluginManager().getPlugin("Towny");
-        Fundamentals fundamentals = (Fundamentals) getServer().getPluginManager().getPlugin("Fundamentals");
 
         int townsImported = 0;
         int townsSkipped = 0;
@@ -519,7 +519,7 @@ public class JVillage extends JavaPlugin implements ClaimManager, PoseidonCustom
                 continue;
             }
 
-            townOwnerUUID = fundamentals.getPlayerCache().getUUIDFromUsername(townOwnerUsername);
+            townOwnerUUID = this.getUUIDFromUsername(townOwnerUsername);
             if (townOwnerUUID == null) {
                 townOwnerUUID = PoseidonUUID.getPlayerUUIDFromCache(townOwnerUsername, true);
             }
@@ -527,18 +527,17 @@ public class JVillage extends JavaPlugin implements ClaimManager, PoseidonCustom
                 townOwnerUUID = PoseidonUUID.getPlayerUUIDFromCache(townOwnerUsername, false);
             }
             if (townOwnerUUID == null) {
-//                log.warning("[" + pluginName + "] Could not find UUID for town owner: " + townOwnerUsername + ". The town will not be imported.");
-//                townsSkipped++;
-                townOwnerUUID = UUID.fromString("ca5c33ce-5825-45e3-ab92-0127c05c2016"); //UUID for jetpackingwolf
-                continue;
+                log.warning("[" + pluginName + "] Could not find UUID for town owner: " + townOwnerUsername + ". The town will not be imported.");
+                townsSkipped++;
+                townOwnerUUID = placeholderUUID; //UUID for jetpackingwolf
             }
 
             //Import Assistants
             for (Resident resident : town.getAssistants()) {
                 String assistantUsername = resident.getName();
-                UUID assistantUUID = fundamentals.getPlayerCache().getUUIDFromUsername(assistantUsername);
+                UUID assistantUUID = this.getUUIDFromUsername(assistantUsername);
                 if (assistantUUID == null) {
-//                    log.warning("[" + pluginName + "] Could not find UUID for town assistant: " + assistantUsername + ". The assistant will not be imported for town " + newTownName + ".");
+                    log.warning("[" + pluginName + "] Could not find UUID for town assistant: " + assistantUsername + ". The assistant will not be imported for town " + newTownName + ".");
                     continue;
                 }
                 assistants.add(assistantUUID);
@@ -547,9 +546,9 @@ public class JVillage extends JavaPlugin implements ClaimManager, PoseidonCustom
             //Import Residents
             for (Resident resident : town.getResidents()) {
                 String residentUsername = resident.getName();
-                UUID residentUUID = fundamentals.getPlayerCache().getUUIDFromUsername(residentUsername);
+                UUID residentUUID = this.getUUIDFromUsername(residentUsername);
                 if (residentUUID == null) {
-//                    log.warning("[" + pluginName + "] Could not find UUID for town resident: " + residentUsername + ". The resident will not be imported for town " + newTownName + ".");
+                    log.warning("[" + pluginName + "] Could not find UUID for town resident: " + residentUsername + ". The resident will not be imported for town " + newTownName + ".");
                     residentsSkipped++;
                     continue;
                 }
@@ -589,10 +588,7 @@ public class JVillage extends JavaPlugin implements ClaimManager, PoseidonCustom
             try {
                 townSpawn = new VCords(town.getSpawn().getBlockX(), town.getSpawn().getBlockY(), town.getSpawn().getBlockZ(), town.getSpawn().getWorld().getName());
             } catch (Exception exception) {
-//                exception.printStackTrace();
-//                log.warning("[" + pluginName + "] Could not find town spawn for town " + newTownName + ". The town will not be imported.");
-//                townsSkipped++;
-//                continue;
+                log.warning("[" + pluginName + "] Could not find town spawn for town " + newTownName + ". World spawn will be used instead.");
                 logger(Level.WARNING, "Could not find town spawn for town " + newTownName + ". The town spawn will be set to the world spawn.");
                 townSpawn = new VCords(Bukkit.getWorlds().get(0).getSpawnLocation().getBlockX(), Bukkit.getWorlds().get(0).getSpawnLocation().getBlockY(), Bukkit.getWorlds().get(0).getSpawnLocation().getBlockZ(), Bukkit.getWorlds().get(0).getName());
             }
@@ -618,8 +614,6 @@ public class JVillage extends JavaPlugin implements ClaimManager, PoseidonCustom
             for (UUID residentUUID : residents) {
                 village.addMember(residentUUID);
             }
-            //Register claims
-
 
             logger(Level.INFO, "Towny Import: Imported town " + newTownName + " with " + townClaims.size() + " claims. Owner Name: " + townOwnerUsername + " Assistants: " + assistants.size() + " Residents: " + residents.size());
         }
@@ -631,18 +625,16 @@ public class JVillage extends JavaPlugin implements ClaimManager, PoseidonCustom
         for (int i = 0; towny.getTownyUniverse().getResidents().size() > i; i++) {
             Resident resident = towny.getTownyUniverse().getResidents().get(i);
             String residentUsername = resident.getName();
-            UUID residentUUID = fundamentals.getPlayerCache().getUUIDFromUsername(residentUsername);
+            UUID residentUUID = this.getUUIDFromUsername(residentUsername);
             if (residentUUID == null) {
 //                log.warning("[" + pluginName + "] Could not find UUID for town resident: " + residentUsername + ". The resident will not be imported.");
                 residentsSkipped2++;
                 continue;
             }
 
-            FundamentalsPlayer fundamentalsPlayer = fundamentals.getPlayerMap().getPlayer(residentUUID);
-
             // Save resident information
-            fundamentalsPlayer.saveInformation("jvillage.firstjoin", resident.getRegistered());
-            fundamentalsPlayer.saveInformation("jvillage.lastjoin", resident.getLastOnline());
+            playerData.setPlayerData(residentUUID, "firstJoin", String.valueOf(resident.getRegistered()/1000L));
+            playerData.setPlayerData(residentUUID, "lastJoin", String.valueOf(resident.getLastOnline()/1000L));
             residentsImported2++;
         }
 
@@ -655,6 +647,196 @@ public class JVillage extends JavaPlugin implements ClaimManager, PoseidonCustom
 
         return true;
 
+    }
+
+    public boolean factionsImport() {
+        logger(Level.INFO, "Factions Import: Starting import of Factions data.");
+
+        UUID placeholderUUID = UUID.fromString(settings.getConfigString("settings.import-placeholder-account.uuid"));
+        String placeholderUsername = settings.getConfigString("settings.import-placeholder-account.name");
+        //Add UUID to Poseidon UUIDManager
+        try {
+            UUIDManager.getInstance().receivedUUID(placeholderUsername, placeholderUUID, (System.currentTimeMillis() / 1000L), true);
+        } catch (Exception exception) {
+            logger(Level.WARNING, "Could not add placeholder UUID to Poseidon UUIDCache. This could cause Unknown User to be shown for some imported Villages.");
+        }
+
+        //Get Private Factions Board
+        HashMap<FLocation, Integer> factionClaims;
+        try {
+            Field flocationIdsField = Board.class.getDeclaredField("flocationIds");
+            flocationIdsField.setAccessible(true);
+            factionClaims = (HashMap<FLocation, Integer>) flocationIdsField.get(null);
+        } catch (Exception exception) {
+            logger(Level.WARNING, "Could not get Factions board. Factions import will be skipped. Please note Factions import is only supported on Java 8 due to the use of reflections.");
+            return false;
+        }
+
+        if(factionClaims == null) {
+            logger(Level.WARNING, "Could not get Factions board. Factions import will be skipped.");
+            return false;
+        }
+
+
+
+        if (Bukkit.getServer().getPluginManager().getPlugin("Factions") == null) {
+            log.log(Level.WARNING, "[" + pluginName + "] Factions not found, cancelling towny import.");
+            return false;
+        }
+
+        Factions factions = (Factions) Bukkit.getServer().getPluginManager().getPlugin("Factions");
+
+        int factionsImported = 0;
+        int factionsSkipped = 0;
+        int membersImported = 0;
+        int membersSkipped = 0;
+        int claimsImported = 0;
+
+
+        Set<String> factionTags = factions.getFactionTags();
+
+        for (String tag : factionTags) {
+            Faction faction = Faction.findByTag(tag);
+            String originalFactionName = faction.getTag();
+            String newVillageName = originalFactionName;
+
+            int i = 0;
+            while (!this.villageNameAvailable(newVillageName)) {
+                i++;
+                newVillageName = originalFactionName + "-" + i;
+            }
+
+            //Print out the new name if it was changed
+            if (!originalFactionName.equals(newVillageName)) {
+                logger(Level.INFO, "Faction Import: Village " + originalFactionName + " already exists. Changing name to " + newVillageName);
+            }
+
+            //Get Village UUID
+            UUID factionUUID = UUID.randomUUID();
+
+
+            UUID villageOwnerUUID = null;
+            ArrayList<UUID> assistants = new ArrayList<>();
+            ArrayList<UUID> members = new ArrayList<>();
+
+            Set<String> factionMembers = factions.getPlayersInFaction(tag);
+
+
+            String ownerUsername = null;
+            ArrayList<String> assistantUsernames = new ArrayList<>();
+            ArrayList<String> memberUsernames = new ArrayList<>();
+
+            //Find owner
+            for (String member : factionMembers) {
+                FPlayer fPlayer = FPlayer.find(member);
+                if (fPlayer.getRole() == Role.ADMIN) {
+                    ownerUsername = fPlayer.getName();
+                } else if (fPlayer.getRole() == Role.MODERATOR) {
+                    assistantUsernames.add(fPlayer.getName());
+                } else {
+                    memberUsernames.add(fPlayer.getName());
+                }
+            }
+
+            //Skip if owner is null
+            if (ownerUsername == null) {
+                log.warning("[" + pluginName + "] Could not find owner for faction " + newVillageName + ". The faction will not be imported.");
+                factionsSkipped++;
+                continue;
+            }
+
+            villageOwnerUUID = this.getUUIDFromUsername(ownerUsername);
+
+            if (villageOwnerUUID == null) {
+                log.warning("[" + pluginName + "] Could not find UUID for faction (" + newVillageName + ") owner: " + ownerUsername + ". Ownership will be given to " + placeholderUsername + " (" + placeholderUUID + ").");
+                villageOwnerUUID = placeholderUUID;
+            }
+
+            //Import Assistants
+            for (String assistantUsername : assistantUsernames) {
+                UUID assistantUUID = this.getUUIDFromUsername(assistantUsername);
+                if (assistantUUID == null) {
+                    log.warning("[" + pluginName + "] Could not find UUID for faction (" + newVillageName + ") assistant: " + assistantUsername + ". The assistant will not be imported.");
+                    continue;
+                }
+                assistants.add(assistantUUID);
+            }
+
+            //Import Members
+            for (String memberUsername : memberUsernames) {
+                UUID memberUUID = this.getUUIDFromUsername(memberUsername);
+                if (memberUUID == null) {
+                    log.warning("[" + pluginName + "] Could not find UUID for faction (" + newVillageName + ") member: " + memberUsername + ". The member will not be imported.");
+                    continue;
+                }
+                members.add(memberUUID);
+                membersImported++;
+            }
+
+
+            //Import Claims
+            ArrayList<VChunk> villageClaims = new ArrayList<>();
+
+
+            int factionId = faction.getId();
+
+            //Loop through factionClaims
+            for (Map.Entry<FLocation, Integer> entry : factionClaims.entrySet()) {
+                FLocation fLocation = entry.getKey();
+                int id = entry.getValue();
+                if(id == factionId) {
+                    VChunk vChunk = new VChunk(fLocation.getWorldName(), (int) fLocation.getX(), (int) fLocation.getZ());
+                    villageClaims.add(vChunk);
+                    claimsImported++;
+                }
+            }
+
+            //Skip if no claims
+            if (villageClaims.size() == 0) {
+                log.warning("[" + pluginName + "] Faction " + newVillageName + " has no claims. The faction will not be imported.");
+                factionsSkipped++;
+                continue;
+            }
+
+
+            //Faction Spawn
+            Location factionSpawn = faction.getHome();
+            VCords villageSpawn = null;
+            VChunk spawnChunk = null;
+            if(factionSpawn == null) {
+                log.warning("[" + pluginName + "] Faction " + newVillageName + " has no spawn. The world spawn will be used instead.");
+                spawnChunk = new VChunk(Bukkit.getWorlds().get(0).getSpawnLocation());
+                villageSpawn = new VCords(Bukkit.getWorlds().get(0).getSpawnLocation());
+            } else {
+                spawnChunk = new VChunk(factionSpawn);
+                villageSpawn = new VCords(factionSpawn);
+            }
+
+
+            //Create Village
+            Village village = new Village(plugin, newVillageName, factionUUID, villageOwnerUUID, spawnChunk, villageSpawn);
+            factionsImported++;
+            this.villageMap.addVillageToMap(village);
+            //Register claims
+            for (VChunk vChunk : villageClaims) {
+                village.addClaim(new VClaim(village, vChunk));
+            }
+            //Register assistants
+            for (UUID assistantUUID : assistants) {
+                village.addAssistant(assistantUUID);
+            }
+            //Register members
+            for (UUID memberUUID : members) {
+                village.addMember(memberUUID);
+            }
+
+            logger(Level.INFO, "Faction Import: Imported faction " + newVillageName + " with " + villageClaims.size() + " claims, " + assistants.size() + " assistants, and " + members.size() + " members.");
+        }
+
+        logger(Level.INFO, "Faction Import: Imported " + factionsImported + " factions with " + claimsImported + " claims and " + membersImported + " members. Skipped " + factionsSkipped + " factions.");
+
+
+        return true;
     }
 
 
@@ -714,6 +896,10 @@ public class JVillage extends JavaPlugin implements ClaimManager, PoseidonCustom
 
     public JVillageSettings getSettings() {
         return settings;
+    }
+
+    public JPlayerData getPlayerData() {
+        return this.playerData;
     }
 
     public Village generateNewVillage(String townName, UUID owner, VChunk vChunk, VCords townSpawn) {
@@ -779,5 +965,42 @@ public class JVillage extends JavaPlugin implements ClaimManager, PoseidonCustom
             }
         }
         return false;
+    }
+
+    @Nullable
+    public UUID getUUIDFromUsername(String username) {
+        UUID uuid = getUUIDFromPoseidonCache(username);
+        if (uuid == null) {
+            uuid = playerData.getUUID(username);
+        }
+
+        //Check if Fundamentals is enabled and if so, use it's cache
+        if(uuid == null && fundamentalsEnabled && Bukkit.getPluginManager().isPluginEnabled("Fundamentals")) {
+            Fundamentals fundamentals = (Fundamentals) Bukkit.getPluginManager().getPlugin("Fundamentals");
+            uuid = fundamentals.getPlayerCache().getUUIDFromUsername(username);
+        }
+
+        return uuid;
+    }
+
+    @Nullable
+    public String getUsernameFromUUID(UUID uuid) {
+        String username = PoseidonUUID.getPlayerUsernameFromUUID(uuid);
+
+        if (username == null) {
+            username = playerData.getUsername(uuid);
+        }
+
+        //Check if Fundamentals is enabled and if so, use it's cache
+        if(uuid == null && fundamentalsEnabled && Bukkit.getPluginManager().isPluginEnabled("Fundamentals")) {
+            Fundamentals fundamentals = (Fundamentals) Bukkit.getPluginManager().getPlugin("Fundamentals");
+            username = fundamentals.getPlayerCache().getUsernameFromUUID(uuid);
+        }
+
+        return username;
+    }
+
+    public boolean isFundamentalsEnabled() {
+        return fundamentalsEnabled;
     }
 }

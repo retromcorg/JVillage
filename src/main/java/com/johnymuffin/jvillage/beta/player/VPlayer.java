@@ -1,7 +1,6 @@
 package com.johnymuffin.jvillage.beta.player;
 
 
-import com.johnymuffin.beta.fundamentals.player.FundamentalsPlayer;
 import com.johnymuffin.jvillage.beta.JVillage;
 import com.johnymuffin.jvillage.beta.events.PlayerSwitchTownEvent;
 import com.johnymuffin.jvillage.beta.models.Village;
@@ -11,6 +10,7 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.UUID;
+import java.util.logging.Level;
 
 import static com.johnymuffin.jvillage.beta.JVUtility.getPlayerFromUUID;
 
@@ -118,14 +118,22 @@ public class VPlayer {
     }
 
     public boolean autoSwitchSelected() {
-        if (getFundamentalsPlayer().getInformation("jvillage.autoswitch") == null) {
+//        if (getFundamentalsPlayer().getInformation("jvillage.autoswitch") == null) {
+//            return true;
+//        }
+//        return Boolean.parseBoolean(String.valueOf(getFundamentalsPlayer().getInformation("jvillage.autoswitch")));
+
+        String autoSwitch = plugin.getPlayerData().getPlayerData(uuid, "autoswitch");
+        if (autoSwitch == null) {
+            plugin.debugLogger(Level.INFO, "AutoSwitch is null in players.yml for " + getUsername() + ". Assuming true.");
             return true;
         }
-        return Boolean.parseBoolean(String.valueOf(getFundamentalsPlayer().getInformation("jvillage.autoswitch")));
+        return Boolean.parseBoolean(autoSwitch);
     }
 
     public void setAutoSwitchSelected(boolean autoSwitch) {
-        getFundamentalsPlayer().saveInformation("jvillage.autoswitch", autoSwitch);
+//        getFundamentalsPlayer().saveInformation("jvillage.autoswitch", autoSwitch);
+        plugin.getPlayerData().setPlayerData(uuid, "autoswitch", String.valueOf(autoSwitch));
     }
 
     public Village getCurrentlyLocatedIn() {
@@ -150,10 +158,6 @@ public class VPlayer {
         return currentlyLocatedIn != null;
     }
 
-    public FundamentalsPlayer getFundamentalsPlayer() {
-        return plugin.getFundamentals().getPlayerMap().getPlayer(uuid);
-    }
-
     public boolean leaveVillage(Village village) {
         if (village.getOwner().equals(uuid)) {
             throw new IllegalArgumentException("Cannot leave a village you own");
@@ -172,9 +176,9 @@ public class VPlayer {
     }
 
     public String getUsername() {
-        String username = plugin.getFundamentals().getPlayerCache().getUsernameFromUUID(uuid);
+        String username = PoseidonUUID.getPlayerUsernameFromUUID(uuid);
         if (username == null) {
-            username = PoseidonUUID.getPlayerUsernameFromUUID(uuid);
+            username = plugin.getPlayerData().getUsername(uuid);
         }
         if (username == null) {
             username = "Unknown UUID";

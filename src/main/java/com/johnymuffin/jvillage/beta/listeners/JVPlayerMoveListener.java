@@ -58,6 +58,15 @@ public class JVPlayerMoveListener extends CustomEventListener implements Listene
         //Disable auto claiming when a player joins if they have it enabled
         VPlayer vPlayer = plugin.getPlayerMap().getPlayer(event.getPlayer().getUniqueId());
         vPlayer.setAutoClaimingEnabled(false, false); //Don't send message as it shouldn't be enabled anyway
+
+        //Record appropriate player data
+        String firstJoin = plugin.getPlayerData().getPlayerData(event.getPlayer().getUniqueId(), "firstJoin");
+        if (firstJoin == null) {
+            plugin.getPlayerData().setPlayerData(event.getPlayer().getUniqueId(), "firstJoin", String.valueOf(System.currentTimeMillis()/1000L));
+        }
+        plugin.getPlayerData().setPlayerData(event.getPlayer().getUniqueId(), "username", event.getPlayer().getName());
+        plugin.getPlayerData().setPlayerData(event.getPlayer().getUniqueId(), "lastOnline", String.valueOf(System.currentTimeMillis()/1000L));
+        plugin.getPlayerData().setUUID(vPlayer.getUsername(), event.getPlayer().getUniqueId());
     }
 
     //TODO: This might not be needed, decide if it is or not
@@ -75,6 +84,8 @@ public class JVPlayerMoveListener extends CustomEventListener implements Listene
         //Disable auto claiming when a player quits if they have it enabled
         VPlayer vPlayer = plugin.getPlayerMap().getPlayer(event.getPlayer().getUniqueId());
         vPlayer.setAutoClaimingEnabled(false, false);
+
+        plugin.getPlayerData().setPlayerData(event.getPlayer().getUniqueId(), "lastOnline", String.valueOf(System.currentTimeMillis()/1000L));
     }
 
     private void updatePlayerLocation(Player player, Location location) {

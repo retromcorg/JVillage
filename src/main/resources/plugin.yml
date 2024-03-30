@@ -41,8 +41,13 @@ permissions:
       jvillage.admin.plugin.reload: true
       jvillage.admin.plugin.import: true
       jvillage.admin.plugin.import.towny: true
+      jvillage.admin.plugin.import.factions: true
       jvillage.admin.world: true
       jvillage.admin.world.wgcleanup: true
+
+  jvillage.admin.plugin.import.factions:
+    description: Allows access to JVillage admin plugin import factions data
+    default: op
 
   jvillage.admin.world:
     description: Allows access to all JVillage world admin commands

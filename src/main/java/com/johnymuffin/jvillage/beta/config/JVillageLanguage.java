@@ -33,6 +33,8 @@ public class JVillageLanguage extends Configuration {
         map.put("no_village_selected_or_name_invalid", "&4Sorry, you don't have a village selected or the name you entered is invalid");
         map.put("command_invalid_argument_provide_integer", "&4Sorry, that is not a valid number. Please provide an integer");
 
+        map.put("economy_disabled", "&4Sorry, the JVillage economy is disabled on this server");
+
         map.put("not_in_village", "&4Sorry, you are not in that village");
         map.put("village_owner_leave", "&4Sorry, the owner of a village can't leave it");
         map.put("movement_village_enter", "&bYou have entered the village of &9%village%");
@@ -58,6 +60,10 @@ public class JVillageLanguage extends Configuration {
         map.put("command_villageadmin_plugin_import_towny_start", "&bImporting Towny data. The server might freeze while this is happening.");
         map.put("command_villageadmin_plugin_import_towny_success", "&bImporting Towny data completed successfully. The debug is available in the console.");
         map.put("command_villageadmin_plugin_import_towny_fail", "&bImporting Towny data failed. The debug is available in the console.");
+
+        map.put("command_villageadmin_plugin_import_factions_start", "&bImporting Factions data. The server might freeze while this is happening.");
+        map.put("command_villageadmin_plugin_import_factions_success", "&bImporting Factions data completed successfully. The debug is available in the console.");
+        map.put("command_villageadmin_plugin_import_factions_fail", "&bImporting Factions data failed. The debug is available in the console.");
 
         map.put("command_villageadmin_plugin_debug_change", "&bDebug mode has been changed to &9%state%");
 
@@ -163,7 +169,7 @@ public class JVillageLanguage extends Configuration {
         map.put("command_village_autoswitch_on", "&bYou have enabled auto switching");
         map.put("command_village_autoswitch_off", "&bYou have disabled auto switching");
         map.put("command_village_autoswitch_use", "&cSorry, that is invalid. Try /village autoswitch [on|off]");
-        map.put("command_village_autoswitch_set", "&bYour auto switching has been set to &9%state%");
+        map.put("command_village_autoswitch_set", "&bYour auto switching is set to &9%state%");
 
         map.put("command_village_leave_success", "&bYou have left the village &9%village%");
         map.put("command_village_leave_use", "&cSorry, that is invalid. Try /village leave [village]");

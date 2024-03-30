@@ -60,7 +60,7 @@ public class JDeleteCommand extends JVBaseCommand implements CommandExecutor {
         // Refund the player the balance
         double townBalance = village.getBalance();
 
-        if (townBalance > 0) {
+        if (townBalance > 0 && plugin.isFundamentalsEnabled()) {
             EconomyAPI.EconomyResult result = FundamentalsAPI.getEconomy().additionBalance(player.getUniqueId(), townBalance);
             String message;
             switch (result) {

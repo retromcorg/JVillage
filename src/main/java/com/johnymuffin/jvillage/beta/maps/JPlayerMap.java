@@ -1,6 +1,5 @@
 package com.johnymuffin.jvillage.beta.maps;
 
-import com.johnymuffin.beta.fundamentals.Fundamentals;
 import com.johnymuffin.jvillage.beta.JVillage;
 import com.johnymuffin.jvillage.beta.models.Village;
 import com.johnymuffin.jvillage.beta.player.VPlayer;
@@ -17,9 +16,9 @@ public class JPlayerMap {
     public JPlayerMap(JVillage plugin) {
         this.plugin = plugin;
 
-        for (UUID uuid : getFundamentals().getPlayerMap().getKnownPlayers()) {
-            playerMap.put(uuid, new VPlayer(plugin, uuid));
-        }
+//        for (UUID uuid : getFundamentals().getPlayerMap().getKnownPlayers()) {
+//            playerMap.put(uuid, new VPlayer(plugin, uuid));
+//        }
 
     }
 
@@ -31,9 +30,9 @@ public class JPlayerMap {
     }
 
 
-    private Fundamentals getFundamentals() {
-        return plugin.getFundamentals();
-    }
+//    private Fundamentals getFundamentals() {
+//        return plugin.getFundamentals();
+//    }
 
 
 }

@@ -56,7 +56,7 @@ public class JSetOwnerCommand  extends JVBaseCommand implements CommandExecutor 
 
 
         String playerName = strings[0];
-        UUID uuid = plugin.getFundamentals().getPlayerCache().getUUIDFromUsername(playerName);
+        UUID uuid = plugin.getUUIDFromUsername(playerName);
         if (uuid == null) {
             String message = language.getMessage("command_village_kick_not_found");
             message = message.replace("%player%", playerName);

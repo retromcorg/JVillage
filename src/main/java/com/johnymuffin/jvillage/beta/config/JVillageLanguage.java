@@ -124,6 +124,7 @@ public class JVillageLanguage extends Configuration {
                 "\n&8- &7/village kick [name] &8- &7Kick a player from your selected town" +
                 "\n&8- &7/village claim &8- &7Claim the chunk you are standing in" +
                 "\n&8- &7/village claim rectangle [chunk radius] &8- &7Claim a rectangle of chunks" +
+                "\n&8- &7/village claim auto &8- &7Claim chunks automatically as you walk (run again to disable)" +
                 "\n&8- &7/village withdraw [village] [amount] &8- &7Withdraw money from village bank" +
                 "\n&8- &7/village unclaim &8- &7Unclaim the chunk you are standing in");
 

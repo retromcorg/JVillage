@@ -52,7 +52,7 @@ public class JLeaveCommand extends JVBaseCommand implements CommandExecutor {
 
             vPlayer.leaveVillage(village);
             String message = language.getMessage("command_village_leave_success");
-            message.replace("%village%", village.getTownName());
+            message = message.replace("%village%", village.getTownName());
             commandSender.sendMessage(message);
 
             //PlayerLeaveVillageEvent

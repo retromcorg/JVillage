@@ -1,2 +1,2 @@
 # JVillage
-An alterative for Towny in Beta 1.7.3
+An alternative for Towny in Beta 1.7.3

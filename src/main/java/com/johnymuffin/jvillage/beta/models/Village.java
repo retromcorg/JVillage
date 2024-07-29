@@ -22,7 +22,7 @@ public class Village implements ClaimManager {
     private final ArrayList<UUID> members = new ArrayList<UUID>();
     private final ArrayList<UUID> assistants = new ArrayList<UUID>();
     private UUID owner;
-    private VCords townSpawn;
+    private VSpawnCords townSpawn;
 
     private boolean modified = false;
 
@@ -42,7 +42,7 @@ public class Village implements ClaimManager {
         }
     }
 
-    public Village(JVillage plugin, String townName, UUID townUUID, UUID owner, VChunk vChunk, VCords townSpawn) {
+    public Village(JVillage plugin, String townName, UUID townUUID, UUID owner, VChunk vChunk, VSpawnCords townSpawn) {
         this.plugin = plugin;
         this.townName = townName;
         this.townUUID = townUUID;
@@ -60,7 +60,7 @@ public class Village implements ClaimManager {
         this.townName = String.valueOf(object.get("name"));
         this.townUUID = uuid; // Ignore UUID in JSON file and use the one from the file name
         this.owner = UUID.fromString(String.valueOf(object.get("owner")));
-        this.townSpawn = new VCords((JSONObject) object.get("townSpawn"));
+        this.townSpawn = new VSpawnCords((JSONObject) object.get("townSpawn"));
         JSONArray members = (JSONArray) object.get("members");
         for (Object member : members) {
             this.members.add(UUID.fromString(String.valueOf(member)));
@@ -372,11 +372,11 @@ public class Village implements ClaimManager {
 //        return claims;
 //    }
 
-    public VCords getTownSpawn() {
+    public VSpawnCords getTownSpawn() {
         return townSpawn;
     }
 
-    public void setTownSpawn(VCords cords) {
+    public void setTownSpawn(VSpawnCords cords) {
         modified = true; // Indicate that the village has been modified and needs to be saved
         townSpawn = cords;
     }

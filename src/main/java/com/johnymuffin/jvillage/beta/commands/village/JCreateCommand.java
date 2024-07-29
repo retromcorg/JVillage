@@ -4,7 +4,7 @@ import com.johnymuffin.beta.fundamentals.api.EconomyAPI;
 import com.johnymuffin.beta.fundamentals.api.FundamentalsAPI;
 import com.johnymuffin.jvillage.beta.JVillage;
 import com.johnymuffin.jvillage.beta.commands.JVBaseCommand;
-import com.johnymuffin.jvillage.beta.models.VCords;
+import com.johnymuffin.jvillage.beta.models.VSpawnCords;
 import com.johnymuffin.jvillage.beta.models.Village;
 import com.johnymuffin.jvillage.beta.models.chunk.ChunkClaimSettings;
 import com.johnymuffin.jvillage.beta.models.chunk.VChunk;
@@ -127,7 +127,7 @@ public class JCreateCommand extends JVBaseCommand implements CommandExecutor {
             }
         }
 
-        Village newVillage = new Village(plugin, villageName, UUID.randomUUID(), player.getUniqueId(), vChunk, new VCords(player.getLocation()));
+        Village newVillage = new Village(plugin, villageName, UUID.randomUUID(), player.getUniqueId(), vChunk, new VSpawnCords(player.getLocation()));
         plugin.getVillageMap().addVillageToMap(newVillage);
 
         //Metadata for first chunk

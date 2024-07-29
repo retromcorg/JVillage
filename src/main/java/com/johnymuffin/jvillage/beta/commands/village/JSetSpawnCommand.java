@@ -2,7 +2,7 @@ package com.johnymuffin.jvillage.beta.commands.village;
 
 import com.johnymuffin.jvillage.beta.JVillage;
 import com.johnymuffin.jvillage.beta.commands.JVBaseCommand;
-import com.johnymuffin.jvillage.beta.models.VCords;
+import com.johnymuffin.jvillage.beta.models.VSpawnCords;
 import com.johnymuffin.jvillage.beta.models.Village;
 import com.johnymuffin.jvillage.beta.models.chunk.VChunk;
 import com.johnymuffin.jvillage.beta.player.VPlayer;
@@ -49,7 +49,7 @@ public class JSetSpawnCommand extends JVBaseCommand implements CommandExecutor {
             return true;
         }
 
-        VCords cords = new VCords(player.getLocation());
+        VSpawnCords cords = new VSpawnCords(player.getLocation());
         village.setTownSpawn(cords);
         village.broadcastToTown(player.getDisplayName() + " has set the spawn point to " + cords.toString());
         return true;

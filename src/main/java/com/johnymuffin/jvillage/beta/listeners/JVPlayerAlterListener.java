@@ -2,7 +2,8 @@ package com.johnymuffin.jvillage.beta.listeners;
 
 import com.johnymuffin.jvillage.beta.JVillage;
 import com.johnymuffin.jvillage.beta.models.Village;
-import com.johnymuffin.jvillage.beta.player.VPlayer;
+import com.johnymuffin.jvillage.beta.models.chunk.VChunk;
+import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -29,7 +30,7 @@ public class JVPlayerAlterListener implements Listener {
     //Lowest priority so that other plugins can cancel this event
     @EventHandler(ignoreCancelled = true, priority = Event.Priority.Lowest)
     public void onBlockPlaceEvent(final BlockPlaceEvent event) {
-        if (isAuthorizedToAlter(event.getPlayer())) {
+        if (isAuthorizedToAlter(event.getPlayer(), event.getBlock())) {
             return;
         }
 
@@ -43,7 +44,7 @@ public class JVPlayerAlterListener implements Listener {
     //Lowest priority so that other plugins can cancel this event
     @EventHandler(ignoreCancelled = true, priority = Event.Priority.Lowest)
     public void onBlockBreakEvent(final BlockBreakEvent event) {
-        if (isAuthorizedToAlter(event.getPlayer())) {
+        if (isAuthorizedToAlter(event.getPlayer(), event.getBlock())) {
             return;
         }
 
@@ -60,7 +61,7 @@ public class JVPlayerAlterListener implements Listener {
             return;
         }
 
-        if (isAuthorizedToAlter(event.getPlayer())) {
+        if (isAuthorizedToAlter(event.getPlayer(), event.getBlock())) {
             return;
         }
 
@@ -79,7 +80,7 @@ public class JVPlayerAlterListener implements Listener {
 
         Player player = event.getPlayer();
 
-        if (isAuthorizedToAlter(player)) {
+        if (isAuthorizedToAlter(player, event.getBlock())) {
             return;
         }
 
@@ -103,7 +104,7 @@ public class JVPlayerAlterListener implements Listener {
 
         Player player = (Player) event.getRemover();
 
-        if (isAuthorizedToAlter(player)) {
+        if (isAuthorizedToAlter(player, event.getPainting().getLocation().getBlock())) {
             return;
         }
 
@@ -119,7 +120,7 @@ public class JVPlayerAlterListener implements Listener {
             return;
         }
 
-        if (isAuthorizedToAlter(event.getPlayer())) {
+        if (isAuthorizedToAlter(event.getPlayer(), event.getBlockClicked())) {
             return;
         }
 
@@ -130,12 +131,12 @@ public class JVPlayerAlterListener implements Listener {
     }
 
     @EventHandler(ignoreCancelled = true, priority = Event.Priority.Lowest)
-    public void onPlayerBucketEmptyEvent(PlayerBucketFillEvent event) {
+    public void onPlayerBucketFillEvent(PlayerBucketFillEvent event) {
         if (event.isCancelled()) {
             return;
         }
 
-        if (isAuthorizedToAlter(event.getPlayer())) {
+        if (isAuthorizedToAlter(event.getPlayer(), event.getBlockClicked())) {
             return;
         }
 
@@ -147,21 +148,16 @@ public class JVPlayerAlterListener implements Listener {
 
 
     //Method utilized to determine if a player is authorized to alter a block based on their permissions and the village they are in
-    private boolean isAuthorizedToAlter(Player player) {
+    private boolean isAuthorizedToAlter(Player player, Block block) {
         if (isAuthorized(player, "jvillage.admin.bypass")) {
             return true;
         }
-
-        VPlayer vPlayer = plugin.getPlayerMap().getPlayer(player.getUniqueId());
-        if (!vPlayer.isLocatedInVillage()) {
-            return true;
+        VChunk vChunk = new VChunk(block.getLocation());
+        if(plugin.isClaimed(vChunk)){
+            Village village = plugin.getVillageAtLocation(vChunk);
+            return village.canPlayerAlter(player);
         }
-        Village locatedVillage = vPlayer.getCurrentlyLocatedIn();
-        if (locatedVillage.canPlayerAlter(player)) {
-            return true;
-        }
-
-        return false;
+        return true;
     }
 
 }

@@ -60,13 +60,15 @@ public class JCreateCommand extends JVBaseCommand implements CommandExecutor {
 
         //If string doesn't only contain numbers and letters
         if (!villageName.matches("[a-zA-Z0-9]+")) {
-            commandSender.sendMessage(language.getMessage("command_village_create_invalid_name"));
+            commandSender.sendMessage(language.getMessage("command_village_create_invalid_name")
+                    .replace("%max%", settings.getConfigInteger("settings.town.max-name-length.value").toString()));
             return true;
         }
 
         //If string is too long
         if (villageName.length() > settings.getConfigInteger("settings.town.max-name-length.value")) {
-            commandSender.sendMessage(language.getMessage("command_village_create_invalid_name"));
+            commandSender.sendMessage(language.getMessage("command_village_create_invalid_name")
+                    .replace("%max%", settings.getConfigInteger("settings.town.max-name-length.value").toString()));
             return true;
         }
 

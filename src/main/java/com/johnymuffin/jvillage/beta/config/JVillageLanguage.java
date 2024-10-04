@@ -117,6 +117,7 @@ public class JVillageLanguage extends Configuration {
                 "\n&8- &7/village autoswitch [on/off] &8- &7Autoswitch town" +
                 "\n&8- &7/village balance [village] &8- &7Shows village balance" +
                 "\n&8- &7/village deposit [village] [amount] &8- &7Deposit money into village bank" +
+                "\n&8- &7/village warp [name] &8- &7Teleport to a village warp" +
                 "\n&8- &7/village spawn &8- &7Teleport to village spawn");
 
         map.put("command_village_assistant_help", "&cJVillage Assistant Commands" +
@@ -126,7 +127,9 @@ public class JVillageLanguage extends Configuration {
                 "\n&8- &7/village claim rectangle [chunk radius] &8- &7Claim a rectangle of chunks" +
                 "\n&8- &7/village claim auto &8- &7Claim chunks automatically as you walk (run again to disable)" +
                 "\n&8- &7/village withdraw [village] [amount] &8- &7Withdraw money from village bank" +
-                "\n&8- &7/village unclaim &8- &7Unclaim the chunk you are standing in");
+                "\n&8- &7/village unclaim &8- &7Unclaim the chunk you are standing in" +
+                "\n&8- &7/village setwarp [name] &8- &7Set a village warp" +
+                "\n&8- &7/village delwarp [name] &8- &7Delete a village warp");
 
         map.put("command_village_owner_help", "&cJVillage Owner Commands" +
                 "\n&8- &7/village create [name] &8- &7Create a new village" +
@@ -198,7 +201,7 @@ public class JVillageLanguage extends Configuration {
         map.put("command_village_delete_broadcast", "&bThe village &9%village% &bhas failed to maintain pace with the world and has fallen into ruin");
 
         map.put("command_village_create_use", "&cSorry, that is invalid. Try /village create [name]");
-        map.put("command_village_create_invalid_name", "&cSorry, that is an invalid name. Please only use letters and numbers and less then 16 characters");
+        map.put("command_village_create_invalid_name", "&cSorry, that is an invalid name. Please only use letters and numbers and less than %max% characters");
         map.put("command_village_create_already_exists", "&cSorry, that village name already exists");
         map.put("command_village_create_already_claimed", "&cSorry, that chunk is already claimed");
         map.put("command_village_create_success", "&bYou have created the village &9%village%");
@@ -242,7 +245,7 @@ public class JVillageLanguage extends Configuration {
         map.put("command_village_kick_denied", "&cSorry, you are not the owner of &9%village%&c so you can't kick members");
         map.put("command_village_kick_message", "&bYou have been kicked from &9%village%");
 
-        map.put("command_village_spawm_unsafe", "&cSorry, teleportation to %village% has been determined to be unsafe");
+        map.put("command_village_spawn_unsafe", "&cSorry, teleportation to %village% has been determined to be unsafe");
         map.put("command_village_spawn_success", "&bYou have been teleported to the spawn of &9%village%");
         map.put("command_village_spawn_not_member", "&cSorry, you are not a member of &9%village%&c so you can't teleport to the spawn");
 
@@ -254,7 +257,7 @@ public class JVillageLanguage extends Configuration {
 
         map.put("command_village_rename_use", "&cSorry, that is invalid. Try /village rename [name]");
         map.put("command_village_rename_not_owner", "&cSorry, you are not the owner of &9%village%&c so you can't change the name");
-        map.put("command_village_rename_invalid_name", "&cSorry, that is an invalid name. Please only use letters and numbers and less then 22 characters");
+        map.put("command_village_rename_invalid_name", "&cSorry, that is an invalid name. Please only use letters and numbers and less than %max% characters");
         map.put("command_village_rename_already_exists", "&cSorry, that village name already exists");
         map.put("command_village_rename_broadcast", "&bThe village &9%village% &bhas been renamed to &9%new_village%");
         map.put("command_village_rename_success", "&bYou have changed the name of &9%village%");
@@ -277,6 +280,27 @@ public class JVillageLanguage extends Configuration {
 
         map.put("command_village_setspawn_not_owner", "&cSorry, you are not the owner of &9%village%&c so you can't change the spawn");
         map.put("command_village_setspawn_not_in_village", "&cSorry, that location is not within an area claimed by &9%village%");
+        map.put("command_village_setspawn_set_broadcast", "&9%player% &bhas set the spawn point to &9%cords%");
+
+        map.put("command_village_setwarp_use", "&cSorry, that is invalid. Try /village setwarp [name]");
+        map.put("command_village_setwarp_no_permission", "&cSorry, you don't have permission to set warps in &9%village%");
+        map.put("command_village_setwarp_not_in_village", "&cSorry, that location is not within an area claimed by &9%village%");
+        map.put("command_village_setwarp_invalid_name", "&cSorry, that is an invalid name. Please only use letters and numbers and less than %max% characters");
+        map.put("command_village_setwarp_already_exists", "&cSorry, that warp name already exists");
+        map.put("command_village_setwarp_insufficient_funds", "&cSorry, you don't have enough money to set a warp. It costs $%cost%");
+        map.put("command_village_setwarp_payment", "&bYou have paid &9$%amount% &bto set the warp &9%warp%");
+        map.put("command_village_setwarp_set_broadcast", "&9%player% &bhas set the warp &9%warp%");
+
+
+        map.put("command_village_delwarp_use", "&cSorry, that is invalid. Try /village delwarp [name]");
+        map.put("command_village_delwarp_no_permission", "&cSorry, you don't have permission to delete warps in &9%village%");
+        map.put("command_village_delwarp_not_found", "&cSorry, the warp &9%warp% &cdoes not exist in &9%village%");
+        map.put("command_village_delwarp_del_broadcast", "&9%player% &bhas deleted the warp &9%warp%");
+        
+        map.put("command_village_warp_list", "&bWarp list of &9%village%:");
+        map.put("command_village_warp_success", "&bYou have been teleported to &9%warp%");
+        map.put("command_village_warp_unsafe", "&cSorry, teleportation to %warp% has been determined to be unsafe");
+        map.put("command_village_warp_not_found", "&cSorry, the warp &9%warp% &cdoes not exist in &9%village%");
 
         //Village Economy
 

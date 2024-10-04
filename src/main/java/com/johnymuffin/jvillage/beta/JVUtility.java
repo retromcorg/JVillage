@@ -74,19 +74,19 @@ public class JVUtility {
     }
 
     public static int closestYaw(double yaw){
-        if(yaw < 0) yaw = 360 + yaw;
+        if (yaw < 0) yaw = 360 + yaw;
         Set<Integer> yaws = new HashSet<>(Arrays.asList(0, 90, 180, 270, 360));
         int closest = -1;
         double lowestDiff = Integer.MAX_VALUE;
 
-        for(Integer entry : yaws){
+        for (Integer entry : yaws) {
             double diff = Math.abs(yaw - entry);
-            if(diff < lowestDiff){
+            if (diff < lowestDiff) {
                 closest = entry;
                 lowestDiff = diff;
             }
         }
-        if(closest == 360) return 0;
+        if (closest == 360) return 0;
         return closest;
     }
 

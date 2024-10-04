@@ -67,7 +67,7 @@ public class JSpawnCommand extends JVBaseCommand implements CommandExecutor {
             commandSender.sendMessage(message);
             return true;
         } catch (Exception e) {
-            String message = language.getMessage("command_village_spawm_unsafe");
+            String message = language.getMessage("command_village_spawn_unsafe");
             message = message.replace("%village%", village.getTownName());
             commandSender.sendMessage(message);
             return true;

@@ -74,12 +74,19 @@ public class JKickCommand extends JVBaseCommand implements CommandExecutor {
             target.setSelectedVillage(null);
         }
         village.removeMember(uuid);
-        commandSender.sendMessage(language.getMessage("command_village_kick_success"));
+        
+        String message = language.getMessage("command_village_kick_success");
+        message = message
+                    .replace("%village%", village.getTownName())
+                    .replace("%player%", playerName);
+
+        commandSender.sendMessage(message);
+
 
         //Message the player if they are online
         Player targetPlayer = getPlayerFromUUID(uuid);
         if (targetPlayer != null && targetPlayer.isOnline()) {
-            String message = language.getMessage("command_village_kick_message");
+            message = language.getMessage("command_village_kick_message");
             message = message.replace("%village%", village.getTownName());
             targetPlayer.sendMessage(message);
 

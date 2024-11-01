@@ -4,7 +4,7 @@ import com.johnymuffin.beta.fundamentals.api.EconomyAPI;
 import com.johnymuffin.beta.fundamentals.api.FundamentalsAPI;
 import com.johnymuffin.jvillage.beta.JVillage;
 import com.johnymuffin.jvillage.beta.commands.JVBaseCommand;
-import com.johnymuffin.jvillage.beta.models.VCords;
+import com.johnymuffin.jvillage.beta.models.VSpawnCords;
 import com.johnymuffin.jvillage.beta.models.Village;
 import com.johnymuffin.jvillage.beta.models.chunk.ChunkClaimSettings;
 import com.johnymuffin.jvillage.beta.models.chunk.VChunk;
@@ -60,13 +60,15 @@ public class JCreateCommand extends JVBaseCommand implements CommandExecutor {
 
         //If string doesn't only contain numbers and letters
         if (!villageName.matches("[a-zA-Z0-9]+")) {
-            commandSender.sendMessage(language.getMessage("command_village_create_invalid_name"));
+            commandSender.sendMessage(language.getMessage("command_village_create_invalid_name")
+                    .replace("%max%", settings.getConfigInteger("settings.town.max-name-length.value").toString()));
             return true;
         }
 
         //If string is too long
         if (villageName.length() > settings.getConfigInteger("settings.town.max-name-length.value")) {
-            commandSender.sendMessage(language.getMessage("command_village_create_invalid_name"));
+            commandSender.sendMessage(language.getMessage("command_village_create_invalid_name")
+                    .replace("%max%", settings.getConfigInteger("settings.town.max-name-length.value").toString()));
             return true;
         }
 
@@ -127,7 +129,7 @@ public class JCreateCommand extends JVBaseCommand implements CommandExecutor {
             }
         }
 
-        Village newVillage = new Village(plugin, villageName, UUID.randomUUID(), player.getUniqueId(), vChunk, new VCords(player.getLocation()));
+        Village newVillage = new Village(plugin, villageName, UUID.randomUUID(), player.getUniqueId(), vChunk, new VSpawnCords(player.getLocation()));
         plugin.getVillageMap().addVillageToMap(newVillage);
 
         //Metadata for first chunk

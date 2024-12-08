@@ -1,6 +1,5 @@
 package com.johnymuffin.jvillage.beta.commands.village;
 
-import com.johnymuffin.jvillage.beta.JVUtility;
 import com.johnymuffin.jvillage.beta.JVillage;
 import com.johnymuffin.jvillage.beta.commands.JVBaseCommand;
 import com.johnymuffin.jvillage.beta.models.Village;
@@ -65,7 +64,6 @@ public class JInfoCommand extends JVBaseCommand implements CommandExecutor {
         villageInfo = villageInfo.replace("%members%", village.getMembers().length + "");
         villageInfo = villageInfo.replace("%claims%", village.getTotalClaims() + "");
         villageInfo = villageInfo.replace("%balance%", round(village.getBalance(), 2) + "");
-        villageInfo = villageInfo.replace("%spawn%", village.getTownSpawn().toString());
         sendWithNewline(commandSender, villageInfo);
         return true;
     }

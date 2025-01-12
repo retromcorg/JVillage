@@ -4,7 +4,10 @@ import com.johnymuffin.beta.fundamentals.api.EconomyAPI;
 import com.johnymuffin.beta.fundamentals.api.FundamentalsAPI;
 import com.johnymuffin.jvillage.beta.JVillage;
 import com.johnymuffin.jvillage.beta.commands.JVBaseCommand;
+import com.johnymuffin.jvillage.beta.models.VCords;
 import com.johnymuffin.jvillage.beta.models.Village;
+import com.johnymuffin.jvillage.beta.models.chunk.ChunkClaimSettings;
+import com.johnymuffin.jvillage.beta.models.chunk.VClaim;
 import com.johnymuffin.jvillage.beta.player.VPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -13,6 +16,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.logging.Level;
+
+import static com.johnymuffin.jvillage.beta.JVUtility.cordsInChunk;
 
 public class JDeleteCommand extends JVBaseCommand implements CommandExecutor {
 
@@ -58,17 +63,28 @@ public class JDeleteCommand extends JVBaseCommand implements CommandExecutor {
         }
 
         // Refund the player the balance
-        double townBalance = village.getBalance();
+        double refundAmount = village.getBalance();
 
-        if (townBalance > 0 && plugin.isFundamentalsEnabled()) {
-            EconomyAPI.EconomyResult result = FundamentalsAPI.getEconomy().additionBalance(player.getUniqueId(), townBalance);
+        // Refund the player the cost of the claims
+        VCords spawnCords = village.getTownSpawn();
+
+        for (VClaim vClaim : plugin.getVillageClaimsArray(village)) {
+            ChunkClaimSettings chunkClaimSettings = village.getChunkClaimSettings(vClaim);
+
+            if (!cordsInChunk(spawnCords, vClaim)) {
+                refundAmount += chunkClaimSettings.getPrice();
+            }
+        }
+
+        if (refundAmount > 0 && plugin.isFundamentalsEnabled()) {
+            EconomyAPI.EconomyResult result = FundamentalsAPI.getEconomy().additionBalance(player.getUniqueId(), refundAmount);
             String message;
             switch (result) {
                 case successful:
-                    this.plugin.logger(Level.INFO, "Successfully refunded $" + townBalance + " to " + player.getName() + " for deleting village " + village.getTownName());
+                    this.plugin.logger(Level.INFO, "Successfully refunded $" + refundAmount + " to " + player.getName() + " for deleting village " + village.getTownName());
                     break;
                 default:
-                    this.plugin.logger(Level.WARNING, "Failed to refund $" + townBalance + " to " + player.getName() + " for deleting village " + village.getTownName());
+                    this.plugin.logger(Level.WARNING, "Failed to refund $" + refundAmount + " to " + player.getName() + " for deleting village " + village.getTownName());
                     message = language.getMessage("generic_error");
                     commandSender.sendMessage(message);
                     return true;

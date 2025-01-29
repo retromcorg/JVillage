@@ -94,6 +94,7 @@ permissions:
       jvillage.player.spawn: true
       jvillage.player.kick: true
       jvillage.player.unclaim: true
+      jvillage.player.unclaim.auto: true
       jvillage.player.claim: true
       jvillage.player.create: true
       jvillage.player.delete: true

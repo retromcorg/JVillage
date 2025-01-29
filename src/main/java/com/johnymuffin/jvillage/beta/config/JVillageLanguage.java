@@ -234,6 +234,8 @@ public class JVillageLanguage extends Configuration {
         map.put("command_village_unclaim_success", "&bUnclaimed the chunk you are standing in. You have been refunded $%refund%");
         map.put("command_village_unclaim_not_assistant", "&cSorry, you are not an assistant or owner of &9%village%&c so you can't unclaim chunks");
         map.put("command_village_unclaim_spawn_block", "&cSorry, you can't unclaim the chunk that contains the village spawn");
+        map.put("command_village_claim_autounclaim_on", "&bYou have turned on autoclaim. You will now automatically unclaim chunks as you walk around");
+        map.put("command_village_claim_autounclaim_off", "&bYou have turned off autoclaim. You will no longer automatically unclaim chunks as you walk around");
 
         map.put("command_village_kick_use", "&cSorry, that is invalid. Try /village kick [name]");
         map.put("command_village_kick_not_found", "&cSorry, the UUID of &9%player% &cwas not found");
@@ -306,10 +308,12 @@ public class JVillageLanguage extends Configuration {
 
         map.put("autoclaim_selected_village_disabled", "&cSorry, autoclaim has been disabled as your selected village has changed");
         map.put("autoclaim_disabled", "&cAutoclaim has been disabled");
+        map.put("autounclaim_disabled", "&cAuto unclaim has been disabled");
         map.put("autoclaim_enter_worldguard_disabled", "&cSorry, autoclaim has been disabled as you have entered a protected World Guard region");
         map.put("autoclaim_not_neighbouring_disabled", "&cSorry, autoclaim has been disabled as you are not neighbouring %village%");
         map.put("autoclaim_not_enough_money_disabled", "&cSorry, autoclaim has been disabled as you don't have enough money to claim land");
         map.put("autoclaim_claim_success", "&bYou have claimed [%chunk%] for &9%village% &bfor &9$%cost%");
+        map.put("autoclaim_unclaim_success", "&bYou have unclaimed [%chunk%] for &9%village% &bfor a &9$%cost% refund");
 
     }
 

@@ -78,11 +78,14 @@ public class JSetWarpCommand extends JVBaseCommand implements CommandExecutor {
         }
 
         double creationCost = settings.getConfigDouble("settings.warp.price.amount");
-        if (creationCost > 0 && !village.hasEnough(creationCost)) {
-            String message = language.getMessage("command_village_setwarp_insufficient_funds")
-                    .replace("%cost%", String.valueOf(creationCost));
-            commandSender.sendMessage(message);
-            return true;
+        if (creationCost > 0) {
+            if (!village.hasEnough(creationCost)) {
+                String message = language.getMessage("command_village_setwarp_insufficient_funds")
+                        .replace("%cost%", String.valueOf(creationCost));
+                commandSender.sendMessage(message);
+                return true;
+            }
+            village.subtractBalance(creationCost);
         }
         VSpawnCords cords = new VSpawnCords(player.getLocation());
         village.addWarp(warpName, cords);

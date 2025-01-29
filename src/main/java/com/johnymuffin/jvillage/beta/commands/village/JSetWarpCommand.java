@@ -1,7 +1,5 @@
 package com.johnymuffin.jvillage.beta.commands.village;
 
-import com.johnymuffin.beta.fundamentals.api.EconomyAPI;
-import com.johnymuffin.beta.fundamentals.api.FundamentalsAPI;
 import com.johnymuffin.jvillage.beta.JVillage;
 import com.johnymuffin.jvillage.beta.commands.JVBaseCommand;
 import com.johnymuffin.jvillage.beta.models.VSpawnCords;
@@ -80,24 +78,11 @@ public class JSetWarpCommand extends JVBaseCommand implements CommandExecutor {
         }
 
         double creationCost = settings.getConfigDouble("settings.warp.price.amount");
-        if (creationCost > 0 && plugin.isFundamentalsEnabled()) {
-            EconomyAPI.EconomyResult result = FundamentalsAPI.getEconomy().subtractBalance(player.getUniqueId(), creationCost, player.getWorld().getName());
-            String message;
-            switch (result) {
-                case successful:
-                    commandSender.sendMessage(language.getMessage("command_village_setwarp_payment")
-                            .replace("%amount%", settings.getConfigDouble("settings.warp.price.amount").toString())
-                            .replace("%warp%", warpName));
-                    break;
-                case notEnoughFunds:
-                    commandSender.sendMessage(language.getMessage("command_village_setwarp_insufficient_funds")
-                            .replace("%cost%", String.valueOf(creationCost)));
-                    return true;
-                default:
-                    message = language.getMessage("unknown_economy_error");
-                    commandSender.sendMessage(message);
-                    return true;
-            }
+        if (creationCost > 0 && !village.hasEnough(creationCost)) {
+            String message = language.getMessage("command_village_setwarp_insufficient_funds")
+                    .replace("%cost%", String.valueOf(creationCost));
+            commandSender.sendMessage(message);
+            return true;
         }
         VSpawnCords cords = new VSpawnCords(player.getLocation());
         village.addWarp(warpName, cords);

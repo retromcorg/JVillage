@@ -35,6 +35,9 @@ public class JVillageSettings extends Configuration {
         
         generateConfigOption("settings.warp.max-name-length.value", 20);
         generateConfigOption("settings.warp.max-name-length.info", "This is the maximum length of a town warp name.");
+
+        generateConfigOption("settings.warp.refund-deleted.enabled", true);
+        generateConfigOption("settings.warp.refund-deleted.info", "If true, the price to set a warp will be refunded when deleting a warp.");
         
         generateConfigOption("settings.resident.maximum-towns-owned.value", 10);
         generateConfigOption("settings.resident.maximum-towns-owned.info", "This is the maximum number of towns a resident can own. Set to 0 to disable.");

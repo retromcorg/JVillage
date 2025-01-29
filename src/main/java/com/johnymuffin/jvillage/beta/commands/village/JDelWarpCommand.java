@@ -57,6 +57,9 @@ public class JDelWarpCommand extends JVBaseCommand implements CommandExecutor {
             return true;
         }
 
+        if (settings.getConfigBoolean("settings.warp.refund-deleted.enabled")) {
+            village.addBalance(settings.getConfigDouble("settings.warp.price.amount"));
+        }
         village.removeWarp(warpName);
         village.broadcastToTown(language.getMessage("command_village_delwarp_del_broadcast")
                 .replace("%player%", player.getName())

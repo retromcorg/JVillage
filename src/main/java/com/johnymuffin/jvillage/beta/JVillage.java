@@ -16,6 +16,7 @@ import com.johnymuffin.jvillage.beta.listeners.JVPlayerMoveListener;
 import com.johnymuffin.jvillage.beta.maps.JPlayerMap;
 import com.johnymuffin.jvillage.beta.maps.JVillageMap;
 import com.johnymuffin.jvillage.beta.models.VCords;
+import com.johnymuffin.jvillage.beta.models.VSpawnCords;
 import com.johnymuffin.jvillage.beta.models.Village;
 import com.johnymuffin.jvillage.beta.models.chunk.VChunk;
 import com.johnymuffin.jvillage.beta.models.chunk.VClaim;
@@ -584,13 +585,13 @@ public class JVillage extends JavaPlugin implements ClaimManager, PoseidonCustom
             }
 
             //Misc
-            VCords townSpawn = null;
+            VSpawnCords townSpawn = null;
             try {
-                townSpawn = new VCords(town.getSpawn().getBlockX(), town.getSpawn().getBlockY(), town.getSpawn().getBlockZ(), town.getSpawn().getWorld().getName());
+                townSpawn = new VSpawnCords(town.getSpawn().getBlockX(), town.getSpawn().getBlockY(), town.getSpawn().getBlockZ(), 0, town.getSpawn().getWorld().getName());
             } catch (Exception exception) {
                 log.warning("[" + pluginName + "] Could not find town spawn for town " + newTownName + ". World spawn will be used instead.");
                 logger(Level.WARNING, "Could not find town spawn for town " + newTownName + ". The town spawn will be set to the world spawn.");
-                townSpawn = new VCords(Bukkit.getWorlds().get(0).getSpawnLocation().getBlockX(), Bukkit.getWorlds().get(0).getSpawnLocation().getBlockY(), Bukkit.getWorlds().get(0).getSpawnLocation().getBlockZ(), Bukkit.getWorlds().get(0).getName());
+                townSpawn = new VSpawnCords(Bukkit.getWorlds().get(0).getSpawnLocation().getBlockX(), Bukkit.getWorlds().get(0).getSpawnLocation().getBlockY(), Bukkit.getWorlds().get(0).getSpawnLocation().getBlockZ(), 0, Bukkit.getWorlds().get(0).getName());
             }
 
             //First chunk from townSpawn
@@ -801,15 +802,15 @@ public class JVillage extends JavaPlugin implements ClaimManager, PoseidonCustom
 
             //Faction Spawn
             Location factionSpawn = faction.getHome();
-            VCords villageSpawn = null;
+            VSpawnCords villageSpawn = null;
             VChunk spawnChunk = null;
             if(factionSpawn == null) {
                 log.warning("[" + pluginName + "] Faction " + newVillageName + " has no spawn. The world spawn will be used instead.");
                 spawnChunk = new VChunk(Bukkit.getWorlds().get(0).getSpawnLocation());
-                villageSpawn = new VCords(Bukkit.getWorlds().get(0).getSpawnLocation());
+                villageSpawn = new VSpawnCords(Bukkit.getWorlds().get(0).getSpawnLocation());
             } else {
                 spawnChunk = new VChunk(factionSpawn);
-                villageSpawn = new VCords(factionSpawn);
+                villageSpawn = new VSpawnCords(factionSpawn);
             }
 
 
@@ -902,7 +903,7 @@ public class JVillage extends JavaPlugin implements ClaimManager, PoseidonCustom
         return this.playerData;
     }
 
-    public Village generateNewVillage(String townName, UUID owner, VChunk vChunk, VCords townSpawn) {
+    public Village generateNewVillage(String townName, UUID owner, VChunk vChunk, VSpawnCords townSpawn) {
         if (!villageNameAvailable(townName)) {
             return null;
         }

@@ -9,6 +9,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.UUID;
 import java.util.logging.Level;
 
@@ -27,6 +28,8 @@ public class VPlayer {
     private Village selectedVillage = null;
 
     private boolean isAutoClaimingEnabled = false;
+
+    private boolean isAutoUnclaimingEnabled = false;
 
 //    private ArrayList<Village> invitedTo = new ArrayList<>();
 
@@ -269,6 +272,10 @@ public class VPlayer {
         return this.isAutoClaimingEnabled;
     }
 
+    public boolean isAutoUnclaimingEnabled() {
+        return this.isAutoUnclaimingEnabled;
+    }
+
     public void setAutoClaimingEnabled(boolean autoClaimingEnabled, boolean sendMessage) {
         if (this.isAutoClaimingEnabled == autoClaimingEnabled) {
             return;
@@ -278,6 +285,19 @@ public class VPlayer {
         this.isAutoClaimingEnabled = autoClaimingEnabled;
         if (!this.isAutoClaimingEnabled && sendMessage) {
             String message = this.plugin.getLanguage().getMessage("autoclaim_disabled");
+            this.sendMessage(message);
+        }
+    }
+
+    public void setAutoUnclaimingEnabled(boolean autoUnclaimingEnabled, boolean sendMessage) {
+        if (this.isAutoUnclaimingEnabled == autoUnclaimingEnabled) {
+            return;
+        }
+
+
+        this.isAutoUnclaimingEnabled = autoUnclaimingEnabled;
+        if (!this.isAutoUnclaimingEnabled && sendMessage) {
+            String message = this.plugin.getLanguage().getMessage("autounclaim_disabled");
             this.sendMessage(message);
         }
     }

@@ -64,7 +64,7 @@ public class Village implements ClaimManager {
         this.townUUID = uuid; // Ignore UUID in JSON file and use the one from the file name
         this.owner = UUID.fromString(String.valueOf(object.get("owner")));
         this.townSpawn = new VSpawnCords((JSONObject) object.get("townSpawn"));
-        JSONObject warps = (JSONObject) object.get("warps");
+        JSONObject warps = object.get("warps") != null ? (JSONObject) object.get("warps") : new JSONObject();
         for (Object warp : warps.keySet()) {
             String warpName = warp.toString();
             VSpawnCords cords = new VSpawnCords((JSONObject) warps.get(warpName));

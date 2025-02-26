@@ -92,6 +92,7 @@ permissions:
       jvillage.player.promote: true
       jvillage.player.setowner: true
       jvillage.player.spawn: true
+      jvillage.player.warp: true
       jvillage.player.kick: true
       jvillage.player.unclaim: true
       jvillage.player.unclaim.auto: true
@@ -126,6 +127,18 @@ permissions:
 
   jvillage.player.setspawn:
     description: Allows access to JVillage player setspawn commands
+    default: true
+
+  jvillage.player.warp:
+    description: Allows access to JVillage player warp command
+    default: true
+
+  jvillage.player.setwarp:
+    description: Allows access to JVillage player setwarp command
+    default: true
+
+  jvillage.player.delwarp:
+    description: Allows access to JVillage player delwarp command
     default: true
 
   jvillage.player.demote:

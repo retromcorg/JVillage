@@ -126,7 +126,8 @@ public class JVillageLanguage extends Configuration {
                 "\n&8- &7/village claim rectangle [chunk radius] &8- &7Claim a rectangle of chunks" +
                 "\n&8- &7/village claim auto &8- &7Claim chunks automatically as you walk (run again to disable)" +
                 "\n&8- &7/village withdraw [village] [amount] &8- &7Withdraw money from village bank" +
-                "\n&8- &7/village unclaim &8- &7Unclaim the chunk you are standing in");
+                "\n&8- &7/village unclaim &8- &7Unclaim the chunk you are standing in" +
+                "\n&8- &7/village unclaim auto &8- &7Unclaim chunks automatically as you walk");
 
         map.put("command_village_owner_help", "&cJVillage Owner Commands" +
                 "\n&8- &7/village create [name] &8- &7Create a new village" +

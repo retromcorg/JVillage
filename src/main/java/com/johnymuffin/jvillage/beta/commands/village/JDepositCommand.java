@@ -5,11 +5,11 @@ import com.johnymuffin.jvillage.beta.JVillage;
 import com.johnymuffin.jvillage.beta.commands.JVBaseCommand;
 import com.johnymuffin.jvillage.beta.models.Village;
 import com.johnymuffin.jvillage.beta.player.VPlayer;
+import me.zavdav.zcore.api.Economy;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.poseidonplugins.zcore.api.Economy;
 
 import java.util.logging.Level;
 
@@ -86,7 +86,7 @@ public class JDepositCommand extends JVBaseCommand implements CommandExecutor {
 
         //Attempt to withdraw money from player
         try {
-            Economy.INSTANCE.subtractBalance(player.getUniqueId(), amount);
+            Economy.subtractBalance(player.getUniqueId(), amount);
             village.addBalance(amount);
             String message = language.getMessage("command_village_deposit_success").replace("%amount%", String.valueOf(amount)).replace("%village%", village.getTownName());
             commandSender.sendMessage(message);
@@ -95,7 +95,7 @@ public class JDepositCommand extends JVBaseCommand implements CommandExecutor {
             village.broadcastToTown(broadcast);
             plugin.logger(Level.INFO, "Player " + player.getName() + " deposited $" + amount + " into the bank of" + village.getTownName());
         } catch (Throwable e) {
-            if (e.getClass().getName().equals("org.poseidonplugins.zcore.util.NoFundsException")) {
+            if (e.getClass().getName().equals("me.zavdav.zcore.util.NoFundsException")) {
                 commandSender.sendMessage(language.getMessage("command_village_deposit_no_funds"));
             } else {
                 commandSender.sendMessage(language.getMessage("generic_error"));

@@ -37,6 +37,12 @@
                 <enabled>true</enabled>
             </snapshots>
         </repository>
+
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+
     </repositories>
 
 
@@ -76,11 +82,9 @@
         </dependency>
 
         <dependency>
-            <groupId>org.poseidonplugins.zcore</groupId>
+            <groupId>com.github.zavdav</groupId>
             <artifactId>ZCore</artifactId>
-            <version>1.0-SNAPSHOT</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/ZCore-1.0-SNAPSHOT.jar</systemPath>
+            <version>1.0.0-rc1</version>
         </dependency>
 
         <dependency>

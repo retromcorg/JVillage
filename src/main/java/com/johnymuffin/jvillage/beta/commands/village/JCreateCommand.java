@@ -8,12 +8,12 @@ import com.johnymuffin.jvillage.beta.models.chunk.ChunkClaimSettings;
 import com.johnymuffin.jvillage.beta.models.chunk.VChunk;
 import com.johnymuffin.jvillage.beta.models.chunk.VClaim;
 import com.johnymuffin.jvillage.beta.player.VPlayer;
+import me.zavdav.zcore.api.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.poseidonplugins.zcore.api.Economy;
 
 import java.util.UUID;
 
@@ -109,12 +109,12 @@ public class JCreateCommand extends JVBaseCommand implements CommandExecutor {
         if (creationCost > 0 && plugin.isZCoreEnabled()) {
             String message = "";
             try {
-                Economy.INSTANCE.subtractBalance(player.getUniqueId(), creationCost);
+                Economy.subtractBalance(player.getUniqueId(), creationCost);
                 message = language.getMessage("command_village_create_payment");
                 message = message.replace("%amount%", String.valueOf(creationCost));
                 message = message.replace("%village%", villageName);
             } catch (Throwable e) {
-                if (e.getClass().getName().equals("org.poseidonplugins.zcore.util.NoFundsException")) {
+                if (e.getClass().getName().equals("me.zavdav.zcore.util.NoFundsException")) {
                     message = language.getMessage("command_village_create_insufficient_funds");
                     message = message.replace("%cost%", String.valueOf(creationCost));
                 } else {

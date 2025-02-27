@@ -25,6 +25,7 @@ import com.johnymuffin.jvillage.beta.routes.api.v1.JVillageGetPlayerRoute;
 import com.johnymuffin.jvillage.beta.routes.api.v1.JVillageGetVillageList;
 import com.johnymuffin.jvillage.beta.routes.api.v1.JVillageGetVillageRoute;
 import com.johnymuffin.jvillage.beta.tasks.AutoClaimingTask;
+import com.johnymuffin.jvillage.beta.tasks.AutoUnclaimingTask;
 import com.johnymuffin.jvillage.beta.tasks.AutomaticSaving;
 import com.johnymuffin.jvillage.beta.tasks.Metrics;
 import com.legacyminecraft.poseidon.event.PoseidonCustomListener;
@@ -211,6 +212,7 @@ public class JVillage extends JavaPlugin implements ClaimManager, PoseidonCustom
 
         //Run auto claim task
         Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new AutoClaimingTask(plugin), 1, this.getSettings().getConfigInteger("settings.auto-claim.timer") * 20);
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new AutoUnclaimingTask(plugin), 1, this.getSettings().getConfigInteger("settings.auto-claim.timer") * 20);
         Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, new AutomaticSaving(plugin), 1, 20 * 60 * 10); //Save every 10 minutes
 
         //bstats metrics

@@ -72,6 +72,10 @@ public class JClaimCommand extends JVBaseCommand implements CommandExecutor {
                     message = message.replace("%village%", village.getTownName());
                     commandSender.sendMessage(message);
                 } else {
+                    // Disable autounclaim if it is enabled
+                    if (vPlayer.isAutoUnclaimingEnabled()) {
+                        vPlayer.setAutoUnclaimingEnabled(false, false);
+                    }
                     vPlayer.setAutoClaimingEnabled(true, false);
                     String message = language.getMessage("command_village_claim_autoclaim_on");
                     message = message.replace("%village%", village.getTownName());

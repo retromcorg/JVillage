@@ -40,6 +40,7 @@ public class JVPlayerMoveListener extends CustomEventListener implements Listene
         //Disable auto claiming when a player teleports if they have it enabled
         VPlayer vPlayer = plugin.getPlayerMap().getPlayer(event.getPlayer().getUniqueId());
         vPlayer.setAutoClaimingEnabled(false, true);
+        vPlayer.setAutoUnclaimingEnabled(false, true);
     }
 
     @EventHandler(ignoreCancelled = true, priority = Event.Priority.Highest)
@@ -49,6 +50,7 @@ public class JVPlayerMoveListener extends CustomEventListener implements Listene
         //Disable auto claiming when a player respawns if they have it enabled
         VPlayer vPlayer = plugin.getPlayerMap().getPlayer(event.getPlayer().getUniqueId());
         vPlayer.setAutoClaimingEnabled(false, true);
+        vPlayer.setAutoUnclaimingEnabled(false, true);
     }
 
     @EventHandler(ignoreCancelled = true, priority = Event.Priority.Highest)
@@ -58,6 +60,7 @@ public class JVPlayerMoveListener extends CustomEventListener implements Listene
         //Disable auto claiming when a player joins if they have it enabled
         VPlayer vPlayer = plugin.getPlayerMap().getPlayer(event.getPlayer().getUniqueId());
         vPlayer.setAutoClaimingEnabled(false, false); //Don't send message as it shouldn't be enabled anyway
+        vPlayer.setAutoUnclaimingEnabled(false, false);
 
         //Record appropriate player data
         String firstJoin = plugin.getPlayerData().getPlayerData(event.getPlayer().getUniqueId(), "firstJoin");
@@ -77,6 +80,7 @@ public class JVPlayerMoveListener extends CustomEventListener implements Listene
         //Disable auto claiming when a player changes world if they have it enabled
         VPlayer vPlayer = plugin.getPlayerMap().getPlayer(event.getPlayer().getUniqueId());
         vPlayer.setAutoClaimingEnabled(false, true);
+        vPlayer.setAutoUnclaimingEnabled(false, true);
     }
 
     @EventHandler
@@ -84,6 +88,7 @@ public class JVPlayerMoveListener extends CustomEventListener implements Listene
         //Disable auto claiming when a player quits if they have it enabled
         VPlayer vPlayer = plugin.getPlayerMap().getPlayer(event.getPlayer().getUniqueId());
         vPlayer.setAutoClaimingEnabled(false, false);
+        vPlayer.setAutoUnclaimingEnabled(false, false);
 
         plugin.getPlayerData().setPlayerData(event.getPlayer().getUniqueId(), "lastOnline", String.valueOf(System.currentTimeMillis()/1000L));
     }

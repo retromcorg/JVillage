@@ -52,6 +52,34 @@ public class JUnclaimCommand extends JVBaseCommand implements CommandExecutor {
             return true;
         }
 
+        //Auto unclaiming toggle
+        if (strings.length > 0 &&
+                (strings[0].equalsIgnoreCase("auto") || strings[0].equalsIgnoreCase("a") || strings[0].equalsIgnoreCase("ac") || strings[0].equalsIgnoreCase("autoclaim"))
+        ) {
+            if(!isAuthorized(commandSender, "jvillage.player.unclaim.auto")) {
+                commandSender.sendMessage(language.getMessage("no_permission"));
+                return true;
+            }
+
+            if (vPlayer.isAutoUnclaimingEnabled()) {
+                vPlayer.setAutoUnclaimingEnabled(false, false);
+                String message = language.getMessage("command_village_claim_autounclaim_off");
+                message = message.replace("%village%", village.getTownName());
+                commandSender.sendMessage(message);
+            } else {
+                // Disable autoclaim if it is enabled
+                if (vPlayer.isAutoClaimingEnabled()) {
+                    vPlayer.setAutoClaimingEnabled(false, false);
+                }
+                vPlayer.setAutoUnclaimingEnabled(true, false);
+                String message = language.getMessage("command_village_claim_autounclaim_on");
+                message = message.replace("%village%", village.getTownName());
+                commandSender.sendMessage(message);
+            }
+            return true;
+        }
+
+        // Player is unclaiming a single chunk (default)
 
         VChunk vChunk = new VChunk(player.getLocation());
 

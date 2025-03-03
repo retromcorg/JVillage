@@ -37,6 +37,12 @@
                 <enabled>true</enabled>
             </snapshots>
         </repository>
+
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+
     </repositories>
 
 
@@ -73,6 +79,12 @@
             <groupId>com.johnymuffin.beta</groupId>
             <artifactId>fundamentals</artifactId>
             <version>1.0.6</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.zavdav</groupId>
+            <artifactId>ZCore</artifactId>
+            <version>1.0.0-rc1</version>
         </dependency>
 
         <dependency>

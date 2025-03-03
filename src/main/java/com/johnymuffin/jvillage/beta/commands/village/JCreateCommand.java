@@ -1,7 +1,5 @@
 package com.johnymuffin.jvillage.beta.commands.village;
 
-import com.johnymuffin.beta.fundamentals.api.EconomyAPI;
-import com.johnymuffin.beta.fundamentals.api.FundamentalsAPI;
 import com.johnymuffin.jvillage.beta.JVillage;
 import com.johnymuffin.jvillage.beta.commands.JVBaseCommand;
 import com.johnymuffin.jvillage.beta.models.VSpawnCords;
@@ -10,6 +8,7 @@ import com.johnymuffin.jvillage.beta.models.chunk.ChunkClaimSettings;
 import com.johnymuffin.jvillage.beta.models.chunk.VChunk;
 import com.johnymuffin.jvillage.beta.models.chunk.VClaim;
 import com.johnymuffin.jvillage.beta.player.VPlayer;
+import me.zavdav.zcore.api.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -107,25 +106,23 @@ public class JCreateCommand extends JVBaseCommand implements CommandExecutor {
 
         //Check if player has enough money
         double creationCost = settings.getConfigDouble("settings.town-create.price.amount");
-        if (creationCost > 0 && plugin.isFundamentalsEnabled()) {
-            EconomyAPI.EconomyResult result = FundamentalsAPI.getEconomy().subtractBalance(player.getUniqueId(), creationCost, player.getWorld().getName());
-            String message;
-            switch (result) {
-                case successful:
-                    message = language.getMessage("command_village_create_payment");
-                    message = message.replace("%amount%", String.valueOf(creationCost));
-                    message = message.replace("%village%", villageName);
-                    commandSender.sendMessage(message);
-                    break;
-                case notEnoughFunds:
+        if (creationCost > 0 && plugin.isZCoreEnabled()) {
+            String message = "";
+            try {
+                Economy.subtractBalance(player.getUniqueId(), creationCost);
+                message = language.getMessage("command_village_create_payment");
+                message = message.replace("%amount%", String.valueOf(creationCost));
+                message = message.replace("%village%", villageName);
+            } catch (Throwable e) {
+                if (e.getClass().getName().equals("me.zavdav.zcore.util.NoFundsException")) {
                     message = language.getMessage("command_village_create_insufficient_funds");
                     message = message.replace("%cost%", String.valueOf(creationCost));
-                    commandSender.sendMessage(message);
-                    return true;
-                default:
+                } else {
                     message = language.getMessage("unknown_economy_error");
-                    commandSender.sendMessage(message);
-                    return true;
+                }
+                return true;
+            } finally {
+                commandSender.sendMessage(message);
             }
         }
 

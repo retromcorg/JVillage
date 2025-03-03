@@ -1,6 +1,5 @@
 package com.johnymuffin.jvillage.beta;
 
-import com.johnymuffin.beta.fundamentals.Fundamentals;
 import com.johnymuffin.beta.webapi.JWebAPI;
 import com.johnymuffin.beta.webapi.event.JWebAPIDisable;
 import com.johnymuffin.jvillage.beta.commands.JVilageAdminCMD;
@@ -84,7 +83,7 @@ public class JVillage extends JavaPlugin implements ClaimManager, PoseidonCustom
 
     private Metrics metrics;
 
-    private boolean fundamentalsEnabled = false;
+    private boolean zcoreEnabled = false;
 
     @Override
     public void onEnable() {
@@ -94,13 +93,13 @@ public class JVillage extends JavaPlugin implements ClaimManager, PoseidonCustom
         pluginName = pdf.getName();
         log.info("[" + pluginName + "] Is Loading, Version: " + pdf.getVersion());
 
-        //Check for Fundamentals
-        if (Bukkit.getPluginManager().getPlugin("Fundamentals") == null) {
-            fundamentalsEnabled = false;
-            log.warning("[" + pluginName + "] Fundamentals is not installed or not enabled, economy features will be disabled");
+        //Check for ZCore
+        if (Bukkit.getPluginManager().getPlugin("ZCore") == null) {
+            zcoreEnabled = false;
+            log.warning("[" + pluginName + "] ZCore is not installed or not enabled, economy features will be disabled");
         } else {
-            log.info("[" + pluginName + "] Fundamentals is installed and enabled, economy features will be enabled");
-            fundamentalsEnabled = true;
+            log.info("[" + pluginName + "] ZCore is installed and enabled, economy features will be enabled");
+            zcoreEnabled = true;
         }
 
 
@@ -977,12 +976,6 @@ public class JVillage extends JavaPlugin implements ClaimManager, PoseidonCustom
             uuid = playerData.getUUID(username);
         }
 
-        //Check if Fundamentals is enabled and if so, use it's cache
-        if(uuid == null && fundamentalsEnabled && Bukkit.getPluginManager().isPluginEnabled("Fundamentals")) {
-            Fundamentals fundamentals = (Fundamentals) Bukkit.getPluginManager().getPlugin("Fundamentals");
-            uuid = fundamentals.getPlayerCache().getUUIDFromUsername(username);
-        }
-
         return uuid;
     }
 
@@ -994,16 +987,10 @@ public class JVillage extends JavaPlugin implements ClaimManager, PoseidonCustom
             username = playerData.getUsername(uuid);
         }
 
-        //Check if Fundamentals is enabled and if so, use it's cache
-        if(uuid == null && fundamentalsEnabled && Bukkit.getPluginManager().isPluginEnabled("Fundamentals")) {
-            Fundamentals fundamentals = (Fundamentals) Bukkit.getPluginManager().getPlugin("Fundamentals");
-            username = fundamentals.getPlayerCache().getUsernameFromUUID(uuid);
-        }
-
         return username;
     }
 
-    public boolean isFundamentalsEnabled() {
-        return fundamentalsEnabled;
+    public boolean isZCoreEnabled() {
+        return zcoreEnabled;
     }
 }

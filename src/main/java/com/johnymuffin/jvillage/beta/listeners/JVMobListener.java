@@ -24,7 +24,7 @@ public class JVMobListener extends EntityListener implements Listener {
 
     public JVMobListener(JVillage plugin) {
         this.plugin = plugin;
-        Bukkit.getPluginManager().registerEvent(Event.Type.ENTITY_DAMAGE_BY_ENTITY, this, Event.Priority.Normal, plugin);
+        //Bukkit.getPluginManager().registerEvent(Event.Type.ENTITY_DAMAGE_BY_ENTITY, this, Event.Priority.Normal, plugin);
     }
 
 
@@ -106,5 +106,21 @@ public class JVMobListener extends EntityListener implements Listener {
         damager.teleport(damager.getLocation().subtract(0, 300, 0)); //Teleport the mob to the void
     }
 
+    @EventHandler(ignoreCancelled = true, priority = Event.Priority.Highest)
+    public void onEntityDamageByEntity(final EntityDamageByEntityEvent event) {
 
+        //Check if the entity being attacked is a player
+        if (!(event.getEntity() instanceof Player)) {
+            return;
+        }
+
+        Village damagerVillage = plugin.getVillageAtLocation(event.getDamager().getLocation());
+        if (damagerVillage.isPvpEnabled) {
+            return;
+        }
+
+        String message = plugin.getLanguage().getMessage("pvp_denied").replace("%village%", damagerVillage.getTownName());
+        Bukkit.getServer().broadcastMessage(message);
+        event.setCancelled(true);
+    }
 }

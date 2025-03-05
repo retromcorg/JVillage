@@ -11,6 +11,7 @@ import com.johnymuffin.jvillage.beta.config.JVillageSettings;
 import com.johnymuffin.jvillage.beta.interfaces.ClaimManager;
 import com.johnymuffin.jvillage.beta.listeners.JVMobListener;
 import com.johnymuffin.jvillage.beta.listeners.JVPlayerAlterListener;
+import com.johnymuffin.jvillage.beta.listeners.JVEntityDamageListener;
 import com.johnymuffin.jvillage.beta.listeners.JVPlayerMoveListener;
 import com.johnymuffin.jvillage.beta.maps.JPlayerMap;
 import com.johnymuffin.jvillage.beta.maps.JVillageMap;
@@ -108,7 +109,7 @@ public class JVillage extends JavaPlugin implements ClaimManager, PoseidonCustom
         debugMode = settings.getConfigBoolean("settings.debug-mode.enabled"); //Set debug mode from config
         language = new JVillageLanguage(new File(this.getDataFolder(), "language.yml"), settings.getConfigBoolean("settings.always-use-default-lang.enabled"));
 
-        //Generate WorldCLaimManagers
+        //Generate WorldClaimManagers
 //        for (World world : Bukkit.getWorlds()) {
 ////            claims.put(world.getName(), new WorldClaimManager(plugin, world.getName()));
 //            getWorldClaimManager(world.getName(), true);
@@ -181,6 +182,9 @@ public class JVillage extends JavaPlugin implements ClaimManager, PoseidonCustom
         JVMobListener mobListener = new JVMobListener(this);
         Bukkit.getPluginManager().registerEvents(mobListener, plugin);
 
+        JVEntityDamageListener entityDamageListener = new JVEntityDamageListener(this);
+        Bukkit.getPluginManager().registerEvents(entityDamageListener, plugin);
+
         //Register API routes if JWebAPI is installed
         if (Bukkit.getPluginManager().getPlugin("JWebAPI") != null) {
             logger(Level.INFO, "JWebAPI found, registering API routes");
@@ -201,7 +205,7 @@ public class JVillage extends JavaPlugin implements ClaimManager, PoseidonCustom
 //            int x = (int) (Math.random() * 60000) - 30000;
 //            int z = (int) (Math.random() * 60000) - 30000;
 //
-//            //Get closest village
+//            //Get the closest village
 //            VClaim claim = findClosestClaim(new VCords(x, 0, z, Bukkit.getWorlds().get(0).getName()));
 //            Village village = getVillageMap().getVillage(claim.getVillage());
 //            logger(Level.INFO, "Closest claim to " + x + ", " + z + " is " + village.getTownName() + " at " + (claim.getX() * 16) + ", " + (claim.getZ() * 16));

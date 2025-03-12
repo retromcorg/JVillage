@@ -38,9 +38,6 @@ public class JVillageCMD extends JVBaseCommand {
         registerCommand(new JDemoteCommand(plugin), "demote");
         registerCommand(new JPromoteCommand(plugin), "promote");
         registerCommand(new JSetSpawnCommand(plugin), "setspawn");
-        registerCommand(new JWarpCommand(plugin), "warp");
-        registerCommand(new JSetWarpCommand(plugin), "setwarp");
-        registerCommand(new JDelWarpCommand(plugin), "delwarp");
         registerCommand(new JRenameCommand(plugin), "rename");
         registerCommand(new JListCommand(plugin), "list");
         registerCommand(new JFlagCommand(plugin), "flag", "flags", "f");

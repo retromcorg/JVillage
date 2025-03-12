@@ -2,7 +2,7 @@ package com.johnymuffin.jvillage.beta.commands.village;
 
 import com.johnymuffin.jvillage.beta.JVillage;
 import com.johnymuffin.jvillage.beta.commands.JVBaseCommand;
-import com.johnymuffin.jvillage.beta.models.VSpawnCords;
+import com.johnymuffin.jvillage.beta.models.VCords;
 import com.johnymuffin.jvillage.beta.models.Village;
 import com.johnymuffin.jvillage.beta.models.chunk.VChunk;
 import com.johnymuffin.jvillage.beta.player.VPlayer;
@@ -22,11 +22,6 @@ public class JSetSpawnCommand extends JVBaseCommand implements CommandExecutor {
 
         if (!isAuthorized(commandSender, "jvillage.player.setspawn")) {
             commandSender.sendMessage(language.getMessage("no_permission"));
-            return true;
-        }
-
-        if (!(commandSender instanceof Player)) {
-            commandSender.sendMessage(language.getMessage("unavailable_to_console"));
             return true;
         }
 
@@ -54,13 +49,9 @@ public class JSetSpawnCommand extends JVBaseCommand implements CommandExecutor {
             return true;
         }
 
-        VSpawnCords cords = new VSpawnCords(player.getLocation());
+        VCords cords = new VCords(player.getLocation());
         village.setTownSpawn(cords);
-        village.broadcastToTown(language.getMessage("command_village_setspawn_set_broadcast")
-                .replace("%player%", player.getName())
-                .replace("%cords%", cords.toString())
-        );
-
+        village.broadcastToTown(player.getDisplayName() + " has set the spawn point to " + cords.toString());
         return true;
     }
 }

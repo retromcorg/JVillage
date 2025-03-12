@@ -13,8 +13,6 @@ import org.json.simple.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.TreeMap;
-import java.util.Map;
 import java.util.UUID;
 
 public class Village implements ClaimManager {
@@ -24,8 +22,7 @@ public class Village implements ClaimManager {
     private final ArrayList<UUID> members = new ArrayList<UUID>();
     private final ArrayList<UUID> assistants = new ArrayList<UUID>();
     private UUID owner;
-    private VSpawnCords townSpawn;
-    private TreeMap<String, VSpawnCords> warps = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+    private VCords townSpawn;
 
     private boolean modified = false;
 
@@ -45,7 +42,7 @@ public class Village implements ClaimManager {
         }
     }
 
-    public Village(JVillage plugin, String townName, UUID townUUID, UUID owner, VChunk vChunk, VSpawnCords townSpawn) {
+    public Village(JVillage plugin, String townName, UUID townUUID, UUID owner, VChunk vChunk, VCords townSpawn) {
         this.plugin = plugin;
         this.townName = townName;
         this.townUUID = townUUID;
@@ -63,14 +60,7 @@ public class Village implements ClaimManager {
         this.townName = String.valueOf(object.get("name"));
         this.townUUID = uuid; // Ignore UUID in JSON file and use the one from the file name
         this.owner = UUID.fromString(String.valueOf(object.get("owner")));
-        this.townSpawn = new VSpawnCords((JSONObject) object.get("townSpawn"));
-        JSONObject warps = (JSONObject) object.get("warps");
-        for (Object warp : warps.keySet()) {
-            String warpName = warp.toString();
-            VSpawnCords cords = new VSpawnCords((JSONObject) warps.get(warpName));
-            this.warps.put(warpName, cords);
-        }
-
+        this.townSpawn = new VCords((JSONObject) object.get("townSpawn"));
         JSONArray members = (JSONArray) object.get("members");
         for (Object member : members) {
             this.members.add(UUID.fromString(String.valueOf(member)));
@@ -224,12 +214,6 @@ public class Village implements ClaimManager {
         object.put("townSpawn", this.townSpawn.getJsonObject());
         object.put("creationTime", this.creationTime);
         object.put("balance", this.balance);
-
-        JSONObject warps = new JSONObject();
-        for (Map.Entry<String, VSpawnCords> entry : this.warps.entrySet()) {
-            warps.put(entry.getKey(), entry.getValue().getJsonObject());
-        }
-        object.put("warps", warps);
         return object;
     }
 
@@ -388,27 +372,13 @@ public class Village implements ClaimManager {
 //        return claims;
 //    }
 
-    public VSpawnCords getTownSpawn() {
+    public VCords getTownSpawn() {
         return townSpawn;
     }
 
-    public void setTownSpawn(VSpawnCords cords) {
+    public void setTownSpawn(VCords cords) {
         modified = true; // Indicate that the village has been modified and needs to be saved
         townSpawn = cords;
-    }
-
-    public TreeMap<String, VSpawnCords> getWarps() {
-        return this.warps;
-    }
-
-    public void addWarp(String name, VSpawnCords cords) {
-        modified = true;
-        warps.put(name, cords);
-    }
-
-    public void removeWarp(String name) {
-        modified = true;
-        warps.remove(name);
     }
 
     public boolean isMember(UUID uuid) {

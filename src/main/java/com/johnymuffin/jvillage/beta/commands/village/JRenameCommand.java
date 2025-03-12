@@ -52,14 +52,12 @@ public class JRenameCommand extends JVBaseCommand implements CommandExecutor {
         String villageName = strings[0];
 
         if (!villageName.matches("[a-zA-Z0-9]+")) {
-            commandSender.sendMessage(language.getMessage("command_village_rename_invalid_name")
-                    .replace("%max%", settings.getConfigInteger("settings.town.max-name-length.value").toString()));
+            commandSender.sendMessage(language.getMessage("command_village_rename_invalid_name"));
             return true;
         }
 
         if (villageName.length() > settings.getConfigInteger("settings.town.max-name-length.value")) {
-            commandSender.sendMessage(language.getMessage("command_village_rename_invalid_name")
-                    .replace("%max%", settings.getConfigInteger("settings.town.max-name-length.value").toString()));
+            commandSender.sendMessage(language.getMessage("command_village_rename_invalid_name"));
             return true;
         }
 

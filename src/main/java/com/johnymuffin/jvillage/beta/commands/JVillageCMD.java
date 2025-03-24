@@ -33,7 +33,7 @@ public class JVillageCMD extends JVBaseCommand {
         registerCommand(new JClaimCommand(plugin), "claim", "c");
         registerCommand(new JUnclaimCommand(plugin), "unclaim", "uc");
         registerCommand(new JKickCommand(plugin), "kick");
-        registerCommand(new JSpawnCommand(plugin), "spawn");
+        registerCommand(new JSpawnCommand(plugin), "spawn", "home");
         registerCommand(new JSetOwnerCommand(plugin), "setowner");
         registerCommand(new JDemoteCommand(plugin), "demote");
         registerCommand(new JPromoteCommand(plugin), "promote");

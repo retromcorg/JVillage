@@ -117,7 +117,7 @@ public class JVillageLanguage extends Configuration {
                 "\n&8- &7/village autoswitch [on/off] &8- &7Autoswitch town" +
                 "\n&8- &7/village balance [village] &8- &7Shows village balance" +
                 "\n&8- &7/village deposit [village] [amount] &8- &7Deposit money into village bank" +
-                "\n&8- &7/village spawn &8- &7Teleport to village spawn");
+                "\n&8- &7/village spawn/home &8- &7Teleport to village spawn");
 
         map.put("command_village_assistant_help", "&cJVillage Assistant Commands" +
                 "\n&8- &7/village invite [name] &8- &7Invite a player to your selected town" +

@@ -57,7 +57,7 @@ public class JJoinCommand extends JVBaseCommand implements CommandExecutor {
 
         if (vPlayer.isInvitedToVillage(village)) {
             vPlayer.joinVillage(village);
-            village.uninvitePlayer(vPlayer.getUUID());
+            vPlayer.removeInvitationToVillage(village);
             String message = language.getMessage("command_village_join_success");
             message = message.replace("%village%", village.getTownName());
             commandSender.sendMessage(message);

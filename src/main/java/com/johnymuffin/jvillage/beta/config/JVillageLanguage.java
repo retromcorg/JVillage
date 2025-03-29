@@ -39,17 +39,17 @@ public class JVillageLanguage extends Configuration {
         map.put("village_owner_leave", "&4Sorry, the owner of a village can't leave it");
         map.put("movement_village_enter", "&bYou have entered the village of &9%village%");
         map.put("movement_wilderness_enter", "&bYou have entered the wilderness");
+        map.put("movement_autoselect_enter", "&bYour selected village has been set to &9%village% &bbecause you have entered it");
         map.put("unknown_economy_error", "&4Sorry, an unknown economy error occurred");
 
         map.put("assistant_or_higher", "&4Sorry, you must be an assistant or higher to do that");
         map.put("owner_or_higher", "&4Sorry, you must be the owner or higher to do that");
 
-
-        map.put("movement_autoselect_enter", "&bYour selected village has been set to &9%village% &bbecause you have entered it");
-
         map.put("build_denied", "&4Sorry, you don't have permission to build in &9%village%");
         map.put("destroy_denied", "&4Sorry, you don't have permission to destroy in &9%village%");
         map.put("ignite_denied", "&4Sorry, you don't have permission to \"ignite\" in &9%village% :(");
+
+        map.put("notification_invites", "&bYou have pending village invites! To view, type &9/village invites");
 
         //JVillage Admin command
         map.put("command_villageadmin_general_use", "&cSorry, that is invalid. Try /villageadmin (plugin|world|village|player)");
@@ -113,7 +113,9 @@ public class JVillageLanguage extends Configuration {
                 "\n&8- &7/village help [&fplayer&7|assistant|owner]&8- &7Shows selected help page" +
                 "\n&8- &7/village select [village] &8- &7Select a village to modify" +
                 "\n&8- &7/village join [village] &8- &7Joins a village" +
+                "\n&8- &7/village deny [village] &8- &7Denies a village invite" +
                 "\n&8- &7/village leave [village]&8- &7Leaves a village" +
+                "\n&8- &7/village invites &8- &7Shows pending village invites" +
                 "\n&8- &7/village autoswitch [on/off] &8- &7Autoswitch town" +
                 "\n&8- &7/village balance [village] &8- &7Shows village balance" +
                 "\n&8- &7/village deposit [village] [amount] &8- &7Deposit money into village bank" +
@@ -189,11 +191,21 @@ public class JVillageLanguage extends Configuration {
         map.put("command_village_invite_sent", "&bYou have invited &9%player% &bto join &9%village%");
         map.put("command_village_invite_broadcast", "&f%player% has been invited by %villagemember%");
 
+        map.put("command_village_invites_pending", "&bPending invites:");
+        map.put("command_village_invites_village", "&7- &9%village%");
+        map.put("command_village_invites_invite_use", "&7/village [join|deny] [village]");
+        map.put("command_village_invites_no_invites", "&cSorry, you have no pending village invites");
+
         map.put("command_village_join_use", "&cSorry, that is invalid. Try /village join [village]");
         map.put("command_village_join_success", "&bYou have joined the village &9%village%");
         map.put("command_village_join_denied", "&cSorry, you haven't received an invite to join %village%");
         map.put("command_village_join_limit", "&cSorry, you can't join %village%. You have reached the limit of %limit% villages");
         map.put("command_village_join_broadcast", "&f%player% has joined the village.");
+
+        map.put("command_village_deny_use", "&cSorry, that is invalid. Try /village deny [village]");
+        map.put("command_village_deny_success", "&bYou have denied the invite to &9%village%");
+        map.put("command_village_deny_denied", "&cSorry, you haven't received an invite to join %village%");
+        map.put("command_village_deny_broadcast", "&f%player% has denied the invite");
 
         map.put("command_village_delete_use", "&cSorry, that is invalid. Try /village delete [village]");
         map.put("command_village_delete_not_owner", "&cSorry, you are not the owner so you can't delete %village%");

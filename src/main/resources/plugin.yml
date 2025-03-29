@@ -102,7 +102,9 @@ permissions:
       jvillage.player.create: true
       jvillage.player.delete: true
       jvillage.player.join: true
+      jvillage.player.deny: true
       jvillage.player.invite: true
+      jvillage.player.invites: true
       jvillage.player.leave: true
       jvillage.player.help: true
       jvillage.player.autoswitch: true
@@ -187,8 +189,16 @@ permissions:
     description: Allows access to JVillage player join command
     default: true
 
+  jvillage.player.deny:
+    description: Allows access to JVillage player deny command
+    default: true
+
   jvillage.player.invite:
     description: Allows access to JVillage player invite command
+    default: true
+
+  jvillage.player.invites:
+    description: Allows access to JVillage player invites command
     default: true
 
   jvillage.player.leave:

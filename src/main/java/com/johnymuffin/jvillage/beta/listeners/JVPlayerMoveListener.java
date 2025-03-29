@@ -13,6 +13,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.*;
 
+import java.util.ArrayList;
+
 public class JVPlayerMoveListener extends CustomEventListener implements Listener {
     private JVillage plugin;
 
@@ -70,6 +72,11 @@ public class JVPlayerMoveListener extends CustomEventListener implements Listene
         plugin.getPlayerData().setPlayerData(event.getPlayer().getUniqueId(), "username", event.getPlayer().getName());
         plugin.getPlayerData().setPlayerData(event.getPlayer().getUniqueId(), "lastOnline", String.valueOf(System.currentTimeMillis()/1000L));
         plugin.getPlayerData().setUUID(vPlayer.getUsername(), event.getPlayer().getUniqueId());
+
+        ArrayList<Village> invites = vPlayer.getInvitedToVillages();
+        if (!invites.isEmpty()) {
+            event.getPlayer().sendMessage(plugin.getLanguage().getMessage("notification_invites"));
+        }
     }
 
     //TODO: This might not be needed, decide if it is or not

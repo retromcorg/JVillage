@@ -64,7 +64,7 @@ public class Village implements ClaimManager {
         this.townUUID = uuid; // Ignore UUID in JSON file and use the one from the file name
         this.owner = UUID.fromString(String.valueOf(object.get("owner")));
         this.townSpawn = new VSpawnCords((JSONObject) object.get("townSpawn"));
-        JSONObject warps = object.get("warps") != null ? (JSONObject) object.get("warps") : new JSONObject();
+        JSONObject warps = (JSONObject) object.getOrDefault("warps", new JSONObject());
         for (Object warp : warps.keySet()) {
             String warpName = warp.toString();
             VSpawnCords cords = new VSpawnCords((JSONObject) warps.get(warpName));
@@ -79,6 +79,11 @@ public class Village implements ClaimManager {
         for (Object assistant : assistants) {
             this.assistants.add(UUID.fromString(String.valueOf(assistant)));
         }
+        JSONArray invited = (JSONArray) object.getOrDefault("invited", new JSONArray());
+        for (Object invitee : invited) {
+            this.invited.add(UUID.fromString(String.valueOf(invitee)));
+        }
+
         JSONArray claims = (JSONArray) object.get("claims");
         //Loop through worlds
         for (Object claim : claims) {
@@ -188,6 +193,11 @@ public class Village implements ClaimManager {
             assistants.add(assistant.toString());
         }
         object.put("assistants", assistants);
+        JSONArray invited = new JSONArray();
+        for (UUID invitee : this.invited) {
+            invited.add(invitee.toString());
+        }
+        object.put("invited", invited);
         JSONArray claimsJsonArray = new JSONArray();
         for (String worldName : this.getWorldsWithClaims()) {
             JSONArray worldClaims = new JSONArray();

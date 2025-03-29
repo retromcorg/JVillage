@@ -298,7 +298,7 @@ public class JVilageAdminCMD extends JVBaseCommand {
 
         if (!village.isMember(target.getUUID())) {
             village.addMember(target.getUUID());
-            village.uninvitePlayer(target.getUUID()); //This is just in case they were invited
+            target.removeInvitationToVillage(village); //This is just in case they were invited
             target.joinVillage(village);
         }
 
@@ -360,7 +360,7 @@ public class JVilageAdminCMD extends JVBaseCommand {
 
         //Add player to village
         village.addMember(target.getUUID());
-        village.uninvitePlayer(target.getUUID()); //This is just in case they were invited
+        target.removeInvitationToVillage(village); //This is just in case they were invited
         target.joinVillage(village);
 
         //Tell the player they have been added to the village

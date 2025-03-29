@@ -31,7 +31,7 @@ public class VPlayer {
 
     private boolean isAutoUnclaimingEnabled = false;
 
-//    private ArrayList<Village> invitedTo = new ArrayList<>();
+    private ArrayList<Village> invitedTo = new ArrayList<>();
 
     public VPlayer(JVillage plugin, UUID uuid) {
         this.uuid = uuid;
@@ -42,6 +42,8 @@ public class VPlayer {
             Village village = plugin.getVillageMap().getVillage(villageUUID);
             if (village.isMember(uuid)) {
                 memberships.add(village);
+            } else if (village.isInvited(uuid)) {
+                invitedTo.add(village);
             }
         }
         //End - Village Memberships
@@ -110,14 +112,20 @@ public class VPlayer {
 
     public void inviteToVillage(Village village) {
         village.invitePlayer(uuid);
+        invitedTo.add(village);
     }
 
     public boolean isInvitedToVillage(Village village) {
         return village.isInvited(uuid);
     }
 
+    public ArrayList<Village> getInvitedToVillages() {
+        return invitedTo;
+    }
+
     public void removeInvitationToVillage(Village village) {
         village.uninvitePlayer(uuid);
+        invitedTo.remove(village);
     }
 
     public boolean autoSwitchSelected() {

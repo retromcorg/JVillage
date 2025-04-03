@@ -11,6 +11,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.math.BigDecimal;
 import java.util.logging.Level;
 
 public class JDepositCommand extends JVBaseCommand implements CommandExecutor {
@@ -86,7 +87,7 @@ public class JDepositCommand extends JVBaseCommand implements CommandExecutor {
 
         //Attempt to withdraw money from player
         try {
-            Economy.subtractBalance(player.getUniqueId(), amount);
+            Economy.subtractBalance(player.getUniqueId(), BigDecimal.valueOf(amount));
             village.addBalance(amount);
             String message = language.getMessage("command_village_deposit_success").replace("%amount%", String.valueOf(amount)).replace("%village%", village.getTownName());
             commandSender.sendMessage(message);

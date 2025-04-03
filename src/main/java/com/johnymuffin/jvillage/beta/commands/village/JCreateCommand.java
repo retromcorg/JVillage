@@ -15,6 +15,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 import static com.johnymuffin.jvillage.beta.JVUtility.getChunkCenter;
@@ -109,7 +110,7 @@ public class JCreateCommand extends JVBaseCommand implements CommandExecutor {
         if (creationCost > 0 && plugin.isZCoreEnabled()) {
             String message = "";
             try {
-                Economy.subtractBalance(player.getUniqueId(), creationCost);
+                Economy.subtractBalance(player.getUniqueId(), BigDecimal.valueOf(creationCost));
                 message = language.getMessage("command_village_create_payment");
                 message = message.replace("%amount%", String.valueOf(creationCost));
                 message = message.replace("%village%", villageName);

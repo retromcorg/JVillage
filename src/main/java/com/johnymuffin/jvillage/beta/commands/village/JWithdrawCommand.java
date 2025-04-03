@@ -12,6 +12,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.math.BigDecimal;
 import java.util.logging.Level;
 
 public class JWithdrawCommand extends JVBaseCommand implements CommandExecutor {
@@ -102,7 +103,7 @@ public class JWithdrawCommand extends JVBaseCommand implements CommandExecutor {
 
         //Attempt to add money to player
         try {
-            Economy.addBalance(player.getUniqueId(), amount);
+            Economy.addBalance(player.getUniqueId(), BigDecimal.valueOf(amount));
             village.subtractBalance(amount);
             String message = language.getMessage("command_village_withdraw_success").replace("%amount%", String.valueOf(amount)).replace("%village%", village.getTownName());
             commandSender.sendMessage(message);

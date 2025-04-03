@@ -84,7 +84,7 @@
         <dependency>
             <groupId>com.github.zavdav</groupId>
             <artifactId>ZCore</artifactId>
-            <version>1.0.0-rc1</version>
+            <version>367d509</version>
         </dependency>
 
         <dependency>

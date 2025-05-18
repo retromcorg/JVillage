@@ -7,8 +7,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.entity.CraftArrow;
 import org.bukkit.craftbukkit.entity.CraftEntity;
 import org.bukkit.craftbukkit.entity.CraftMonster;
+import org.bukkit.craftbukkit.entity.CraftSlime;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
+import org.bukkit.entity.Cow;
 import org.bukkit.entity.Monster;
+import org.bukkit.entity.Pig;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
@@ -30,7 +33,7 @@ public class JVMobListener extends EntityListener implements Listener {
 
     @EventHandler(ignoreCancelled = true, priority = Event.Priority.Lowest)
     public void onMobSpawnEvent(final CreatureSpawnEvent event) {
-        if (!(event.getEntity() instanceof Monster)) {
+        if (!(event.getEntity() instanceof Monster || event.getEntity().getClass().getSimpleName().equals("CraftSlime"))) {
             return;
         }
         //See if the mob is in a village
@@ -96,7 +99,6 @@ public class JVMobListener extends EntityListener implements Listener {
         if (vPlayer.getCurrentlyLocatedIn().isMobsCanSpawn()) {
             return;
         }
-
 //        System.out.println("Player was damaged by a hostile mob in a village where mobs are not allowed to spawn");
 
         //Cancel the damage event if it is a hostile mob attacking a player in a village where mobs are not allowed to spawn

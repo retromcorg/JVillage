@@ -32,7 +32,7 @@ public class JVMobListener extends EntityListener implements Listener {
     @EventHandler(ignoreCancelled = true, priority = Event.Priority.Lowest)
     public void onMobSpawnEvent(final CreatureSpawnEvent event) {
         Entity entity = event.getEntity();
-        if (!(event.getEntity() instanceof Monster || entity instanceof Cow)) {
+        if (!(event.getEntity() instanceof Monster || entity instanceof CraftSlime)) {
             return;
         }
         //See if the mob is in a village

@@ -9,12 +9,16 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import static com.johnymuffin.jvillage.beta.JVUtility.formatUsernames;
 
 public class JListCommand extends JVBaseCommand implements CommandExecutor {
-
 
     public JListCommand(JVillage plugin) {
         super(plugin);
@@ -22,59 +26,116 @@ public class JListCommand extends JVBaseCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
-
         if (!isAuthorized(commandSender, "jvillage.player.list")) {
             commandSender.sendMessage(language.getMessage("no_permission"));
             return true;
         }
 
-        UUID targetUUID = null;
+        Village village = null;
+        int page = 1;
 
+        if (commandSender instanceof Player) {
+            Player player = (Player) commandSender;
+            VPlayer vPlayer = plugin.getPlayerMap().getPlayer(player.getUniqueId());
+            Village selectedVillage = vPlayer.getSelectedVillage();
 
-        if (strings.length == 0) {
-            //Get UUID of the issuing player
-            if (!(commandSender instanceof Player)) {
+            if (strings.length == 0) {
+                if (selectedVillage == null) {
+                    commandSender.sendMessage(language.getMessage("no_village_selected"));
+                    return true;
+                }
+                village = selectedVillage;
+            } else {
+                try {
+                    page = Integer.parseInt(strings[0]);
+                    village = selectedVillage;
+                    if (strings.length > 1) {
+                        commandSender.sendMessage(language.getMessage("too_many_arguments"));
+                        return true;
+                    }
+                } catch (NumberFormatException e) {
+                    village = plugin.getVillageMap().getVillage(strings[0]);
+                    if (village == null) {
+                        commandSender.sendMessage(language.getMessage("village_not_found"));
+                        return true;
+                    }
+                    if (strings.length >= 2) {
+                        try {
+                            page = Integer.parseInt(strings[1]);
+                        } catch (NumberFormatException ex) {
+                            commandSender.sendMessage(language.getMessage("invalid_page_number"));
+                            return true;
+                        }
+                    }
+                }
+            }
+        } else {
+            if (strings.length == 0) {
                 commandSender.sendMessage(language.getMessage("unavailable_to_console"));
                 return true;
             }
-            Player player = (Player) commandSender;
-            VPlayer vPlayer = plugin.getPlayerMap().getPlayer(player.getUniqueId());
-
-            Village selectedVillage = vPlayer.getSelectedVillage();
-            if (selectedVillage == null) {
-                commandSender.sendMessage(language.getMessage("no_village_selected"));
-                return true;
-            }
-
-            targetUUID = selectedVillage.getTownUUID();
-
-        } else {
-            String targetName = strings[0];
-            Village village = plugin.getVillageMap().getVillage(targetName);
-
+            village = plugin.getVillageMap().getVillage(strings[0]);
             if (village == null) {
                 commandSender.sendMessage(language.getMessage("village_not_found"));
                 return true;
             }
-
-            targetUUID = village.getTownUUID();
+            if (strings.length >= 2) {
+                try {
+                    page = Integer.parseInt(strings[1]);
+                } catch (NumberFormatException ex) {
+                    commandSender.sendMessage(language.getMessage("invalid_page_number"));
+                    return true;
+                }
+            }
         }
-        Village village = plugin.getVillageMap().getVillage(targetUUID);
 
-        String villageList = language.getMessage("command_village_list_use");
+        // Process members with duplicate protection, I'm pretty sure there is a better way to do this
+        List<UUID> uniqueMembers = new ArrayList<>();
+        Set<UUID> seenUUIDs = new HashSet<>();
+        UUID[] originalMembers = village.getMembers();
 
-        villageList = villageList.replace("%village%", village.getTownName());
+        for (UUID uuid : originalMembers) {
+            if (uuid != null && !seenUUIDs.contains(uuid)) {
+                seenUUIDs.add(uuid);
+                uniqueMembers.add(uuid);
+            }
+        }
 
-        String ownerUsername = this.plugin.getPlayerMap().getPlayer(village.getOwner()).getUsername();
-        villageList = villageList.replace("%owner%", ownerUsername);
+        UUID[] filteredMembers = uniqueMembers.toArray(new UUID[0]);
+        int pageSize = 15;
+        int totalMembers = filteredMembers.length;
+        int totalPages = (int) Math.ceil((double) totalMembers / pageSize);
+        totalPages = Math.max(1, totalPages);
 
+        if (page < 1 || page > totalPages) {
+            commandSender.sendMessage(language.getMessage("invalid_page_number")
+                    .replace("%max%", String.valueOf(totalPages)));
+            return true;
+        }
+
+        int start = (page - 1) * pageSize;
+        int end = Math.min(start + pageSize, totalMembers);
+        UUID[] pageMembers = Arrays.copyOfRange(filteredMembers, start, end);
+        String memberList = formatUsernames(plugin, pageMembers);
+
+        String ownerUsername = plugin.getPlayerMap().getPlayer(village.getOwner()).getUsername();
         UUID[] assistants = village.getAssistants();
         String assistantList = formatUsernames(plugin, assistants);
-        villageList = villageList.replace("%assistants%", assistantList);
 
-        UUID[] members = village.getMembers();
-        String memberList = formatUsernames(plugin, members);
-        villageList = villageList.replace("%members%", memberList);
+        // Builds the message
+        String villageList = language.getMessage("command_village_list_use")
+                .replace("%village%", village.getTownName())
+                .replace("%owner%", ownerUsername)
+                .replace("%assistants%", assistantList)
+                .replace("%members%", memberList);
+
+        // Add page footer with page numbers
+        if (totalPages > 1) {
+            String pageHint = language.getMessage("multiple_pages")
+                    .replace("%current_page%", String.valueOf(page))
+                    .replace("%total_pages%", String.valueOf(totalPages));
+            villageList += "\n" + pageHint;
+        }
 
         sendWithNewline(commandSender, villageList);
         return true;

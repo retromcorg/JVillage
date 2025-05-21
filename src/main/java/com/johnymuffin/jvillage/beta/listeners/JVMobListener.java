@@ -6,8 +6,10 @@ import com.johnymuffin.jvillage.beta.player.VPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.entity.CraftArrow;
 import org.bukkit.craftbukkit.entity.CraftEntity;
-import org.bukkit.craftbukkit.entity.CraftMonster;
+import org.bukkit.craftbukkit.entity.CraftSlime;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
+import org.bukkit.entity.Cow;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -17,7 +19,6 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityListener;
-import org.bukkit.event.player.PlayerListener;
 
 public class JVMobListener extends EntityListener implements Listener {
     private JVillage plugin;
@@ -30,7 +31,8 @@ public class JVMobListener extends EntityListener implements Listener {
 
     @EventHandler(ignoreCancelled = true, priority = Event.Priority.Lowest)
     public void onMobSpawnEvent(final CreatureSpawnEvent event) {
-        if (!(event.getEntity() instanceof Monster)) {
+        Entity entity = event.getEntity();
+        if (!(event.getEntity() instanceof Monster || entity instanceof CraftSlime)) {
             return;
         }
         //See if the mob is in a village
@@ -54,7 +56,7 @@ public class JVMobListener extends EntityListener implements Listener {
 
 
     @EventHandler(priority = Event.Priority.Normal)
-    public void onEntityDamageEvnet(final EntityDamageEvent preEvent) {
+    public void onEntityDamageEvent(final EntityDamageEvent preEvent) {
         if (!(preEvent instanceof EntityDamageByEntityEvent)) {
             return;
         }
@@ -96,7 +98,6 @@ public class JVMobListener extends EntityListener implements Listener {
         if (vPlayer.getCurrentlyLocatedIn().isMobsCanSpawn()) {
             return;
         }
-
 //        System.out.println("Player was damaged by a hostile mob in a village where mobs are not allowed to spawn");
 
         //Cancel the damage event if it is a hostile mob attacking a player in a village where mobs are not allowed to spawn

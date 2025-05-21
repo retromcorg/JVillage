@@ -195,7 +195,6 @@ public class JVillage extends JavaPlugin implements ClaimManager, PoseidonCustom
 
         Bukkit.getPluginManager().registerEvents(this, this);
 
-
 //        long startTime = System.currentTimeMillis();
 //        for (int i = 0; i < 500; i++) {
 //            //Random X and Z within 30000 blocks of 0,0

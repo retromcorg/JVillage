@@ -61,7 +61,7 @@ permissions:
     description: Allows access to JVillage admin spawn commands
     default: op
 
-  jvilage.admin.bypass:
+  jvillage.admin.bypass:
     description: Allows access to JVillage admin bypass commands
 
   jvillage.admin.plugin:
@@ -111,6 +111,7 @@ permissions:
       jvillage.player.select: true
       jvillage.player.info: true
       jvillage.player.flag: true
+      jvillage.player.map: true
       jvillage.player.balance: true
       jvillage.player.deposit: true
       jvillage.player.withdraw: true
@@ -220,6 +221,11 @@ permissions:
   jvillage.player.info:
     description: Allows access to JVillage player info command
     default: true
+
   jvillage.player.flag:
     description: Allows access to JVillage player flag command
+    default: true
+
+  jvillage.player.map:
+    description: Allows access to JVillage player map command
     default: true

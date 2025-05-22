@@ -12,6 +12,7 @@ import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.awt.Point;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Arrays;
@@ -46,6 +47,55 @@ public class JVUtility {
         corners[2] = new VCords(vChunk.getX() * 16, 0, vChunk.getZ() * 16 + 15, vChunk.getWorldName());
         corners[3] = new VCords(vChunk.getX() * 16 + 15, 0, vChunk.getZ() * 16 + 15, vChunk.getWorldName());
         return corners;
+    }
+
+    public static Point[][] getNearbyChunkCoords(Location location, int radiusX, int radiusZ) {
+        Point[][] chunkCoords = new Point[2 * radiusZ + 1][2 * radiusX + 1];
+        int centerX = location.getBlockX() >> 4;
+        int centerZ = location.getBlockZ() >> 4;
+        Direction direction = Direction.byYaw(location.getYaw());
+
+        for (int row = -radiusZ; row <= radiusZ; row++) {
+            for (int col = -radiusX; col <= radiusX ; col++) {
+                int dx = col;
+                int dz = row;
+                switch (direction) {
+                    case SOUTH:
+                        break;
+                    case WEST:
+                        dx = -row;
+                        dz = col;
+                        break;
+                    case NORTH:
+                        dx = -col;
+                        dz = -row;
+                        break;
+                    case EAST:
+                        dx = row;
+                        dz = -col;
+                        break;
+                }
+
+                chunkCoords[row + radiusZ][col + radiusX] = new Point(centerX + dx, centerZ + dz);
+            }
+        }
+
+        return chunkCoords;
+    }
+
+    public enum Direction {
+        NORTH,
+        EAST,
+        SOUTH,
+        WEST;
+
+        static Direction byYaw(double yaw) {
+            yaw = (yaw % 360 + 360) % 360;
+            if (yaw >= 45 && yaw < 135) return Direction.EAST;
+            else if (yaw >= 135 && yaw < 225) return Direction.SOUTH;
+            else if (yaw >= 225 && yaw < 315) return Direction.WEST;
+            else return Direction.NORTH;
+        }
     }
 
     public static double distance(VCords cords1, VCords cords2) {

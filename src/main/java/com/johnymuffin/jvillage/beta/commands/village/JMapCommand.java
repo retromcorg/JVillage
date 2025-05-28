@@ -67,7 +67,7 @@ public class JMapCommand extends JVBaseCommand implements CommandExecutor {
         radiusZ = Math.min(radiusZ, 32);
 
         Point[][] matrix = JVUtility.getNearbyChunkCoords(location, radiusX, radiusZ);
-        List<VClaim> claims = getFilteredClaims(allClaims, matrix);
+        List<VClaim> claims = getFilteredClaims(allClaims, matrix, location.getWorld().getName());
         ArrayList<String> lines = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
 
@@ -119,7 +119,7 @@ public class JMapCommand extends JVBaseCommand implements CommandExecutor {
         return lines.toArray(new String[0]);
     }
 
-    private List<VClaim> getFilteredClaims(List<VClaim> allClaims, Point[][] matrix) {
+    private List<VClaim> getFilteredClaims(List<VClaim> allClaims, Point[][] matrix, String worldName) {
         ArrayList<Point> coords = new ArrayList<>();
         for (Point[] points : matrix) {
             for (Point point : points) {
@@ -128,7 +128,8 @@ public class JMapCommand extends JVBaseCommand implements CommandExecutor {
         }
 
         return allClaims.stream()
-                .filter(claim -> coords.contains(new Point(claim.getX(), claim.getZ())))
+                .filter(claim -> claim.getWorldName().equals(worldName) &&
+                        coords.contains(new Point(claim.getX(), claim.getZ())))
                 .collect(Collectors.toList());
     }
 

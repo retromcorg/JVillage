@@ -40,11 +40,6 @@ public class JMapCommand extends JVBaseCommand implements CommandExecutor {
         VPlayer vPlayer = plugin.getPlayerMap().getPlayer(player.getUniqueId());
         Village village = vPlayer.getSelectedVillage();
 
-        if (village == null) {
-            commandSender.sendMessage(language.getMessage("no_village_selected"));
-            return true;
-        }
-
         ArrayList<VClaim> allClaims = (ArrayList<VClaim>) plugin.getAllClaims().clone();
 
         Bukkit.getScheduler().scheduleAsyncDelayedTask(plugin, () -> {
@@ -96,7 +91,7 @@ public class JMapCommand extends JVBaseCommand implements CommandExecutor {
 
                 if (claim == null) {
                     currentColor = wildernessColor;
-                } else if (claim.getVillage().equals(selectedVillage.getTownUUID())) {
+                } else if (selectedVillage != null && claim.getVillage().equals(selectedVillage.getTownUUID())) {
                     currentColor = currentVillageColor;
                 } else {
                     currentColor = otherVillagesColor;

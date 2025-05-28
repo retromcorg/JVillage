@@ -49,10 +49,12 @@ public class JMapCommand extends JVBaseCommand implements CommandExecutor {
 
         Bukkit.getScheduler().scheduleAsyncDelayedTask(plugin, () -> {
             String[] villageMap = createMap(player.getLocation(), allClaims, village);
-            player.sendMessage(plugin.getLanguage().getMessage("command_village_map_use"));
-            for (String row : villageMap) {
-                player.sendMessage(row);
-            }
+            Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> {
+                player.sendMessage(plugin.getLanguage().getMessage("command_village_map_use"));
+                for (String row : villageMap) {
+                    player.sendMessage(row);
+                }
+            });
         });
 
         return true;
@@ -69,17 +71,20 @@ public class JMapCommand extends JVBaseCommand implements CommandExecutor {
         ArrayList<String> lines = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
 
+        String cursorColor = plugin.getSettings().getConfigString("settings.map.cursor.color");
+        String cursorSymbol = plugin.getSettings().getConfigString("settings.map.cursor.symbol");
+        String wildernessColor = plugin.getSettings().getConfigString("settings.map.chunk.color.wilderness");
+        String currentVillageColor = plugin.getSettings().getConfigString("settings.map.chunk.color.current-village");
+        String otherVillagesColor = plugin.getSettings().getConfigString("settings.map.chunk.color.other-villages");
+
         for (int row = 0; row < matrix.length; row++) {
             String prevColor = "";
             String currentColor = "";
 
             for (int col = 0; col < matrix[row].length; col++) {
                 if (row == radiusZ && col == radiusX) {
-                    String cursorColor = plugin.getSettings().getConfigString("settings.map.cursor.color");
                     cursorColor = cursorColor.replaceAll("&([0-9a-f])", "\u00A7$1");
-                    sb.append(cursorColor)
-                            .append(plugin.getSettings().getConfigString("settings.map.cursor.symbol"))
-                            .append(currentColor);
+                    sb.append(cursorColor).append(cursorSymbol).append(currentColor);
                     continue;
                 }
 
@@ -90,11 +95,11 @@ public class JMapCommand extends JVBaseCommand implements CommandExecutor {
                         .orElse(null);
 
                 if (claim == null) {
-                    currentColor = plugin.getSettings().getConfigString("settings.map.chunk.color.wilderness");
+                    currentColor = wildernessColor;
                 } else if (claim.getVillage().equals(selectedVillage.getTownUUID())) {
-                    currentColor = plugin.getSettings().getConfigString("settings.map.chunk.color.current-village");
+                    currentColor = currentVillageColor;
                 } else {
-                    currentColor = plugin.getSettings().getConfigString("settings.map.chunk.color.other-villages");
+                    currentColor = otherVillagesColor;
                 }
 
                 currentColor = currentColor.replaceAll("&([0-9a-f])", "\u00A7$1");

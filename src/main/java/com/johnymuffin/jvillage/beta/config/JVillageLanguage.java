@@ -63,13 +63,13 @@ public class JVillageLanguage extends Configuration {
 
         //Working Copy of paged /v list migrated from yml file I was originally using
         map.put("command_village_list_use",
-                "&6&m-------------&r &6Village Info &r&6&m-------------\n" +
+                "&9&-------------& &bVillage Info &9&-------------\n" +
                         "&6Name: &f%village%\n" +
-                        "&6Owner: &f%owner%\n" +
-                        "&6Assistants: &f%assistants%\n" +
-                        "&6Members:\n" +
+                        "&3Owner: &f%owner%\n" +
+                        "&5Assistants: &f%assistants%\n" +
+                        "&2Members:\n" +
                         "&f%members%\n" +
-                        "&6&m----------------------------------------");
+                        "&9&----------------------------------------");
 
         //Error handling for new paged /v list
         map.put("invalid_page_number", "&cInvalid page number.");

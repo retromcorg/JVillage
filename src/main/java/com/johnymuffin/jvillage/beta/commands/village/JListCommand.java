@@ -89,7 +89,7 @@ public class JListCommand extends JVBaseCommand implements CommandExecutor {
             }
         }
 
-        // Process members with duplicate protection, I'm pretty sure there is a better way to do this
+        // Process members with duplicate protection
         List<UUID> uniqueMembers = new ArrayList<>();
         Set<UUID> seenUUIDs = new HashSet<>();
         UUID[] originalMembers = village.getMembers();

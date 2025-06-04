@@ -51,6 +51,30 @@ public class JVillageLanguage extends Configuration {
 
         map.put("notification_invites", "&bYou have pending village invites! To view, type &9/village invites");
 
+        //Messages for paged /v list for rough prototype
+        map.put("general.page_navigation", "&ePage %current_page%/%total_pages% &7- Use &b/v list <1-%total_pages%> &7to navigate");
+        map.put("village.member_list_header", "&e%village% Member list");
+        map.put("village.owner", "\n&3Owner: &b%owner%");
+        map.put("village.assistants", "\n&5Assistants: &d%assistants%");
+        map.put("village.info_header", "&9--- &bJVillage List &9---");
+        map.put("village.members_header", "&aMembers (Page %page%/%total%):");
+        map.put("multiple_pages", "&ePage %current_page%/%total_pages% &7- Use &b/v list <1-%total_pages%> &7to navigate");
+//      map.put("village.no_regular_members", "\n&2Members:");
+
+        //Working Copy of paged /v list migrated from yml file I was originally using
+        map.put("command_village_list_use",
+                "&9&-------------& &bVillage Info &9&-------------\n" +
+                        "&6Name: &f%village%\n" +
+                        "&3Owner: &f%owner%\n" +
+                        "&5Assistants: &f%assistants%\n" +
+                        "&2Members:\n" +
+                        "&f%members%\n" +
+                        "&9&----------------------------------------");
+
+        //Error handling for new paged /v list
+        map.put("invalid_page_number", "&cInvalid page number.");
+        map.put("too_many_arguments", "&cToo many arguments. Usage: /village list [village] [page]");
+
         //JVillage Admin command
         map.put("command_villageadmin_general_use", "&cSorry, that is invalid. Try /villageadmin (plugin|world|village|player)");
         map.put("command_villageadmin_plugin_use", "&cSorry, that is invalid. Try /villageadmin plugin (reload|save|version|import|debug)");
@@ -159,12 +183,12 @@ public class JVillageLanguage extends Configuration {
                 "\n&9Claims: &d%claims%" +
                 "\n&9Spawn: &f%spawn%");
 
-
-        map.put("command_village_list_use", "&9--- &bJVillage List &9---" +
-                "\n&6Village: &e%village%" +
-                "\n&3Owner: &b%owner%" +
-                "\n&5Assistants: &d%assistants%" +
-                "\n&2Members: &a%members%");
+        //Deprecated for in favor of paginated /v list
+//        map.put("command_village_list_use", "&9--- &bJVillage List &9---" +
+//                "\n&6Village: &e%village%" +
+//                "\n&3Owner: &b%owner%" +
+//                "\n&5Assistants: &d%assistants%" +
+//                "\n&2Members: &a%members%");
 
         map.put("command_village_flag_list_use", "&9--- &bJVillage Flags&9---" +
                 "%flags%");

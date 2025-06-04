@@ -39,6 +39,19 @@ public class JVillageSettings extends Configuration {
         generateConfigOption("settings.warp.refund-deleted.enabled", true);
         generateConfigOption("settings.warp.refund-deleted.info", "If true, the price to set a warp will be refunded when deleting a warp.");
 
+        generateConfigOption("settings.map.chunk.color.current-village", "&b");
+        generateConfigOption("settings.map.chunk.color.other-villages", "&f");
+        generateConfigOption("settings.map.chunk.color.wilderness", "&7");
+        generateConfigOption("settings.map.chunk.symbol", "#");
+
+        generateConfigOption("settings.map.cursor.symbol", "^");
+        generateConfigOption("settings.map.cursor.color", "&b");
+
+        generateConfigOption("settings.map.radius-x", 16);
+        generateConfigOption("settings.map.radius-z", 8);
+
+        generateConfigOption("settings.map.info", "This is the format of the village map displayed by /village map.");
+
         generateConfigOption("settings.resident.maximum-towns-owned.value", 10);
         generateConfigOption("settings.resident.maximum-towns-owned.info", "This is the maximum number of towns a resident can own. Set to 0 to disable.");
 

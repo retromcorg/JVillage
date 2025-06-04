@@ -144,7 +144,8 @@ public class JVillageLanguage extends Configuration {
                 "\n&8- &7/village balance [village] &8- &7Shows village balance" +
                 "\n&8- &7/village deposit [village] [amount] &8- &7Deposit money into village bank" +
                 "\n&8- &7/village warp [name] &8- &7Teleport to a village warp" +
-                "\n&8- &7/village spawn/home &8- &7Teleport to village spawn");
+                "\n&8- &7/village spawn/home &8- &7Teleport to village spawn" +
+                "\n&8- &7/village map &8- &7Shows a map of nearby claims");
 
         map.put("command_village_assistant_help", "&cJVillage Assistant Commands" +
                 "\n&8- &7/village invite [name] &8- &7Invite a player to your selected town" +
@@ -192,6 +193,7 @@ public class JVillageLanguage extends Configuration {
         map.put("command_village_flag_list_use", "&9--- &bJVillage Flags&9---" +
                 "%flags%");
 
+        map.put("command_village_map_use", "&9----------- &bJVillage Map &9-----------");
 
         map.put("command_village_select_use", "&bYour selected village is &9%village%");
         map.put("command_village_select_none", "&cYou have no selected village");

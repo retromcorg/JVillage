@@ -1,25 +1,26 @@
 package com.johnymuffin.jvillage.beta.listeners;
 
-import com.johnymuffin.jvillage.beta.JVillage;
-import com.johnymuffin.jvillage.beta.models.Village;
-import com.johnymuffin.jvillage.beta.player.VPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.entity.CraftArrow;
 import org.bukkit.craftbukkit.entity.CraftEntity;
-import org.bukkit.craftbukkit.entity.CraftSlime;
+import org.bukkit.craftbukkit.entity.CraftGhast;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
+import org.bukkit.craftbukkit.entity.CraftSlime;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityListener;
 
-public class JVMobListener extends EntityListener implements Listener {
+import com.johnymuffin.jvillage.beta.JVillage;
+import com.johnymuffin.jvillage.beta.models.Village;
+import com.johnymuffin.jvillage.beta.player.VPlayer;
+
+public class JVMobListener extends EntityListener {
     private JVillage plugin;
 
     public JVMobListener(JVillage plugin) {
@@ -31,9 +32,12 @@ public class JVMobListener extends EntityListener implements Listener {
     @EventHandler(ignoreCancelled = true, priority = Event.Priority.Lowest)
     public void onMobSpawnEvent(final CreatureSpawnEvent event) {
         Entity entity = event.getEntity();
-        if (!(event.getEntity() instanceof Monster || entity instanceof CraftSlime)) {
-            return;
-        }
+        if (!(
+            entity instanceof Monster ||
+            entity instanceof CraftSlime ||
+            entity instanceof CraftGhast
+        )) return;
+
         //See if the mob is in a village
         Village village = plugin.getVillageAtLocation(event.getLocation());
         if (village == null) {

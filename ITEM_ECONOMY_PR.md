@@ -1,72 +1,57 @@
-# Item-Based Economy System
+# Item Economy
 
-Added support for item-based currency so you don't need Fundamentals to run a working economy. Use iron ingots, gold, diamonds, whatever - just set it in the config.
+So I added an item-based economy option. You can now use iron ingots or whatever item you want instead of needing Fundamentals.
 
 ## What it does
 
-Gives you two economy options:
-- **Fundamentals** (default) - Uses the Fundamentals plugin economy
-- **Item** - Uses any vanilla Minecraft item as currency (no plugin required)
+You get two economy modes now:
+- Fundamentals - the existing plugin economy
+- Item-based - use any vanilla item as money
 
-Players deposit/withdraw items from their inventory directly into the village bank. Creating villages, claiming chunks, setting warps - all costs are paid with the configured item.
+Just pick one in the config. If you choose items, players pay with actual items from their inventory. No economy plugin needed.
 
 ## Config
 
 ```yaml
 settings:
   economy:
-    type: "item"  # or "fundamentals"
+    type: "item"
     item-currency:
-      material: "IRON_INGOT"  # Any valid Material name
+      material: "IRON_INGOT"
 ```
 
-Use `IRON_INGOT`, `GOLD_INGOT`, `DIAMOND`, `EMERALD`, etc. Whatever makes sense for your server.
+Change the material to whatever. Gold ingots, diamonds, dirt blocks, I don't care. It'll work.
 
 ## How it works
 
-Created an `ItemEconomy` class that handles inventory operations - checking if players have enough, taking items, giving items back. It's straightforward.
+Made an ItemEconomy class that does basic inventory stuff - check if player has X items, remove X items, give X items. Pretty simple.
 
-Updated all the economy checks:
-- Village creation costs
-- Deposit/withdraw commands
-- Claiming chunk costs
-- Delete refunds
-- Everything that touches money now checks the economy type first
+Then went through and updated everything that touches economy:
+- Creating villages
+- Deposit/withdraw 
+- Claiming chunks
+- Getting refunds
 
-If you set it to "item" mode, it uses the item economy. If set to "fundamentals" or Fundamentals isn't installed, it falls back gracefully.
+They all check what economy type you're using and handle it accordingly. If the item config is broken it falls back to Fundamentals mode.
 
-## What changed
+Items drop on the ground if your inventory is full. Handles stack sizes correctly. The usual stuff. Not sure if I handled offline edgecase; ie admin deleting a village...
 
-**New files:**
-- `ItemEconomy.java` - Handles item currency operations
+## Files changed
 
-**Updated files:**
-- `JVillage.java` - Initialize economy system based on config
-- `JVillageSettings.java` - Added economy config options
-- `JDepositCommand.java` - Support both economy types
-- `JWithdrawCommand.java` - Support both economy types  
-- `JCreateCommand.java` - Support item costs for village creation
-- `JDeleteCommand.java` - Support item refunds
+New: `ItemEconomy.java`
 
-## Why
+Modified: JVillage.java, JVillageSettings.java, and the deposit/withdraw/create/delete commands.
 
-Not everyone wants to run Fundamentals or deal with economy plugins. Sometimes you just want a simple "pay with iron" system. This gives server owners that choice without breaking existing setups.
+## Why though
 
-If you're already using Fundamentals, nothing changes - it keeps working exactly the same way. But if you want to go standalone, now you can.
+Honestly got tired of needing external economy plugins for what's basically just "do you have 10 iron ingots". Some servers just want simple item-based costs without all the economy plugin overhead. (also im a beta elietist)
+
+If you're using Fundamentals already, nothing changes. But now you have the option to go standalone if you want.
 
 ## Testing
 
-Tested with both economy modes:
-- Creating villages with item costs
-- Depositing items into village bank
-- Withdrawing items from village bank
-- Claiming chunks (costs items from village bank)
-- Deleting villages (refunds items)
-- Config validation for invalid materials
-- Fallback to Fundamentals when item config is wrong
-
-Works with full inventories (drops items on ground), handles stack sizes properly, all the edge cases.
+Tried both modes, seems to work. Created villages, deposited stuff, withdrew stuff, claimed chunks, deleted villages for refunds. Put invalid material names in the config to test the fallback. All good.
 
 ---
 
-Figured this would be useful for servers that want a lightweight setup. Let me know if anything breaks.
+Should be fine. Open an issue if something's broken.

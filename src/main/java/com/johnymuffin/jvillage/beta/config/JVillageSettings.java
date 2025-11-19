@@ -87,6 +87,11 @@ public class JVillageSettings extends Configuration {
         generateConfigOption("settings.import-placeholder-account.name", "Herobrine");
         generateConfigOption("settings.import-placeholder-account.info", "This is the account that will be given ownership of Villages imported from Towny and Factions that do not have a valid owner. This should be a VALID Mojang account.");
 
+        generateConfigOption("settings.economy.type", "fundamentals");
+        generateConfigOption("settings.economy.type.info", "Economy type: 'fundamentals' for Fundamentals economy plugin, or 'item' for item-based currency.");
+        
+        generateConfigOption("settings.economy.item-currency.material", "IRON_INGOT");
+        generateConfigOption("settings.economy.item-currency.info", "The item type to use as currency when economy type is 'item'. Valid materials: IRON_INGOT, GOLD_INGOT, DIAMOND, etc.");
 
         getWorldGuardPermissions(); //This is a hack to get the default value to be added to the config file.
 

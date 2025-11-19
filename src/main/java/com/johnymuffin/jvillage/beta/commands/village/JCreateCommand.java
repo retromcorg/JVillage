@@ -4,6 +4,7 @@ import com.johnymuffin.beta.fundamentals.api.EconomyAPI;
 import com.johnymuffin.beta.fundamentals.api.FundamentalsAPI;
 import com.johnymuffin.jvillage.beta.JVillage;
 import com.johnymuffin.jvillage.beta.commands.JVBaseCommand;
+import com.johnymuffin.jvillage.beta.economy.ItemEconomy;
 import com.johnymuffin.jvillage.beta.models.VSpawnCords;
 import com.johnymuffin.jvillage.beta.models.Village;
 import com.johnymuffin.jvillage.beta.models.chunk.ChunkClaimSettings;
@@ -122,25 +123,51 @@ public class JCreateCommand extends JVBaseCommand implements CommandExecutor {
 
         //Check if player has enough money
         double creationCost = settings.getConfigDouble("settings.town-create.price.amount");
-        if (creationCost > 0 && plugin.isFundamentalsEnabled()) {
-            EconomyAPI.EconomyResult result = FundamentalsAPI.getEconomy().subtractBalance(player.getUniqueId(), creationCost, player.getWorld().getName());
+        if (creationCost > 0 && plugin.isEconomyEnabled()) {
             String message;
-            switch (result) {
-                case successful:
-                    message = language.getMessage("command_village_create_payment");
-                    message = message.replace("%amount%", String.valueOf(creationCost));
-                    message = message.replace("%village%", villageName);
-                    commandSender.sendMessage(message);
-                    break;
-                case notEnoughFunds:
+            
+            // Handle item-based economy
+            if (plugin.getEconomyType().equals("item")) {
+                ItemEconomy itemEconomy = plugin.getItemEconomy();
+                int itemCost = (int) creationCost;
+                
+                if (!itemEconomy.hasEnough(player, itemCost)) {
                     message = language.getMessage("command_village_create_insufficient_funds");
-                    message = message.replace("%cost%", String.valueOf(creationCost));
+                    message = message.replace("%cost%", String.valueOf(itemCost));
                     commandSender.sendMessage(message);
                     return true;
-                default:
+                }
+                
+                if (itemEconomy.removeItems(player, itemCost)) {
+                    message = language.getMessage("command_village_create_payment");
+                    message = message.replace("%amount%", String.valueOf(itemCost));
+                    message = message.replace("%village%", villageName);
+                    commandSender.sendMessage(message);
+                } else {
                     message = language.getMessage("unknown_economy_error");
                     commandSender.sendMessage(message);
                     return true;
+                }
+            } else {
+                // Handle Fundamentals economy
+                EconomyAPI.EconomyResult result = FundamentalsAPI.getEconomy().subtractBalance(player.getUniqueId(), creationCost, player.getWorld().getName());
+                switch (result) {
+                    case successful:
+                        message = language.getMessage("command_village_create_payment");
+                        message = message.replace("%amount%", String.valueOf(creationCost));
+                        message = message.replace("%village%", villageName);
+                        commandSender.sendMessage(message);
+                        break;
+                    case notEnoughFunds:
+                        message = language.getMessage("command_village_create_insufficient_funds");
+                        message = message.replace("%cost%", String.valueOf(creationCost));
+                        commandSender.sendMessage(message);
+                        return true;
+                    default:
+                        message = language.getMessage("unknown_economy_error");
+                        commandSender.sendMessage(message);
+                        return true;
+                }
             }
         }
 

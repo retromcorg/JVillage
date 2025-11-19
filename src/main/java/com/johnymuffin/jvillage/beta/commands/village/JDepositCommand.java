@@ -5,6 +5,7 @@ import com.johnymuffin.beta.fundamentals.api.FundamentalsAPI;
 import com.johnymuffin.jvillage.beta.JVUtility;
 import com.johnymuffin.jvillage.beta.JVillage;
 import com.johnymuffin.jvillage.beta.commands.JVBaseCommand;
+import com.johnymuffin.jvillage.beta.economy.ItemEconomy;
 import com.johnymuffin.jvillage.beta.models.Village;
 import com.johnymuffin.jvillage.beta.player.VPlayer;
 import org.bukkit.command.Command;
@@ -80,12 +81,44 @@ public class JDepositCommand extends JVBaseCommand implements CommandExecutor {
             return true;
         }
 
-        if (!this.plugin.isFundamentalsEnabled()) {
+        if (!this.plugin.isEconomyEnabled()) {
             sendWithNewline(commandSender, language.getMessage("economy_disabled"));
             return true;
         }
 
-        //Attempt to withdraw money from player
+        // Handle item-based economy
+        if (plugin.getEconomyType().equals("item")) {
+            ItemEconomy itemEconomy = plugin.getItemEconomy();
+            int itemAmount = (int) amount;
+            
+            if (!itemEconomy.hasEnough(player, itemAmount)) {
+                commandSender.sendMessage(language.getMessage("command_village_deposit_no_funds"));
+                return true;
+            }
+            
+            if (itemEconomy.removeItems(player, itemAmount)) {
+                village.addBalance(itemAmount);
+                String message = language.getMessage("command_village_deposit_success")
+                    .replace("%amount%", String.valueOf(itemAmount))
+                    .replace("%village%", village.getTownName());
+                commandSender.sendMessage(message);
+                
+                String broadcast = language.getMessage("command_village_deposit_broadcast")
+                    .replace("%amount%", String.valueOf(itemAmount))
+                    .replace("%village%", village.getTownName())
+                    .replace("%player%", player.getName());
+                village.broadcastToTown(broadcast);
+                
+                plugin.logger(Level.INFO, "Player " + player.getName() + " deposited " + itemAmount + " " + 
+                    itemEconomy.getCurrencyItem().name() + " into the bank of " + village.getTownName());
+                return true;
+            } else {
+                commandSender.sendMessage(language.getMessage("generic_error"));
+                return true;
+            }
+        }
+
+        // Handle Fundamentals economy
         EconomyAPI.EconomyResult result = FundamentalsAPI.getEconomy().subtractBalance(player.getUniqueId(), amount);
         switch (result) {
             case successful:

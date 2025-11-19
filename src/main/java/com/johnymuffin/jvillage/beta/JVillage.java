@@ -9,6 +9,7 @@ import com.johnymuffin.jvillage.beta.commands.VResidentCommand;
 import com.johnymuffin.jvillage.beta.config.JPlayerData;
 import com.johnymuffin.jvillage.beta.config.JVillageLanguage;
 import com.johnymuffin.jvillage.beta.config.JVillageSettings;
+import com.johnymuffin.jvillage.beta.economy.ItemEconomy;
 import com.johnymuffin.jvillage.beta.interfaces.ClaimManager;
 import com.johnymuffin.jvillage.beta.listeners.JVMobListener;
 import com.johnymuffin.jvillage.beta.listeners.JVMushroomListener;
@@ -45,6 +46,7 @@ import com.sk89q.worldguard.protection.managers.RegionManager;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
@@ -86,6 +88,8 @@ public class JVillage extends JavaPlugin implements ClaimManager, PoseidonCustom
     private Metrics metrics;
 
     private boolean fundamentalsEnabled = false;
+    private ItemEconomy itemEconomy = null;
+    private String economyType = "fundamentals";
 
     @Override
     public void onEnable() {
@@ -95,20 +99,39 @@ public class JVillage extends JavaPlugin implements ClaimManager, PoseidonCustom
         pluginName = pdf.getName();
         log.info("[" + pluginName + "] Is Loading, Version: " + pdf.getVersion());
 
-        //Check for Fundamentals
-        if (Bukkit.getPluginManager().getPlugin("Fundamentals") == null) {
-            fundamentalsEnabled = false;
-            log.warning("[" + pluginName + "] Fundamentals is not installed or not enabled, economy features will be disabled");
-        } else {
-            log.info("[" + pluginName + "] Fundamentals is installed and enabled, economy features will be enabled");
-            fundamentalsEnabled = true;
-        }
-
-
         //Config files
         settings = new JVillageSettings(new File(this.getDataFolder(), "settings.yml"));
         debugMode = settings.getConfigBoolean("settings.debug-mode.enabled"); //Set debug mode from config
         language = new JVillageLanguage(new File(this.getDataFolder(), "language.yml"), settings.getConfigBoolean("settings.always-use-default-lang.enabled"));
+
+        //Initialize economy system
+        economyType = settings.getConfigString("settings.economy.type").toLowerCase();
+        
+        if (economyType.equals("item")) {
+            //Item-based economy
+            try {
+                String materialName = settings.getConfigString("settings.economy.item-currency.material").toUpperCase();
+                Material currencyMaterial = Material.valueOf(materialName);
+                itemEconomy = new ItemEconomy(currencyMaterial);
+                fundamentalsEnabled = false;
+                log.info("[" + pluginName + "] Using item-based economy with currency: " + materialName);
+            } catch (IllegalArgumentException e) {
+                log.severe("[" + pluginName + "] Invalid currency material in config: " + settings.getConfigString("settings.economy.item-currency.material"));
+                log.severe("[" + pluginName + "] Falling back to Fundamentals economy");
+                economyType = "fundamentals";
+            }
+        }
+        
+        if (economyType.equals("fundamentals")) {
+            //Check for Fundamentals
+            if (Bukkit.getPluginManager().getPlugin("Fundamentals") == null) {
+                fundamentalsEnabled = false;
+                log.warning("[" + pluginName + "] Fundamentals is not installed or not enabled, economy features will be disabled");
+            } else {
+                log.info("[" + pluginName + "] Fundamentals is installed and enabled, economy features will be enabled");
+                fundamentalsEnabled = true;
+            }
+        }
 
         //Generate WorldCLaimManagers
 //        for (World world : Bukkit.getWorlds()) {
@@ -293,6 +316,18 @@ public class JVillage extends JavaPlugin implements ClaimManager, PoseidonCustom
 
     public JPlayerMap getPlayerMap() {
         return playerMap;
+    }
+
+    public ItemEconomy getItemEconomy() {
+        return itemEconomy;
+    }
+
+    public String getEconomyType() {
+        return economyType;
+    }
+
+    public boolean isEconomyEnabled() {
+        return fundamentalsEnabled || itemEconomy != null;
     }
 
     //Village at location

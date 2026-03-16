@@ -4,6 +4,7 @@ import com.johnymuffin.beta.fundamentals.api.EconomyAPI;
 import com.johnymuffin.beta.fundamentals.api.FundamentalsAPI;
 import com.johnymuffin.jvillage.beta.JVillage;
 import com.johnymuffin.jvillage.beta.commands.JVBaseCommand;
+import com.johnymuffin.jvillage.beta.economy.ItemEconomy;
 import com.johnymuffin.jvillage.beta.models.VCords;
 import com.johnymuffin.jvillage.beta.models.Village;
 import com.johnymuffin.jvillage.beta.models.chunk.ChunkClaimSettings;
@@ -76,18 +77,38 @@ public class JDeleteCommand extends JVBaseCommand implements CommandExecutor {
             }
         }
 
-        if (refundAmount > 0 && plugin.isFundamentalsEnabled()) {
-            EconomyAPI.EconomyResult result = FundamentalsAPI.getEconomy().additionBalance(player.getUniqueId(), refundAmount);
+        if (refundAmount > 0 && plugin.isEconomyEnabled()) {
             String message;
-            switch (result) {
-                case successful:
-                    this.plugin.logger(Level.INFO, "Successfully refunded $" + refundAmount + " to " + player.getName() + " for deleting village " + village.getTownName());
-                    break;
-                default:
-                    this.plugin.logger(Level.WARNING, "Failed to refund $" + refundAmount + " to " + player.getName() + " for deleting village " + village.getTownName());
+            
+            // Handle item-based economy
+            if (plugin.getEconomyType().equals("item")) {
+                ItemEconomy itemEconomy = plugin.getItemEconomy();
+                int itemAmount = (int) refundAmount;
+                
+                if (itemEconomy.giveItems(player, itemAmount)) {
+                    this.plugin.logger(Level.INFO, "Successfully refunded " + itemAmount + " " + 
+                        itemEconomy.getCurrencyItem().name() + " to " + player.getName() + 
+                        " for deleting village " + village.getTownName());
+                } else {
+                    this.plugin.logger(Level.WARNING, "Failed to refund " + itemAmount + " items to " + 
+                        player.getName() + " for deleting village " + village.getTownName());
                     message = language.getMessage("generic_error");
                     commandSender.sendMessage(message);
                     return true;
+                }
+            } else {
+                // Handle Fundamentals economy
+                EconomyAPI.EconomyResult result = FundamentalsAPI.getEconomy().additionBalance(player.getUniqueId(), refundAmount);
+                switch (result) {
+                    case successful:
+                        this.plugin.logger(Level.INFO, "Successfully refunded $" + refundAmount + " to " + player.getName() + " for deleting village " + village.getTownName());
+                        break;
+                    default:
+                        this.plugin.logger(Level.WARNING, "Failed to refund $" + refundAmount + " to " + player.getName() + " for deleting village " + village.getTownName());
+                        message = language.getMessage("generic_error");
+                        commandSender.sendMessage(message);
+                        return true;
+                }
             }
         }
 
